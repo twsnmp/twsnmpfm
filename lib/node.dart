@@ -1,8 +1,7 @@
-import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'dart:io';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class Node {
   String name;
@@ -43,9 +42,9 @@ class Node {
         icon = map['icon'];
 }
 
-final countViewModel = ChangeNotifierProvider((_) => Nodes());
+final nodesProvider = Provider((_) => Nodes());
 
-class Nodes with ChangeNotifier {
+class Nodes {
   List<Node> nodes = [];
 
   Nodes() {
@@ -76,6 +75,13 @@ class Nodes with ChangeNotifier {
     }
     nodes.removeAt(i);
     return true;
+  }
+
+  Node get(int i) {
+    if (i < 0 || i >= nodes.length) {
+      return Node();
+    }
+    return nodes[i];
   }
 
   Future save() async {
