@@ -21,3 +21,8 @@ doc/api/
 *.js.map
 
 .DS_Store
+
+.flutter-plugins
+.flutter-plugins-dependencies
+lib/generated_plugin_registrant.dart
+macos/Flutter/GeneratedPluginRegistrant.swift
