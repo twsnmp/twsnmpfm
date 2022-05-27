@@ -1,6 +1,5 @@
 {
-    "helloWorld": "Hello World!",
-    "@helloWorld": {
-      "description": "The conventional newborn programmer greeting"
-    }
+    "edit": "Edit",
+    "panel": "Panel",
+    "traffic": "Traffic"
 }

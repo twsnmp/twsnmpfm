@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-// import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:twsnmpfm/node.dart';
 
@@ -22,11 +22,35 @@ class NodeListPage extends ConsumerWidget {
             children: [
               for (int i = 0; i < nodes.nodes.length; i++)
                 ListTile(
-                  leading: getIcon(nodes.nodes[i].icon),
-                  title: Text(nodes.nodes[i].name),
-                  subtitle: Text(nodes.nodes[i].ip),
-                  trailing: const Icon(Icons.more_vert),
-                ),
+                    leading: getIcon(nodes.nodes[i].icon),
+                    title: Text(nodes.nodes[i].name),
+                    subtitle: Text(nodes.nodes[i].ip),
+                    trailing: PopupMenuButton<String>(
+                      padding: EdgeInsets.zero,
+                      onSelected: (value) => {showPage(value, i)},
+                      itemBuilder: (context) => <PopupMenuItem<String>>[
+                        PopupMenuItem<String>(
+                          value: "edit",
+                          child: Text(AppLocalizations.of(context)!.edit),
+                        ),
+                        const PopupMenuItem<String>(
+                          value: "ping",
+                          child: Text("Ping"),
+                        ),
+                        const PopupMenuItem<String>(
+                          value: "snmp",
+                          child: Text("SNMP"),
+                        ),
+                        PopupMenuItem<String>(
+                          value: "pannel",
+                          child: Text(AppLocalizations.of(context)!.panel),
+                        ),
+                        PopupMenuItem<String>(
+                          value: "traffic",
+                          child: Text(AppLocalizations.of(context)!.traffic),
+                        ),
+                      ],
+                    )),
             ],
           ),
         );
@@ -52,12 +76,15 @@ class NodeListPage extends ConsumerWidget {
     return const Icon(Icons.lan);
   }
 
+  void showPage(String page, int i) {
+    print('page=$page i=$i');
+  }
+
   void addNode(WidgetRef ref) {
     final List<String> icons = ["laptop", "dektop", "server", "cloud", "lan"];
     final nodes = ref.read(nodesProvider);
     ref.read(nodeListCountProvider.state).state++;
     final ip = ref.read(nodeListCountProvider.state).state;
     nodes.add(Node(ip: '10.30.1.$ip', name: "node-$ip", icon: icons[ip % 5]));
-    print(ip);
   }
 }
