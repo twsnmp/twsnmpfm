@@ -30,24 +30,42 @@ class NodeListPage extends ConsumerWidget {
                       onSelected: (value) => {showPage(value, i)},
                       itemBuilder: (context) => <PopupMenuItem<String>>[
                         PopupMenuItem<String>(
-                          value: "edit",
-                          child: Text(AppLocalizations.of(context)!.edit),
-                        ),
-                        const PopupMenuItem<String>(
-                          value: "ping",
-                          child: Text("Ping"),
-                        ),
-                        const PopupMenuItem<String>(
-                          value: "snmp",
-                          child: Text("SNMP"),
-                        ),
+                            value: "ping",
+                            child: Row(children: const [
+                              Icon(Icons.network_ping),
+                              Text("Ping"),
+                            ])),
+                        PopupMenuItem<String>(
+                            value: "snmp",
+                            child: Row(children: const [
+                              Icon(Icons.storage),
+                              Text("SNMP"),
+                            ])),
                         PopupMenuItem<String>(
                           value: "pannel",
-                          child: Text(AppLocalizations.of(context)!.panel),
+                          child: Row(children: [
+                            const Icon(Icons.lan),
+                            Text(AppLocalizations.of(context)!.panel),
+                          ]),
                         ),
                         PopupMenuItem<String>(
-                          value: "traffic",
-                          child: Text(AppLocalizations.of(context)!.traffic),
+                            value: "traffic",
+                            child: Row(children: [
+                              const Icon(Icons.show_chart),
+                              Text(AppLocalizations.of(context)!.traffic),
+                            ])),
+                        PopupMenuItem<String>(
+                            value: "edit",
+                            child: Row(children: [
+                              const Icon(Icons.edit),
+                              Text(AppLocalizations.of(context)!.edit),
+                            ])),
+                        PopupMenuItem<String>(
+                          value: "delete",
+                          child: Row(children: [
+                            const Icon(Icons.delete, color: Colors.red),
+                            Text(AppLocalizations.of(context)!.edit),
+                          ]),
                         ),
                       ],
                     )),
