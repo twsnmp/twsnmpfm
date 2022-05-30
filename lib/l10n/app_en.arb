@@ -2,5 +2,22 @@
     "edit": "Edit",
     "delete": "Delete",
     "panel": "Panel",
-    "traffic": "Traffic"
+    "traffic": "Traffic",
+    "editNode": "Edit Node",
+    "icon": "Icon",
+    "name": "Name",
+    "nameHint": "The name of the node.",
+    "nameError": "Node name is required",
+    "ip": "IP Address",
+    "ipHint": "IP address of the node",
+    "ipError": "IP address is required",
+    "community": "Community",
+    "communityHint": "SNMP Community",
+    "communityError": "Invalid coummunity",
+    "laptop": "Laptop",
+    "desktop": "Desktop",
+    "lan": "LAN",
+    "cloud": "Cloud",
+    "server": "Server",
+    "save":"Save"
 }

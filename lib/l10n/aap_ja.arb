@@ -2,5 +2,22 @@
     "edit": "編集",
     "delete": "削除",
     "panel": "パネル",
-    "traffic": "トラフィック"
+    "traffic": "トラフィック",
+    "editNode": "ノードの編集",
+    "icon": "アイコン",
+    "name": "ノード名",
+    "nameHint": "ノードに好きな名前をつけてください。",
+    "nameError": "ノード名は必須です。",
+    "ip": "IPアドレス",
+    "ipHint": "ノードのIPアドレスです。",
+    "ipError": "IPアドレスが正しくありません。",
+    "community": "Community",
+    "communityHint": "SNMPのCommunityです。",
+    "communityError": "Coummunity正しくありません。",
+    "laptop": "ノートPC",
+    "desktop": "デスクトップPC",
+    "lan": "ネットワーク機器",
+    "cloud": "クラウド",
+    "server": "サーバー",
+    "save":"保存"
 }

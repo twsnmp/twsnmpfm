@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -40,15 +41,29 @@ class Node {
         user = map['user'],
         password = map['password'],
         icon = map['icon'];
+
+  Icon getIcon() {
+    switch (icon) {
+      case 'laptop':
+        return const Icon(Icons.laptop);
+      case 'desktop':
+        return const Icon(Icons.desktop_windows);
+      case 'server':
+        return const Icon(Icons.dns);
+      case 'cloud':
+        return const Icon(Icons.cloud);
+    }
+    return const Icon(Icons.lan);
+  }
 }
 
-final nodesProvider = Provider((_) => Nodes());
+final nodesProvider = ChangeNotifierProvider<Nodes>((_) => Nodes());
 
-class Nodes {
+class Nodes extends ChangeNotifier {
   List<Node> nodes = [];
 
   Nodes() {
-    load();
+    _load();
   }
 
   bool add(Node n) {
@@ -58,6 +73,8 @@ class Nodes {
       }
     }
     nodes.add(n);
+    notifyListeners();
+    _save();
     return true;
   }
 
@@ -66,6 +83,8 @@ class Nodes {
       return false;
     }
     nodes[i] = n;
+    notifyListeners();
+    _save();
     return true;
   }
 
@@ -74,6 +93,8 @@ class Nodes {
       return false;
     }
     nodes.removeAt(i);
+    notifyListeners();
+    _save();
     return true;
   }
 
@@ -84,7 +105,7 @@ class Nodes {
     return nodes[i];
   }
 
-  Future save() async {
+  Future _save() async {
     if (Platform.operatingSystem == 'macos') {
       return;
     }
@@ -93,7 +114,7 @@ class Nodes {
     await prefs.setStringList('nodes', strNodes);
   }
 
-  Future load() async {
+  Future _load() async {
     if (Platform.operatingSystem == 'macos') {
       return;
     }
@@ -102,5 +123,6 @@ class Nodes {
     if (result != null) {
       nodes = result.map((f) => Node.fromMap(json.decode(f))).toList();
     }
+    notifyListeners();
   }
 }
