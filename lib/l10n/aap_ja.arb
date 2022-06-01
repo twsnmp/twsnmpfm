@@ -19,5 +19,18 @@
     "lan": "ネットワーク機器",
     "cloud": "クラウド",
     "server": "サーバー",
+    "pingCount":"回数",
+    "pingCountHint":"Pingの実行回数",
+    "pingTimeout":"タイムアウト",
+    "pingTimeoutHint":"Pingのタイムアウトです。",
+    "pingTTL":"TTL",
+    "pingTTLHint":"PingのTTLです。",
+    "start":"開始",
+    "stop":"停止",
+    "max": "最大",
+    "min": "最小",
+    "mean": "平均",
+    "median": "中央値",
+    "sd": "標準偏差",
     "save":"保存"
 }

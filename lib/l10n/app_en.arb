@@ -19,5 +19,18 @@
     "lan": "LAN",
     "cloud": "Cloud",
     "server": "Server",
+    "pingCount":"Count",
+    "pingCountHint":"Ping Count",
+    "pingTimeout":"Timeout",
+    "pingTimeoutHint":"Ping Timeout",
+    "pingTTL":"TTL",
+    "pingTTLHint":"Ping TTL",
+    "start":"Start",
+    "stop":"Stop",
+    "max": "Max",
+    "min": "Min",
+    "mean": "Mean",
+    "median": "Median",
+    "sd": "Standard Deviation",
     "save":"Save"
 }

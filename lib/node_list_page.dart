@@ -3,6 +3,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:twsnmpfm/node.dart';
 import 'package:twsnmpfm/node_edit_page.dart';
+import 'package:twsnmpfm/ping_page.dart';
 
 class NodeListPage extends ConsumerWidget {
   const NodeListPage({Key? key}) : super(key: key);
@@ -88,6 +89,9 @@ class NodeListPage extends ConsumerWidget {
       case "edit":
         editNode(context, ref, i);
         return;
+      case "ping":
+        ping(context, ref, i);
+        return;
     }
   }
 
@@ -106,5 +110,16 @@ class NodeListPage extends ConsumerWidget {
     } else {
       nodes.update(i, node);
     }
+  }
+
+  void ping(BuildContext context, WidgetRef ref, int i) {
+    final nodes = ref.read(nodesProvider);
+    if (i < 0 || i >= nodes.nodes.length) {
+      return;
+    }
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => PingPage(ip: nodes.nodes[i].ip)),
+    );
   }
 }
