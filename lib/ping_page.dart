@@ -145,123 +145,116 @@ class _PingPageState extends State<PingPage> {
     final loc = AppLocalizations.of(context)!;
     return SafeArea(
       child: Scaffold(
-          appBar: AppBar(
-            title: Text("Ping ${widget.ip}"),
-          ),
-          body: SingleChildScrollView(
-            child: Form(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  Row(children: <Widget>[
-                    Flexible(
-                        child: TextFormField(
-                      keyboardType:
-                          const TextInputType.numberWithOptions(decimal: true),
-                      initialValue: '5',
-                      onChanged: (value) {
-                        if (value.isEmpty) {
-                          return;
+        appBar: AppBar(
+          title: Text("Ping ${widget.ip}"),
+        ),
+        body: SingleChildScrollView(
+          child: Form(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Row(children: <Widget>[
+                  Flexible(
+                      child: TextFormField(
+                    keyboardType:
+                        const TextInputType.numberWithOptions(decimal: true),
+                    initialValue: '5',
+                    onChanged: (value) {
+                      if (value.isEmpty) {
+                        return;
+                      }
+                      setState(() {
+                        try {
+                          _count = value.toInt();
+                        } on FormatException catch (_) {
+                          _count = 5;
                         }
-                        setState(() {
-                          try {
-                            _count = value.toInt();
-                          } on FormatException catch (_) {
-                            _count = 5;
-                          }
-                        });
-                      },
-                      decoration: InputDecoration(
-                          labelText: loc.pingCount,
-                          hintText: loc.pingCountHint),
-                    )),
-                    Flexible(
-                        child: TextFormField(
-                      keyboardType:
-                          const TextInputType.numberWithOptions(decimal: true),
-                      initialValue: '2',
-                      onChanged: (value) {
-                        setState(() {
-                          try {
-                            _timeout = value.toInt();
-                          } on FormatException catch (_) {
-                            _timeout = 2;
-                          }
-                        });
-                      },
-                      decoration: InputDecoration(
-                          labelText: loc.pingTimeout,
-                          hintText: loc.pingTimeoutHint),
-                    )),
-                    Flexible(
-                        child: TextFormField(
-                      keyboardType:
-                          const TextInputType.numberWithOptions(decimal: true),
-                      initialValue: '255',
-                      onChanged: (value) {
-                        setState(() {
-                          try {
-                            _ttl = value.toInt();
-                          } on FormatException catch (_) {
-                            _ttl = 255;
-                          }
-                        });
-                      },
-                      decoration: InputDecoration(
-                          labelText: loc.pingTTL, hintText: loc.pingTTLHint),
-                    ))
-                  ]),
-                  Text(
-                    _lastResult,
-                    style: const TextStyle(fontSize: 16, color: Colors.black87),
+                      });
+                    },
+                    decoration: InputDecoration(
+                        labelText: loc.pingCount, hintText: loc.pingCountHint),
+                  )),
+                  Flexible(
+                      child: TextFormField(
+                    keyboardType:
+                        const TextInputType.numberWithOptions(decimal: true),
+                    initialValue: '2',
+                    onChanged: (value) {
+                      setState(() {
+                        try {
+                          _timeout = value.toInt();
+                        } on FormatException catch (_) {
+                          _timeout = 2;
+                        }
+                      });
+                    },
+                    decoration: InputDecoration(
+                        labelText: loc.pingTimeout,
+                        hintText: loc.pingTimeoutHint),
+                  )),
+                  Flexible(
+                      child: TextFormField(
+                    keyboardType:
+                        const TextInputType.numberWithOptions(decimal: true),
+                    initialValue: '255',
+                    onChanged: (value) {
+                      setState(() {
+                        try {
+                          _ttl = value.toInt();
+                        } on FormatException catch (_) {
+                          _ttl = 255;
+                        }
+                      });
+                    },
+                    decoration: InputDecoration(
+                        labelText: loc.pingTTL, hintText: loc.pingTTLHint),
+                  ))
+                ]),
+                Text(
+                  _lastResult,
+                  style: const TextStyle(fontSize: 16, color: Colors.black87),
+                ),
+                SizedBox(
+                  height: 200,
+                  child: PingChart(_createChartData()),
+                ),
+                DataTable(
+                  headingTextStyle: const TextStyle(
+                    color: Colors.blueGrey,
+                    fontSize: 16,
                   ),
-                  SizedBox(
-                    height: 200,
-                    child: PingChart(_createChartData()),
-                  ),
-                  DataTable(
-                    headingTextStyle: const TextStyle(
-                      color: Colors.blueGrey,
-                      fontSize: 16,
+                  headingRowHeight: 22,
+                  dataTextStyle:
+                      const TextStyle(color: Colors.black, fontSize: 14),
+                  dataRowHeight: 20,
+                  columns: const [
+                    DataColumn(
+                      label: Text('項目'),
                     ),
-                    headingRowHeight: 22,
-                    dataTextStyle:
-                        const TextStyle(color: Colors.black, fontSize: 14),
-                    dataRowHeight: 20,
-                    columns: const [
-                      DataColumn(
-                        label: Text('項目'),
-                      ),
-                      DataColumn(
-                        label: Text('値'),
-                      ),
-                    ],
-                    rows: _stats,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: ping == null
-                        ? ElevatedButton(
-                            onPressed: () {
-                              _startPing(loc);
-                            },
-                            child: Text(loc.start),
-                          )
-                        : ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              primary: Colors.red,
-                            ),
-                            onPressed: () {
-                              _stopPing();
-                            },
-                            child: Text(loc.stop),
-                          ),
-                  )
-                ],
-              ),
+                    DataColumn(
+                      label: Text('値'),
+                    ),
+                  ],
+                  rows: _stats,
+                ),
+              ],
             ),
-          )),
+          ),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            if (ping != null) {
+              _stopPing();
+            } else {
+              _startPing(loc);
+            }
+          },
+          child: ping != null
+              ? const Icon(Icons.stop, color: Colors.red)
+              : const Icon(Icons.play_circle),
+        ),
+      ),
     );
   }
 }

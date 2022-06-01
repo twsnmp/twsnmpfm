@@ -61,4 +61,12 @@ class MIBDB {
     }
     return "0.0";
   }
+
+  List<String> getAllNames() {
+    final List<String> names = [];
+    for (var n in _nameToOid.keys) {
+      names.add(n);
+    }
+    return names;
+  }
 }

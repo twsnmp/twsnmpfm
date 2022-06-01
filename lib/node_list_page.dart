@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:twsnmpfm/node.dart';
 import 'package:twsnmpfm/node_edit_page.dart';
 import 'package:twsnmpfm/ping_page.dart';
+import 'package:twsnmpfm/mib_browser_page.dart';
 
 class NodeListPage extends ConsumerWidget {
   const NodeListPage({Key? key}) : super(key: key);
@@ -92,6 +93,9 @@ class NodeListPage extends ConsumerWidget {
       case "ping":
         ping(context, ref, i);
         return;
+      case "snmp":
+        snmp(context, ref, i);
+        return;
     }
   }
 
@@ -120,6 +124,18 @@ class NodeListPage extends ConsumerWidget {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => PingPage(ip: nodes.nodes[i].ip)),
+    );
+  }
+
+  void snmp(BuildContext context, WidgetRef ref, int i) {
+    final nodes = ref.read(nodesProvider);
+    if (i < 0 || i >= nodes.nodes.length) {
+      return;
+    }
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => MibBrowserPage(node: nodes.nodes[i])),
     );
   }
 }
