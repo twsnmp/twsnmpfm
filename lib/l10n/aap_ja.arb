@@ -32,5 +32,7 @@
     "mean": "平均",
     "median": "中央値",
     "sd": "標準偏差",
+    "mibName":"オブジェクト名",
+    "mibValue": "値",
     "save":"保存"
 }

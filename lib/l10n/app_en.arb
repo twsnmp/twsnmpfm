@@ -5,7 +5,7 @@
     "traffic": "Traffic",
     "editNode": "Edit Node",
     "icon": "Icon",
-    "name": "Name",
+    "name": "Node Name",
     "nameHint": "The name of the node.",
     "nameError": "Node name is required",
     "ip": "IP Address",
@@ -32,5 +32,7 @@
     "mean": "Mean",
     "median": "Median",
     "sd": "Standard Deviation",
+    "mibName":"オブジェクト名",
+    "mibValue": "値",
     "save":"Save"
 }

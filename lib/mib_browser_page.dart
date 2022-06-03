@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:twsnmpfm/node.dart';
@@ -5,6 +7,7 @@ import 'package:twsnmpfm/mibdb.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'dart:io';
 import 'package:dart_snmp/dart_snmp.dart';
+import 'package:sprintf/sprintf.dart';
 
 class MibBrowserPage extends StatefulWidget {
   const MibBrowserPage({Key? key, required this.node}) : super(key: key);
@@ -17,12 +20,12 @@ class MibBrowserPage extends StatefulWidget {
 
 class _MibBrowserState extends State<MibBrowserPage> {
   final List<DataRow> _rows = [];
-  final List<DataColumn> _columns = const [
+  List<DataColumn> _columns = const [
     DataColumn(
-      label: Text('名前'),
+      label: Text("Name"),
     ),
     DataColumn(
-      label: Text('値'),
+      label: Text("Value"),
     ),
   ];
   List<String> _mibNames = [];
@@ -30,6 +33,7 @@ class _MibBrowserState extends State<MibBrowserPage> {
   String _errorMsg = '';
   MIBDB? _mibdb;
   bool _progoress = false;
+  AppLocalizations? loc;
 
   _MibBrowserState() {
     _loadMIBDB();
@@ -42,12 +46,27 @@ class _MibBrowserState extends State<MibBrowserPage> {
   }
 
   void _startSnmp() {
-    _doSnmpWalk();
+    _errorMsg = "";
+    if (_mibName.endsWith("Table")) {
+      _doGetTable();
+    } else {
+      _doSnmpWalk();
+    }
   }
 
   void _doSnmpWalk() async {
     try {
       _rows.length = 0;
+      setState(() {
+        _columns = [
+          DataColumn(
+            label: Text(loc!.mibName),
+          ),
+          DataColumn(
+            label: Text(loc!.mibValue),
+          ),
+        ];
+      });
       var t = InternetAddress(widget.node.ip);
       var session = await Snmp.createSession(t);
       final rootOid = _mibdb!.nameToOid(_mibName);
@@ -62,15 +81,21 @@ class _MibBrowserState extends State<MibBrowserPage> {
           break;
         }
         final vbname =
-            _mibdb?.oidToName(message.pdu.varbinds.first.oid.identifier);
+            _mibdb?.oidToName(message.pdu.varbinds.first.oid.identifier) ?? "";
+        if (vbname == "") {
+          continue;
+        }
         var vbval = message.pdu.varbinds.first.value.toString();
+        if (vbname.startsWith("ifPhysAd")) {
+          vbval = strMacToHex(vbval);
+        }
         if (message.pdu.varbinds.first.tag == OID) {
           vbval = _mibdb!.oidToName(vbval);
         }
         setState(() {
           _rows.add(
             DataRow(cells: [
-              DataCell(Text(vbname ?? "")),
+              DataCell(Text(vbname)),
               DataCell(Text(vbval)),
             ]),
           );
@@ -80,6 +105,77 @@ class _MibBrowserState extends State<MibBrowserPage> {
       setState(() {
         _errorMsg = e.toString();
       });
+      _progoress = false;
+    }
+  }
+
+  void _doGetTable() async {
+    final List<String> names = [];
+    final List<String> indexes = [];
+    final List<List<String>> rows = [[]];
+    try {
+      var t = InternetAddress(widget.node.ip);
+      var session = await Snmp.createSession(t);
+      final rootOid = _mibdb!.nameToOid(_mibName);
+      var currentOid = rootOid;
+      _progoress = true;
+      while (_progoress) {
+        final oid = Oid.fromString(currentOid);
+        final message = await session.getNext(oid);
+        currentOid = message.pdu.varbinds.first.oid.identifier!;
+        if (currentOid.indexOf(rootOid) != 0) {
+          _progoress = false;
+          break;
+        }
+        final vbname =
+            _mibdb?.oidToName(message.pdu.varbinds.first.oid.identifier) ?? "";
+        if (vbname == "") {
+          continue;
+        }
+        var vbval = message.pdu.varbinds.first.value.toString();
+        if (message.pdu.varbinds.first.tag == OID) {
+          vbval = _mibdb!.oidToName(vbval);
+        }
+        if (vbname.startsWith("ifPhysAd")) {
+          vbval = strMacToHex(vbval);
+        }
+        final i = vbname.indexOf(".");
+        if (i < 2) {
+          continue;
+        }
+        final base = vbname.substring(0, i);
+        final index = vbname.substring(i + 1);
+        if (!names.contains(base)) {
+          names.add(base);
+        }
+        if (!indexes.contains(index)) {
+          indexes.add(index);
+          rows.add([]);
+        }
+        final r = indexes.indexOf(index);
+        rows[r].add(vbval);
+      }
+      setState(() {
+        _columns = [];
+        _columns.add(const DataColumn(label: Text("Index")));
+        for (var n in names) {
+          _columns.add(DataColumn(label: Text(n)));
+        }
+        _rows.length = 0;
+        for (var r = 0; r < indexes.length; r++) {
+          final List<DataCell> cells = [];
+          cells.add(DataCell(Text(indexes[r])));
+          for (var c = 0; c < names.length; c++) {
+            cells.add(DataCell(Text(rows[r][c])));
+          }
+          _rows.add(DataRow(cells: cells));
+        }
+      });
+    } catch (e) {
+      setState(() {
+        _errorMsg = e.toString();
+      });
+      _progoress = false;
     }
   }
 
@@ -87,9 +183,29 @@ class _MibBrowserState extends State<MibBrowserPage> {
     _progoress = false;
   }
 
+  String strMacToHex(String s) {
+    String r = "";
+    if (s.length > 6) {
+      for (var c in base64Decode(s)) {
+        if (r != "") {
+          r += ":";
+        }
+        r += sprintf("%02x", [c]);
+      }
+    } else {
+      for (var c in s.runes) {
+        if (r != "") {
+          r += ":";
+        }
+        r += sprintf("%02x", [c]);
+      }
+    }
+    return r;
+  }
+
   @override
   Widget build(BuildContext context) {
-    final loc = AppLocalizations.of(context)!;
+    loc = AppLocalizations.of(context)!;
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
