@@ -25,8 +25,9 @@ class _PingPageState extends State<PingPage> {
   final List<TimeSeriesPingRTT> _chartData = [];
   String _lastResult = "";
   Ping? ping;
+  AppLocalizations? loc;
 
-  void _startPing(AppLocalizations loc) {
+  void _startPing() {
     int i = 0;
     _stats.length = 0;
     _chartData.length = 0;
@@ -51,7 +52,7 @@ class _PingPageState extends State<PingPage> {
           i++;
           setState(() {
             _lastResult = '$i/$_count rtt=${nrtt / 1000}mSec ttl=$ttl';
-            _setStats(loc);
+            _setStats();
           });
         } else {
           setState(() {
@@ -63,7 +64,7 @@ class _PingPageState extends State<PingPage> {
             } else {
               _lastResult = err;
             }
-            _setStats(loc);
+            _setStats();
             ping = null;
           });
         }
@@ -78,7 +79,7 @@ class _PingPageState extends State<PingPage> {
     });
   }
 
-  void _setStats(AppLocalizations loc) {
+  void _setStats() {
     if (_rtts.isEmpty) {
       return;
     }
@@ -86,43 +87,43 @@ class _PingPageState extends State<PingPage> {
     var statistics = _rtts.statistics;
     _stats.add(
       DataRow(cells: [
-        DataCell(Text("${loc.max} TTL")),
+        DataCell(Text("${loc!.max} TTL")),
         DataCell(Text("$_maxTTL")),
       ]),
     );
     _stats.add(
       DataRow(cells: [
-        DataCell(Text("${loc.min} TTL")),
+        DataCell(Text("${loc!.min} TTL")),
         DataCell(Text("$_minTTL")),
       ]),
     );
     _stats.add(
       DataRow(cells: [
-        DataCell(Text("${loc.max} RTT(mSec)")),
+        DataCell(Text("${loc!.max} RTT(mSec)")),
         DataCell(Text(statistics.max.toStringAsFixed(3))),
       ]),
     );
     _stats.add(
       DataRow(cells: [
-        DataCell(Text("${loc.min} RTT(mSec)")),
+        DataCell(Text("${loc!.min} RTT(mSec)")),
         DataCell(Text(statistics.min.toStringAsFixed(3))),
       ]),
     );
     _stats.add(
       DataRow(cells: [
-        DataCell(Text("${loc.mean} RTT(mSec)")),
+        DataCell(Text("${loc!.mean} RTT(mSec)")),
         DataCell(Text(statistics.mean.toStringAsFixed(3))),
       ]),
     );
     _stats.add(
       DataRow(cells: [
-        DataCell(Text("${loc.median} RTT(mSec)")),
+        DataCell(Text("${loc!.median} RTT(mSec)")),
         DataCell(Text(statistics.median.toStringAsFixed(3))),
       ]),
     );
     _stats.add(
       DataRow(cells: [
-        DataCell(Text(loc.sd)),
+        DataCell(Text(loc!.sd)),
         DataCell(Text(statistics.standardDeviation.toStringAsFixed(3))),
       ]),
     );
@@ -142,7 +143,7 @@ class _PingPageState extends State<PingPage> {
 
   @override
   Widget build(BuildContext context) {
-    final loc = AppLocalizations.of(context)!;
+    loc = AppLocalizations.of(context)!;
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
@@ -173,7 +174,8 @@ class _PingPageState extends State<PingPage> {
                       });
                     },
                     decoration: InputDecoration(
-                        labelText: loc.pingCount, hintText: loc.pingCountHint),
+                        labelText: loc!.pingCount,
+                        hintText: loc!.pingCountHint),
                   )),
                   Flexible(
                       child: TextFormField(
@@ -190,8 +192,8 @@ class _PingPageState extends State<PingPage> {
                       });
                     },
                     decoration: InputDecoration(
-                        labelText: loc.pingTimeout,
-                        hintText: loc.pingTimeoutHint),
+                        labelText: loc!.pingTimeout,
+                        hintText: loc!.pingTimeoutHint),
                   )),
                   Flexible(
                       child: TextFormField(
@@ -208,7 +210,7 @@ class _PingPageState extends State<PingPage> {
                       });
                     },
                     decoration: InputDecoration(
-                        labelText: loc.pingTTL, hintText: loc.pingTTLHint),
+                        labelText: loc!.pingTTL, hintText: loc!.pingTTLHint),
                   ))
                 ]),
                 Text(
@@ -247,7 +249,7 @@ class _PingPageState extends State<PingPage> {
             if (ping != null) {
               _stopPing();
             } else {
-              _startPing(loc);
+              _startPing();
             }
           },
           child: ping != null

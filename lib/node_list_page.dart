@@ -12,6 +12,7 @@ class NodeListPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final nodes = ref.watch(nodesProvider);
+    final loc = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(title: const Text('TWSNMP For Mobile')),
       body: Scrollbar(
@@ -45,26 +46,26 @@ class NodeListPage extends ConsumerWidget {
                         value: "pannel",
                         child: Row(children: [
                           const Icon(Icons.lan),
-                          Text(AppLocalizations.of(context)!.panel),
+                          Text(loc.panel),
                         ]),
                       ),
                       PopupMenuItem<String>(
                           value: "traffic",
                           child: Row(children: [
                             const Icon(Icons.show_chart),
-                            Text(AppLocalizations.of(context)!.traffic),
+                            Text(loc.traffic),
                           ])),
                       PopupMenuItem<String>(
                           value: "edit",
                           child: Row(children: [
                             const Icon(Icons.edit),
-                            Text(AppLocalizations.of(context)!.edit),
+                            Text(loc.edit),
                           ])),
                       PopupMenuItem<String>(
                         value: "delete",
                         child: Row(children: [
                           const Icon(Icons.delete, color: Colors.red),
-                          Text(AppLocalizations.of(context)!.delete),
+                          Text(loc.delete),
                         ]),
                       ),
                     ],
