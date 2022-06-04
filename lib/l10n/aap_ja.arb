@@ -34,5 +34,7 @@
     "sd": "標準偏差",
     "mibName":"オブジェクト名",
     "mibValue": "値",
+    "interval": "周期",
+    "showAllPort": "内部ポートも表示",
     "save":"保存"
 }

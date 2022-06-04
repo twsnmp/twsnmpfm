@@ -6,6 +6,7 @@ import 'package:twsnmpfm/node_edit_page.dart';
 import 'package:twsnmpfm/ping_page.dart';
 import 'package:twsnmpfm/mib_browser_page.dart';
 import 'package:twsnmpfm/traffic_page.dart';
+import 'package:twsnmpfm/vpanel_page.dart';
 
 class NodeListPage extends ConsumerWidget {
   const NodeListPage({Key? key}) : super(key: key);
@@ -43,7 +44,7 @@ class NodeListPage extends ConsumerWidget {
                             Text("SNMP"),
                           ])),
                       PopupMenuItem<String>(
-                        value: "pannel",
+                        value: "panel",
                         child: Row(children: [
                           const Icon(Icons.lan),
                           Text(loc.panel),
@@ -151,7 +152,7 @@ class NodeListPage extends ConsumerWidget {
     }
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => MibBrowserPage(node: nodes.nodes[i])),
+      MaterialPageRoute(builder: (context) => VPanelPage(node: nodes.nodes[i])),
     );
   }
 
