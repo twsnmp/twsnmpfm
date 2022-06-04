@@ -5,6 +5,7 @@ import 'package:twsnmpfm/node.dart';
 import 'package:twsnmpfm/node_edit_page.dart';
 import 'package:twsnmpfm/ping_page.dart';
 import 'package:twsnmpfm/mib_browser_page.dart';
+import 'package:twsnmpfm/traffic_page.dart';
 
 class NodeListPage extends ConsumerWidget {
   const NodeListPage({Key? key}) : super(key: key);
@@ -27,8 +28,7 @@ class NodeListPage extends ConsumerWidget {
                   subtitle: Text(nodes.nodes[i].ip),
                   trailing: PopupMenuButton<String>(
                     padding: EdgeInsets.zero,
-                    onSelected: (value) =>
-                        {nodeMenuAction(value, i, context, ref)},
+                    onSelected: (value) => {nodeMenuAction(value, i, context, ref)},
                     itemBuilder: (context) => <PopupMenuItem<String>>[
                       PopupMenuItem<String>(
                           value: "ping",
@@ -81,8 +81,7 @@ class NodeListPage extends ConsumerWidget {
     );
   }
 
-  void nodeMenuAction(
-      String action, int i, BuildContext context, WidgetRef ref) {
+  void nodeMenuAction(String action, int i, BuildContext context, WidgetRef ref) {
     final nodes = ref.read(nodesProvider);
     switch (action) {
       case "delete":
@@ -96,6 +95,12 @@ class NodeListPage extends ConsumerWidget {
         return;
       case "snmp":
         snmp(context, ref, i);
+        return;
+      case "panel":
+        panel(context, ref, i);
+        return;
+      case "traffic":
+        traffic(context, ref, i);
         return;
     }
   }
@@ -135,8 +140,29 @@ class NodeListPage extends ConsumerWidget {
     }
     Navigator.push(
       context,
-      MaterialPageRoute(
-          builder: (context) => MibBrowserPage(node: nodes.nodes[i])),
+      MaterialPageRoute(builder: (context) => MibBrowserPage(node: nodes.nodes[i])),
+    );
+  }
+
+  void panel(BuildContext context, WidgetRef ref, int i) {
+    final nodes = ref.read(nodesProvider);
+    if (i < 0 || i >= nodes.nodes.length) {
+      return;
+    }
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => MibBrowserPage(node: nodes.nodes[i])),
+    );
+  }
+
+  void traffic(BuildContext context, WidgetRef ref, int i) {
+    final nodes = ref.read(nodesProvider);
+    if (i < 0 || i >= nodes.nodes.length) {
+      return;
+    }
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => TrafficPage(node: nodes.nodes[i])),
     );
   }
 }

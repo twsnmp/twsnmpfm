@@ -101,6 +101,7 @@ class _MibBrowserState extends State<MibBrowserPage> {
           );
         });
       }
+      session.close();
     } catch (e) {
       setState(() {
         _errorMsg = e.toString();
@@ -171,6 +172,7 @@ class _MibBrowserState extends State<MibBrowserPage> {
           _rows.add(DataRow(cells: cells));
         }
       });
+      session.close();
     } catch (e) {
       setState(() {
         _errorMsg = e.toString();
