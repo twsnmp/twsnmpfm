@@ -4,11 +4,12 @@ import 'package:dart_ping/dart_ping.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:twsnmpfm/ping_chart.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
+import 'package:twsnmpfm/settings.dart';
 
 class PingPage extends StatefulWidget {
-  const PingPage({Key? key, required this.ip}) : super(key: key);
-
   final String ip;
+  final Settings settings;
+  const PingPage({Key? key, required this.ip, required this.settings}) : super(key: key);
 
   @override
   State<PingPage> createState() => _PingPageState();
@@ -27,6 +28,14 @@ class _PingPageState extends State<PingPage> {
   Ping? ping;
   AppLocalizations? loc;
   bool _err = false;
+
+  @override
+  void initState() {
+    _count = widget.settings.count.toDouble();
+    _timeout = widget.settings.timeout.toDouble();
+    _ttl = widget.settings.ttl.toDouble();
+    super.initState();
+  }
 
   void _startPing() {
     int i = 0;
@@ -176,7 +185,7 @@ class _PingPageState extends State<PingPage> {
                 ),
                 Row(
                   children: [
-                    Expanded(child: Text("${loc!.timeout}(${_timeout.toInt()})")),
+                    Expanded(child: Text("${loc!.timeout}(${_timeout.toInt()}${loc!.sec})")),
                     Slider(
                         label: "${_timeout.toInt()}",
                         value: _timeout,

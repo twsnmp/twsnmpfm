@@ -9,6 +9,7 @@ class Settings extends ChangeNotifier {
   int count = 5;
   int ttl = 255;
   int timeout = 2;
+  int retry = 1;
   int interval = 5;
   String mibName = "system";
   bool showAllPort = false;
@@ -25,6 +26,7 @@ class Settings extends ChangeNotifier {
     await prefs.setInt('count', count);
     await prefs.setInt('ttl', ttl);
     await prefs.setInt('timeout', timeout);
+    await prefs.setInt('retry', retry);
     await prefs.setInt('interval', interval);
     await prefs.setString('mibName', mibName);
     await prefs.setBool('showAllPort', showAllPort);
@@ -36,8 +38,9 @@ class Settings extends ChangeNotifier {
     }
     SharedPreferences prefs = await SharedPreferences.getInstance();
     count = prefs.getInt("count") ?? 5;
-    ttl = prefs.getInt("ttl") ?? 5;
+    ttl = prefs.getInt("ttl") ?? 255;
     timeout = prefs.getInt("timeout") ?? 2;
+    retry = prefs.getInt("retry") ?? 1;
     interval = prefs.getInt("interval") ?? 5;
     mibName = prefs.getString("mibName") ?? "system";
     showAllPort = prefs.getBool("showAllPort") ?? false;

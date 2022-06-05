@@ -40,5 +40,7 @@
     "settings": "設定",
     "count": "回数",
     "timeout": "タイムアウト",
+    "retry": "リトライ",
+    "sec": "秒",
     "save":"保存"
 }

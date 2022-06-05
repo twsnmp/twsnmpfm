@@ -139,46 +139,50 @@ class NodeListPage extends ConsumerWidget {
   }
 
   void ping(BuildContext context, WidgetRef ref, int i) {
+    final settings = ref.read(settingsProvider);
     final nodes = ref.read(nodesProvider);
     if (i < 0 || i >= nodes.nodes.length) {
       return;
     }
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => PingPage(ip: nodes.nodes[i].ip)),
+      MaterialPageRoute(builder: (context) => PingPage(ip: nodes.nodes[i].ip, settings: settings)),
     );
   }
 
   void snmp(BuildContext context, WidgetRef ref, int i) {
+    final settings = ref.read(settingsProvider);
     final nodes = ref.read(nodesProvider);
     if (i < 0 || i >= nodes.nodes.length) {
       return;
     }
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => MibBrowserPage(node: nodes.nodes[i])),
+      MaterialPageRoute(builder: (context) => MibBrowserPage(node: nodes.nodes[i], settings: settings)),
     );
   }
 
   void panel(BuildContext context, WidgetRef ref, int i) {
     final nodes = ref.read(nodesProvider);
+    final settings = ref.read(settingsProvider);
     if (i < 0 || i >= nodes.nodes.length) {
       return;
     }
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => VPanelPage(node: nodes.nodes[i])),
+      MaterialPageRoute(builder: (context) => VPanelPage(node: nodes.nodes[i], settings: settings)),
     );
   }
 
   void traffic(BuildContext context, WidgetRef ref, int i) {
     final nodes = ref.read(nodesProvider);
+    final settings = ref.read(settingsProvider);
     if (i < 0 || i >= nodes.nodes.length) {
       return;
     }
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => TrafficPage(node: nodes.nodes[i])),
+      MaterialPageRoute(builder: (context) => TrafficPage(node: nodes.nodes[i], settings: settings)),
     );
   }
 

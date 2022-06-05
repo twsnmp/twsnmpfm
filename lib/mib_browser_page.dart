@@ -8,11 +8,12 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'dart:io';
 import 'package:dart_snmp/dart_snmp.dart';
 import 'package:sprintf/sprintf.dart';
+import 'package:twsnmpfm/settings.dart';
 
 class MibBrowserPage extends StatefulWidget {
-  const MibBrowserPage({Key? key, required this.node}) : super(key: key);
-
   final Node node;
+  final Settings settings;
+  const MibBrowserPage({Key? key, required this.node, required this.settings}) : super(key: key);
 
   @override
   State<MibBrowserPage> createState() => _MibBrowserState();
@@ -30,6 +31,8 @@ class _MibBrowserState extends State<MibBrowserPage> {
   ];
   List<String> _mibNames = [];
   String _mibName = '';
+  int _timeout = 5;
+  int _retry = 1;
   String _errorMsg = '';
   MIBDB? _mibdb;
   bool _progoress = false;
@@ -37,6 +40,13 @@ class _MibBrowserState extends State<MibBrowserPage> {
 
   _MibBrowserState() {
     _loadMIBDB();
+  }
+  @override
+  void initState() {
+    _mibName = widget.settings.mibName;
+    _timeout = widget.settings.timeout;
+    _retry = widget.settings.retry;
+    super.initState();
   }
 
   void _loadMIBDB() async {
@@ -68,7 +78,7 @@ class _MibBrowserState extends State<MibBrowserPage> {
         ];
       });
       var t = InternetAddress(widget.node.ip);
-      var session = await Snmp.createSession(t);
+      var session = await Snmp.createSession(t, timeout: Duration(seconds: _timeout), retries: _retry);
       final rootOid = _mibdb!.nameToOid(_mibName);
       var currentOid = rootOid;
       _progoress = true;
@@ -80,8 +90,7 @@ class _MibBrowserState extends State<MibBrowserPage> {
           _progoress = false;
           break;
         }
-        final vbname =
-            _mibdb?.oidToName(message.pdu.varbinds.first.oid.identifier) ?? "";
+        final vbname = _mibdb?.oidToName(message.pdu.varbinds.first.oid.identifier) ?? "";
         if (vbname == "") {
           continue;
         }
@@ -116,7 +125,7 @@ class _MibBrowserState extends State<MibBrowserPage> {
     final List<List<String>> rows = [[]];
     try {
       var t = InternetAddress(widget.node.ip);
-      var session = await Snmp.createSession(t);
+      var session = await Snmp.createSession(t, timeout: Duration(seconds: _timeout), retries: _retry);
       final rootOid = _mibdb!.nameToOid(_mibName);
       var currentOid = rootOid;
       _progoress = true;
@@ -128,8 +137,7 @@ class _MibBrowserState extends State<MibBrowserPage> {
           _progoress = false;
           break;
         }
-        final vbname =
-            _mibdb?.oidToName(message.pdu.varbinds.first.oid.identifier) ?? "";
+        final vbname = _mibdb?.oidToName(message.pdu.varbinds.first.oid.identifier) ?? "";
         if (vbname == "") {
           continue;
         }
@@ -225,8 +233,7 @@ class _MibBrowserState extends State<MibBrowserPage> {
                     if (value.text.isEmpty) {
                       return [];
                     }
-                    return _mibNames.where((n) =>
-                        n.toLowerCase().contains(value.text.toLowerCase()));
+                    return _mibNames.where((n) => n.toLowerCase().contains(value.text.toLowerCase()));
                   },
                   onSelected: (value) {
                     setState(() {
@@ -243,8 +250,7 @@ class _MibBrowserState extends State<MibBrowserPage> {
                       fontSize: 16,
                     ),
                     headingRowHeight: 22,
-                    dataTextStyle:
-                        const TextStyle(color: Colors.black, fontSize: 14),
+                    dataTextStyle: const TextStyle(color: Colors.black, fontSize: 14),
                     dataRowHeight: 20,
                     columns: _columns,
                     rows: _rows,
@@ -262,9 +268,7 @@ class _MibBrowserState extends State<MibBrowserPage> {
               _startSnmp();
             }
           },
-          child: _progoress
-              ? const Icon(Icons.stop, color: Colors.red)
-              : const Icon(Icons.play_circle),
+          child: _progoress ? const Icon(Icons.stop, color: Colors.red) : const Icon(Icons.play_circle),
         ),
       ),
     );

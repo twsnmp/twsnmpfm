@@ -31,6 +31,7 @@ class SettingsFormState extends State<SettingsForm> {
   final _formKey = GlobalKey<FormState>();
   double _count = 5;
   double _timeout = 5;
+  double _retry = 1;
   double _ttl = 5;
   double _interval = 5;
   String _mibName = "";
@@ -40,6 +41,7 @@ class SettingsFormState extends State<SettingsForm> {
   void initState() {
     _count = widget.settings.count.toDouble();
     _timeout = widget.settings.timeout.toDouble();
+    _retry = widget.settings.retry.toDouble();
     _interval = widget.settings.interval.toDouble();
     _ttl = widget.settings.ttl.toDouble();
     _mibName = widget.settings.mibName;
@@ -74,7 +76,7 @@ class SettingsFormState extends State<SettingsForm> {
           ),
           Row(
             children: [
-              Expanded(child: Text("${loc.timeout}(${_timeout.toInt()})")),
+              Expanded(child: Text("${loc.timeout}(${_timeout.toInt()}${loc.sec})")),
               Slider(
                   label: "${_timeout.toInt()}",
                   value: _timeout,
@@ -84,6 +86,22 @@ class SettingsFormState extends State<SettingsForm> {
                   onChanged: (value) => {
                         setState(() {
                           _timeout = value;
+                        })
+                      }),
+            ],
+          ),
+          Row(
+            children: [
+              Expanded(child: Text("${loc.retry}(${_retry.toInt()})")),
+              Slider(
+                  label: "${_retry.toInt()}",
+                  value: _retry,
+                  min: 0,
+                  max: 5,
+                  divisions: 5,
+                  onChanged: (value) => {
+                        setState(() {
+                          _retry = value;
                         })
                       }),
             ],
@@ -106,7 +124,7 @@ class SettingsFormState extends State<SettingsForm> {
           ),
           Row(
             children: [
-              Expanded(child: Text("${loc.interval}(${_interval.toInt()})")),
+              Expanded(child: Text("${loc.interval}(${_interval.toInt()}${loc.sec})")),
               Slider(
                   label: "${_interval.toInt()}",
                   value: _interval,
@@ -155,6 +173,7 @@ class SettingsFormState extends State<SettingsForm> {
                 if (_formKey.currentState!.validate()) {
                   widget.settings.count = _count.toInt();
                   widget.settings.timeout = _timeout.toInt();
+                  widget.settings.retry = _retry.toInt();
                   widget.settings.interval = _interval.toInt();
                   widget.settings.ttl = _ttl.toInt();
                   widget.settings.mibName = _mibName;

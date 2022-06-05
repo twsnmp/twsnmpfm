@@ -9,11 +9,12 @@ import 'dart:async';
 import 'package:sprintf/sprintf.dart';
 import 'dart:convert';
 import "package:p5/p5.dart";
+import 'package:twsnmpfm/settings.dart';
 
 class VPanelPage extends StatefulWidget {
-  const VPanelPage({Key? key, required this.node}) : super(key: key);
-
   final Node node;
+  final Settings settings;
+  const VPanelPage({Key? key, required this.node, required this.settings}) : super(key: key);
 
   @override
   State<VPanelPage> createState() => _VPanelState();
@@ -21,6 +22,8 @@ class VPanelPage extends StatefulWidget {
 
 class _VPanelState extends State<VPanelPage> {
   double _interval = 10;
+  int _timeout = 5;
+  int _retry = 1;
   String _errorMsg = '';
   MIBDB? _mibdb;
   Timer? _timer;
@@ -30,6 +33,15 @@ class _VPanelState extends State<VPanelPage> {
 
   _VPanelState() {
     _loadMIBDB();
+  }
+
+  @override
+  void initState() {
+    _interval = widget.settings.interval.toDouble();
+    _timeout = widget.settings.timeout;
+    _retry = widget.settings.retry;
+    _showAllPort = widget.settings.showAllPort;
+    super.initState();
   }
 
   void _loadMIBDB() async {
@@ -54,7 +66,7 @@ class _VPanelState extends State<VPanelPage> {
     try {
       _ports = [];
       var t = InternetAddress(widget.node.ip);
-      var session = await Snmp.createSession(t);
+      var session = await Snmp.createSession(t, timeout: Duration(seconds: _timeout), retries: _retry);
       final rootOid = _mibdb!.nameToOid("ifType");
       var currentOid = rootOid;
       while (true) {
@@ -258,9 +270,9 @@ class _VPanelState extends State<VPanelPage> {
                 ),
                 Row(
                   children: [
-                    Expanded(child: Text("${loc.interval}(${_interval.toInt()}Sec)")),
+                    Expanded(child: Text("${loc.interval}(${_interval.toInt()}${loc.sec})")),
                     Slider(
-                        label: "${_interval.toInt()}Sec",
+                        label: "${_interval.toInt()}${loc.sec}",
                         value: _interval,
                         min: 5,
                         max: 60,

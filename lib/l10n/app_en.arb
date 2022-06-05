@@ -40,5 +40,7 @@
     "settings": "Settings",
     "count": "Count",
     "timeout": "Timeout",
+    "retry": "Retry",
+    "sec": "Sec",
     "save":"Save"
 }

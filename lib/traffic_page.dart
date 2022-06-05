@@ -5,14 +5,15 @@ import 'package:twsnmpfm/mibdb.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'dart:io';
 import 'package:dart_snmp/dart_snmp.dart';
+import 'package:twsnmpfm/settings.dart';
 import 'dart:async';
 import 'package:twsnmpfm/traffic_chart.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
 
 class TrafficPage extends StatefulWidget {
-  const TrafficPage({Key? key, required this.node}) : super(key: key);
-
   final Node node;
+  final Settings settings;
+  const TrafficPage({Key? key, required this.node, required this.settings}) : super(key: key);
 
   @override
   State<TrafficPage> createState() => _TrafficState();
@@ -21,6 +22,9 @@ class TrafficPage extends StatefulWidget {
 class _TrafficState extends State<TrafficPage> {
   String _selectedTarget = '';
   double _interval = 5;
+  int _timeout = 1;
+  int _retry = 1;
+
   final List<TimeSeriesTraffic> _chartData = [];
   TimeSeriesTraffic? _lastData;
   List<_TrafficTarget> _targetList = [];
@@ -31,6 +35,14 @@ class _TrafficState extends State<TrafficPage> {
   List<String> _txMIBs = [];
   List<String> _rxMIBs = [];
   List<String> _errorMIBs = [];
+
+  @override
+  void initState() {
+    _interval = widget.settings.interval.toDouble();
+    _timeout = widget.settings.timeout;
+    _retry = widget.settings.retry;
+    super.initState();
+  }
 
   @override
   void didChangeDependencies() {
@@ -110,7 +122,7 @@ class _TrafficState extends State<TrafficPage> {
   void _getTraffic() async {
     try {
       var t = InternetAddress(widget.node.ip);
-      var session = await Snmp.createSession(t);
+      var session = await Snmp.createSession(t, timeout: Duration(seconds: _timeout), retries: _retry);
       double tx = 0.0;
       double rx = 0.0;
       double err = 0.0;
@@ -166,7 +178,7 @@ class _TrafficState extends State<TrafficPage> {
     ];
     try {
       var t = InternetAddress(widget.node.ip);
-      var session = await Snmp.createSession(t);
+      var session = await Snmp.createSession(t, timeout: Duration(seconds: _timeout), retries: _retry);
       final rootOid = _mibdb!.nameToOid("ifType");
       var currentOid = rootOid;
       while (true) {
@@ -287,9 +299,9 @@ class _TrafficState extends State<TrafficPage> {
                 ]),
                 Row(
                   children: [
-                    Expanded(child: Text("${loc.interval}(${_interval.toInt()}Sec)")),
+                    Expanded(child: Text("${loc.interval}(${_interval.toInt()}${loc.sec})")),
                     Slider(
-                        label: "${_interval.toInt()}Sec",
+                        label: "${_interval.toInt()}${loc.sec}",
                         value: _interval,
                         min: 5,
                         max: 60,
