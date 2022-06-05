@@ -36,5 +36,6 @@
     "mibValue": "Value",
     "interval": "Interval",
     "showAllPort": "Show all port",
+    "target": "Target",
     "save":"Save"
 }

@@ -26,7 +26,6 @@ class _TrafficState extends State<TrafficPage> {
   List<_TrafficTarget> _targetList = [];
   String _errorMsg = '';
   MIBDB? _mibdb;
-  AppLocalizations? loc;
   Timer? _timer;
   List<DropdownMenuItem<String>> _targetMenuItems = [];
   List<String> _txMIBs = [];
@@ -87,7 +86,8 @@ class _TrafficState extends State<TrafficPage> {
         _errorMIBs = [];
         break;
     }
-    _timer = Timer.periodic(Duration(seconds: _interval.toInt()), _getTraffic);
+    _getTraffic();
+    _timer = Timer.periodic(Duration(seconds: _interval.toInt()), _getTrafficTimer);
     _chartData.length = 0;
     setState(() {
       _lastData = null;
@@ -103,7 +103,11 @@ class _TrafficState extends State<TrafficPage> {
     return -1;
   }
 
-  void _getTraffic(Timer t) async {
+  void _getTrafficTimer(Timer t) async {
+    _getTraffic();
+  }
+
+  void _getTraffic() async {
     try {
       var t = InternetAddress(widget.node.ip);
       var session = await Snmp.createSession(t);
@@ -257,11 +261,11 @@ class _TrafficState extends State<TrafficPage> {
 
   @override
   Widget build(BuildContext context) {
-    loc = AppLocalizations.of(context)!;
+    final loc = AppLocalizations.of(context)!;
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: Text("Traffic ${widget.node.name}"),
+          title: Text("${loc.traffic} ${widget.node.name}"),
         ),
         body: SingleChildScrollView(
           scrollDirection: Axis.vertical,
@@ -270,21 +274,26 @@ class _TrafficState extends State<TrafficPage> {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
+                Row(children: [
+                  Expanded(child: Text(loc.target)),
+                  DropdownButton<String>(
+                      value: _selectedTarget,
+                      items: _targetMenuItems,
+                      onChanged: (value) => {
+                            setState(() {
+                              _selectedTarget = value!;
+                            })
+                          }),
+                ]),
                 Row(
                   children: [
-                    DropdownButton<String>(
-                        value: _selectedTarget,
-                        items: _targetMenuItems,
-                        onChanged: (value) => {
-                              setState(() {
-                                _selectedTarget = value!;
-                              })
-                            }),
+                    Expanded(child: Text("${loc.interval}(${_interval}Sec)")),
                     Slider(
                         label: "${_interval}Sec",
                         value: _interval,
                         min: 5,
                         max: 60,
+                        divisions: (60 - 5) ~/ 5,
                         onChanged: (value) => {
                               setState(() {
                                 _interval = value;

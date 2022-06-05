@@ -36,5 +36,6 @@
     "mibValue": "値",
     "interval": "周期",
     "showAllPort": "内部ポートも表示",
+    "target": "取得対象",
     "save":"保存"
 }
