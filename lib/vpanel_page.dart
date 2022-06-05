@@ -8,6 +8,7 @@ import 'package:dart_snmp/dart_snmp.dart';
 import 'dart:async';
 import 'package:sprintf/sprintf.dart';
 import 'dart:convert';
+import "package:p5/p5.dart";
 
 class VPanelPage extends StatefulWidget {
   const VPanelPage({Key? key, required this.node}) : super(key: key);
@@ -22,7 +23,6 @@ class _VPanelState extends State<VPanelPage> {
   double _interval = 10;
   String _errorMsg = '';
   MIBDB? _mibdb;
-  AppLocalizations? loc;
   Timer? _timer;
   List<Port> _ports = [];
   bool _showAllPort = false;
@@ -228,11 +228,12 @@ class _VPanelState extends State<VPanelPage> {
 
   @override
   Widget build(BuildContext context) {
-    loc = AppLocalizations.of(context)!;
+    final loc = AppLocalizations.of(context)!;
+    final sketch = PanelSketch(_ports, _showAllPort);
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: Text("VPanel ${widget.node.name}"),
+          title: Text("${loc.panel} ${widget.node.name}"),
         ),
         body: SingleChildScrollView(
           scrollDirection: Axis.vertical,
@@ -243,7 +244,7 @@ class _VPanelState extends State<VPanelPage> {
               children: <Widget>[
                 Row(
                   children: [
-                    Expanded(child: Text(loc!.showAllPort)),
+                    Expanded(child: Text(loc.showAllPort)),
                     Switch(
                       value: _showAllPort,
                       onChanged: (bool value) {
@@ -257,27 +258,29 @@ class _VPanelState extends State<VPanelPage> {
                 ),
                 Row(
                   children: [
-                    Expanded(child: Text(loc!.interval)),
+                    Expanded(child: Text("${loc.interval}(${_interval}Sec)")),
                     Slider(
                         label: "${_interval}Sec",
                         value: _interval,
                         min: 5,
                         max: 60,
+                        divisions: (60 - 5) ~/ 5,
                         onChanged: (value) => {
                               setState(() {
                                 _interval = value;
-                                _stop();
-                                sleep(const Duration(milliseconds: 100));
-                                _start();
                               })
                             }),
                   ],
                 ),
                 Text(_errorMsg, style: const TextStyle(color: Colors.red)),
-                const SizedBox(
-                  height: 200,
-                  child: Text("ここにパネルを表示"),
+                Center(
+                  child: SizedBox(
+                    height: ((_rows.length ~/ 8) * 25) + 45,
+                    width: 8 * 25 + 40,
+                    child: PWidget(sketch),
+                  ),
                 ),
+                const SizedBox(height: 10),
                 SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: DataTable(
@@ -341,4 +344,44 @@ class Port {
   int oper = 0;
   String mac = "";
   Port(this.index);
+}
+
+class PanelSketch extends PPainter {
+  List<Port> ports = [];
+  bool showAllPorts = false;
+  PanelSketch(this.ports, this.showAllPorts);
+  @override
+  void setup() {}
+
+  @override
+  void draw() {
+    background(color(64, 64, 64, 240));
+    int i = 0;
+    for (var p in ports) {
+      if (!showAllPorts && p.type == 24) {
+        continue;
+      }
+      final int x = (i % 8) * 25 + 20;
+      final int y = (i ~/ 8) * 25 + 10;
+      switch (p.state) {
+        case "Up":
+          if (p.speed >= 1000) {
+            fill(color(0, 192, 0, 192));
+          } else {
+            fill(color(0, 128, 192, 192));
+          }
+          break;
+        case "Down":
+          fill(color(254, 0, 0, 192));
+          break;
+        default:
+          fill(color(192, 192, 192, 192));
+          break;
+      }
+      strokeWeight(1);
+      stroke(color(10, 10, 10, 192));
+      rect(x.toDouble(), y.toDouble(), 18, 18);
+      i++;
+    }
+  }
 }
