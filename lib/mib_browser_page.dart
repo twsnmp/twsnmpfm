@@ -229,6 +229,7 @@ class _MibBrowserState extends State<MibBrowserPage> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 Autocomplete<String>(
+                  initialValue: TextEditingValue(text: _mibName),
                   optionsBuilder: (value) {
                     if (value.text.isEmpty) {
                       return [];
