@@ -15,9 +15,9 @@ class PingPage extends StatefulWidget {
 }
 
 class _PingPageState extends State<PingPage> {
-  int _count = 5;
-  int _timeout = 2;
-  int _ttl = 255;
+  double _count = 5;
+  double _timeout = 2;
+  double _ttl = 255;
   int _maxTTL = 0;
   int _minTTL = 255;
   final List<DataRow> _stats = [];
@@ -26,6 +26,7 @@ class _PingPageState extends State<PingPage> {
   String _lastResult = "";
   Ping? ping;
   AppLocalizations? loc;
+  bool _err = false;
 
   void _startPing() {
     int i = 0;
@@ -34,7 +35,8 @@ class _PingPageState extends State<PingPage> {
     _maxTTL = 0;
     _minTTL = 255;
     _rtts.length = 0;
-    ping = Ping(widget.ip, count: _count, timeout: _timeout, ttl: _ttl);
+    _err = false;
+    ping = Ping(widget.ip, count: _count.toInt(), timeout: _timeout.toInt(), ttl: _ttl.toInt());
     ping?.stream.listen((event) {
       final ttl = event.response?.ttl ?? '';
       setState(() {
@@ -63,6 +65,7 @@ class _PingPageState extends State<PingPage> {
               _lastResult = "ping done $rx/$tx";
             } else {
               _lastResult = err;
+              _err = true;
             }
             _setStats();
             ping = null;
@@ -155,67 +158,57 @@ class _PingPageState extends State<PingPage> {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
-                Row(children: <Widget>[
-                  Flexible(
-                      child: TextFormField(
-                    keyboardType:
-                        const TextInputType.numberWithOptions(decimal: true),
-                    initialValue: '5',
-                    onChanged: (value) {
-                      if (value.isEmpty) {
-                        return;
-                      }
-                      setState(() {
-                        try {
-                          _count = value.toInt();
-                        } on FormatException catch (_) {
-                          _count = 5;
-                        }
-                      });
-                    },
-                    decoration: InputDecoration(
-                        labelText: loc!.pingCount,
-                        hintText: loc!.pingCountHint),
-                  )),
-                  Flexible(
-                      child: TextFormField(
-                    keyboardType:
-                        const TextInputType.numberWithOptions(decimal: true),
-                    initialValue: '2',
-                    onChanged: (value) {
-                      setState(() {
-                        try {
-                          _timeout = value.toInt();
-                        } on FormatException catch (_) {
-                          _timeout = 2;
-                        }
-                      });
-                    },
-                    decoration: InputDecoration(
-                        labelText: loc!.pingTimeout,
-                        hintText: loc!.pingTimeoutHint),
-                  )),
-                  Flexible(
-                      child: TextFormField(
-                    keyboardType:
-                        const TextInputType.numberWithOptions(decimal: true),
-                    initialValue: '255',
-                    onChanged: (value) {
-                      setState(() {
-                        try {
-                          _ttl = value.toInt();
-                        } on FormatException catch (_) {
-                          _ttl = 255;
-                        }
-                      });
-                    },
-                    decoration: InputDecoration(
-                        labelText: loc!.pingTTL, hintText: loc!.pingTTLHint),
-                  ))
-                ]),
+                Row(
+                  children: [
+                    Expanded(child: Text("${loc!.count}(${_count.toInt()})")),
+                    Slider(
+                        label: "${_count.toInt()}",
+                        value: _count,
+                        min: 1,
+                        max: 100,
+                        divisions: (100 - 1),
+                        onChanged: (value) => {
+                              setState(() {
+                                _count = value;
+                              })
+                            }),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Expanded(child: Text("${loc!.timeout}(${_timeout.toInt()})")),
+                    Slider(
+                        label: "${_timeout.toInt()}",
+                        value: _timeout,
+                        min: 1,
+                        max: 10,
+                        divisions: (10 - 1),
+                        onChanged: (value) => {
+                              setState(() {
+                                _timeout = value;
+                              })
+                            }),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Expanded(child: Text("TTL(${_ttl.toInt()})")),
+                    Slider(
+                        label: "${_ttl.toInt()}",
+                        value: _ttl,
+                        min: 1,
+                        max: 255,
+                        divisions: (255 - 1),
+                        onChanged: (value) => {
+                              setState(() {
+                                _ttl = value;
+                              })
+                            }),
+                  ],
+                ),
                 Text(
                   _lastResult,
-                  style: const TextStyle(fontSize: 16, color: Colors.black87),
+                  style: TextStyle(fontSize: 16, color: _err ? Colors.red : Colors.black87),
                 ),
                 SizedBox(
                   height: 200,
@@ -227,8 +220,7 @@ class _PingPageState extends State<PingPage> {
                     fontSize: 16,
                   ),
                   headingRowHeight: 22,
-                  dataTextStyle:
-                      const TextStyle(color: Colors.black, fontSize: 14),
+                  dataTextStyle: const TextStyle(color: Colors.black, fontSize: 14),
                   dataRowHeight: 20,
                   columns: const [
                     DataColumn(
@@ -252,9 +244,7 @@ class _PingPageState extends State<PingPage> {
               _startPing();
             }
           },
-          child: ping != null
-              ? const Icon(Icons.stop, color: Colors.red)
-              : const Icon(Icons.play_circle),
+          child: ping != null ? const Icon(Icons.stop, color: Colors.red) : const Icon(Icons.play_circle),
         ),
       ),
     );

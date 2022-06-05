@@ -258,9 +258,9 @@ class _VPanelState extends State<VPanelPage> {
                 ),
                 Row(
                   children: [
-                    Expanded(child: Text("${loc.interval}(${_interval}Sec)")),
+                    Expanded(child: Text("${loc.interval}(${_interval.toInt()}Sec)")),
                     Slider(
-                        label: "${_interval}Sec",
+                        label: "${_interval.toInt()}Sec",
                         value: _interval,
                         min: 5,
                         max: 60,

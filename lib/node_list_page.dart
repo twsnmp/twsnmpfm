@@ -7,6 +7,8 @@ import 'package:twsnmpfm/ping_page.dart';
 import 'package:twsnmpfm/mib_browser_page.dart';
 import 'package:twsnmpfm/traffic_page.dart';
 import 'package:twsnmpfm/vpanel_page.dart';
+import 'package:twsnmpfm/settings.dart';
+import 'package:twsnmpfm/settings_page.dart';
 
 class NodeListPage extends ConsumerWidget {
   const NodeListPage({Key? key}) : super(key: key);
@@ -16,7 +18,20 @@ class NodeListPage extends ConsumerWidget {
     final nodes = ref.watch(nodesProvider);
     final loc = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(title: const Text('TWSNMP For Mobile')),
+      appBar: AppBar(
+        title: const Text('TWSNMP For Mobile'),
+        actions: [
+          IconButton(
+            tooltip: loc.settings,
+            icon: const Icon(
+              Icons.settings,
+            ),
+            onPressed: () {
+              settings(context, ref);
+            },
+          ),
+        ],
+      ),
       body: Scrollbar(
         child: ListView(
           restorationId: 'node_list_view',
@@ -165,5 +180,17 @@ class NodeListPage extends ConsumerWidget {
       context,
       MaterialPageRoute(builder: (context) => TrafficPage(node: nodes.nodes[i])),
     );
+  }
+
+  void settings(BuildContext context, WidgetRef ref) async {
+    final settings = ref.read(settingsProvider);
+    final r = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => SettingsPage(settings: settings)),
+    );
+    if (r == null) {
+      return;
+    }
+    settings.save();
   }
 }

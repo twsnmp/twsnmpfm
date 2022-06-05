@@ -37,5 +37,8 @@
     "interval": "周期",
     "showAllPort": "内部ポートも表示",
     "target": "取得対象",
+    "settings": "設定",
+    "count": "回数",
+    "timeout": "タイムアウト",
     "save":"保存"
 }

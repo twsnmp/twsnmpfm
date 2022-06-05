@@ -37,5 +37,8 @@
     "interval": "Interval",
     "showAllPort": "Show all port",
     "target": "Target",
+    "settings": "Settings",
+    "count": "Count",
+    "timeout": "Timeout",
     "save":"Save"
 }
