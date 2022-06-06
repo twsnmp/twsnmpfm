@@ -7,7 +7,7 @@ import 'dart:io';
 import 'package:dart_snmp/dart_snmp.dart';
 import 'package:twsnmpfm/settings.dart';
 import 'dart:async';
-import 'package:twsnmpfm/traffic_chart.dart';
+import 'package:twsnmpfm/time_line_chart.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
 
 class TrafficPage extends StatefulWidget {
@@ -25,8 +25,8 @@ class _TrafficState extends State<TrafficPage> {
   int _timeout = 1;
   int _retry = 1;
 
-  final List<TimeSeriesTraffic> _chartData = [];
-  TimeSeriesTraffic? _lastData;
+  final List<TimeLineSeries> _chartData = [];
+  TimeLineSeries? _lastData;
   List<_TrafficTarget> _targetList = [];
   String _errorMsg = '';
   MIBDB? _mibdb;
@@ -150,7 +150,7 @@ class _TrafficState extends State<TrafficPage> {
       final now = DateTime.now();
       session.close();
       if (_lastData == null) {
-        _lastData = TimeSeriesTraffic(now, tx, rx, err);
+        _lastData = TimeLineSeries(now, tx, rx, err);
         return;
       }
       final diff = (now.second - _lastData!.time.second).toDouble();
@@ -159,10 +159,10 @@ class _TrafficState extends State<TrafficPage> {
         final rxps = (rx - _lastData!.rx) / diff;
         final errps = (err - _lastData!.error) / diff;
         setState(() {
-          _chartData.add(TimeSeriesTraffic(now, txps, rxps, errps));
+          _chartData.add(TimeLineSeries(now, txps, rxps, errps));
         });
       }
-      _lastData = TimeSeriesTraffic(now, tx, rx, err);
+      _lastData = TimeLineSeries(now, tx, rx, err);
     } catch (e) {
       setState(() {
         _errorMsg = e.toString();
@@ -239,27 +239,27 @@ class _TrafficState extends State<TrafficPage> {
     });
   }
 
-  List<charts.Series<TimeSeriesTraffic, DateTime>> _createChartData() {
+  List<charts.Series<TimeLineSeries, DateTime>> _createChartData() {
     return [
-      charts.Series<TimeSeriesTraffic, DateTime>(
+      charts.Series<TimeLineSeries, DateTime>(
         id: 'Tx',
         colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
-        domainFn: (TimeSeriesTraffic t, _) => t.time,
-        measureFn: (TimeSeriesTraffic t, _) => t.tx,
+        domainFn: (TimeLineSeries t, _) => t.time,
+        measureFn: (TimeLineSeries t, _) => t.tx,
         data: _chartData,
       ),
-      charts.Series<TimeSeriesTraffic, DateTime>(
+      charts.Series<TimeLineSeries, DateTime>(
         id: 'Rx',
         colorFn: (_, __) => charts.MaterialPalette.green.shadeDefault,
-        domainFn: (TimeSeriesTraffic t, _) => t.time,
-        measureFn: (TimeSeriesTraffic t, _) => t.rx,
+        domainFn: (TimeLineSeries t, _) => t.time,
+        measureFn: (TimeLineSeries t, _) => t.rx,
         data: _chartData,
       ),
-      charts.Series<TimeSeriesTraffic, DateTime>(
+      charts.Series<TimeLineSeries, DateTime>(
         id: 'Error',
         colorFn: (_, __) => charts.MaterialPalette.red.shadeDefault,
-        domainFn: (TimeSeriesTraffic t, _) => t.time,
-        measureFn: (TimeSeriesTraffic t, _) => t.error,
+        domainFn: (TimeLineSeries t, _) => t.time,
+        measureFn: (TimeLineSeries t, _) => t.error,
         data: _chartData,
       )
     ];
@@ -316,7 +316,7 @@ class _TrafficState extends State<TrafficPage> {
                 Text(_errorMsg, style: const TextStyle(color: Colors.red)),
                 SizedBox(
                   height: 200,
-                  child: TrafficChart(_createChartData()),
+                  child: TimeLineChart(_createChartData()),
                 ),
               ],
             ),

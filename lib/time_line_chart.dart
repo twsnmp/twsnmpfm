@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
 
-class TrafficChart extends StatelessWidget {
-  final List<charts.Series<TimeSeriesTraffic, DateTime>> seriesList;
+class TimeLineChart extends StatelessWidget {
+  final List<charts.Series<TimeLineSeries, DateTime>> seriesList;
 
-  const TrafficChart(this.seriesList, {Key? key}) : super(key: key);
+  const TimeLineChart(this.seriesList, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -16,10 +16,10 @@ class TrafficChart extends StatelessWidget {
   }
 }
 
-class TimeSeriesTraffic {
+class TimeLineSeries {
   final DateTime time;
   final double tx;
   final double rx;
   final double error;
-  TimeSeriesTraffic(this.time, this.tx, this.rx, this.error);
+  TimeLineSeries(this.time, this.tx, this.rx, this.error);
 }
