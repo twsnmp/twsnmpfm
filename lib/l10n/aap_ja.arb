@@ -42,5 +42,8 @@
     "timeout": "タイムアウト",
     "retry": "リトライ",
     "sec": "秒",
+    "mibBrowser": "MIBブラウザー",
+    "hostResource": "ホストリソース",
+    "processes": "プロセス",
     "save":"保存"
 }

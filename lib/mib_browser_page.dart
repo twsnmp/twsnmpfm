@@ -219,7 +219,7 @@ class _MibBrowserState extends State<MibBrowserPage> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: Text("MIB Browser ${widget.node.name}"),
+          title: Text("${loc!.mibBrowser} ${widget.node.name}"),
         ),
         body: SingleChildScrollView(
           scrollDirection: Axis.vertical,

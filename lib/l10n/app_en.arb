@@ -42,5 +42,8 @@
     "timeout": "Timeout",
     "retry": "Retry",
     "sec": "Sec",
+    "mibBrowser": "MIB Browser",
+    "hostResource": "Host Resource",
+    "processes": "Processes",
     "save":"Save"
 }
