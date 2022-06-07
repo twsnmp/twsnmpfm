@@ -45,5 +45,7 @@
     "mibBrowser": "MIB Browser",
     "hostResource": "Host Resource",
     "processes": "Processes",
+    "key": "Name",
+    "value": "Value",
     "save":"Save"
 }

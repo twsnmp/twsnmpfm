@@ -18,8 +18,6 @@ class TimeLineChart extends StatelessWidget {
 
 class TimeLineSeries {
   final DateTime time;
-  final double tx;
-  final double rx;
-  final double error;
-  TimeLineSeries(this.time, this.tx, this.rx, this.error);
+  final List<double> value;
+  TimeLineSeries(this.time, this.value);
 }

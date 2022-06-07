@@ -150,19 +150,19 @@ class _TrafficState extends State<TrafficPage> {
       final now = DateTime.now();
       session.close();
       if (_lastData == null) {
-        _lastData = TimeLineSeries(now, tx, rx, err);
+        _lastData = TimeLineSeries(now, <double>[tx, rx, err]);
         return;
       }
       final diff = (now.second - _lastData!.time.second).toDouble();
       if (diff > 0) {
-        final txps = (tx - _lastData!.tx) / diff;
-        final rxps = (rx - _lastData!.rx) / diff;
-        final errps = (err - _lastData!.error) / diff;
+        final txps = (tx - _lastData!.value[0]) / diff;
+        final rxps = (rx - _lastData!.value[1]) / diff;
+        final errps = (err - _lastData!.value[2]) / diff;
         setState(() {
-          _chartData.add(TimeLineSeries(now, txps, rxps, errps));
+          _chartData.add(TimeLineSeries(now, <double>[txps, rxps, errps]));
         });
       }
-      _lastData = TimeLineSeries(now, tx, rx, err);
+      _lastData = TimeLineSeries(now, <double>[tx, rx, err]);
     } catch (e) {
       setState(() {
         _errorMsg = e.toString();
@@ -245,21 +245,21 @@ class _TrafficState extends State<TrafficPage> {
         id: 'Tx',
         colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
         domainFn: (TimeLineSeries t, _) => t.time,
-        measureFn: (TimeLineSeries t, _) => t.tx,
+        measureFn: (TimeLineSeries t, _) => t.value[0],
         data: _chartData,
       ),
       charts.Series<TimeLineSeries, DateTime>(
         id: 'Rx',
         colorFn: (_, __) => charts.MaterialPalette.green.shadeDefault,
         domainFn: (TimeLineSeries t, _) => t.time,
-        measureFn: (TimeLineSeries t, _) => t.rx,
+        measureFn: (TimeLineSeries t, _) => t.value[1],
         data: _chartData,
       ),
       charts.Series<TimeLineSeries, DateTime>(
         id: 'Error',
         colorFn: (_, __) => charts.MaterialPalette.red.shadeDefault,
         domainFn: (TimeLineSeries t, _) => t.time,
-        measureFn: (TimeLineSeries t, _) => t.error,
+        measureFn: (TimeLineSeries t, _) => t.value[2],
         data: _chartData,
       )
     ];

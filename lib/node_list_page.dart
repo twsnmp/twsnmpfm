@@ -7,6 +7,7 @@ import 'package:twsnmpfm/ping_page.dart';
 import 'package:twsnmpfm/mib_browser_page.dart';
 import 'package:twsnmpfm/traffic_page.dart';
 import 'package:twsnmpfm/vpanel_page.dart';
+import 'package:twsnmpfm/host_resource_page.dart';
 import 'package:twsnmpfm/settings.dart';
 import 'package:twsnmpfm/settings_page.dart';
 
@@ -54,9 +55,9 @@ class NodeListPage extends ConsumerWidget {
                           ])),
                       PopupMenuItem<String>(
                           value: "snmp",
-                          child: Row(children: const [
-                            Icon(Icons.storage),
-                            Text("SNMP"),
+                          child: Row(children: [
+                            const Icon(Icons.storage),
+                            Text(loc.mibBrowser),
                           ])),
                       PopupMenuItem<String>(
                         value: "panel",
@@ -70,6 +71,18 @@ class NodeListPage extends ConsumerWidget {
                           child: Row(children: [
                             const Icon(Icons.show_chart),
                             Text(loc.traffic),
+                          ])),
+                      PopupMenuItem<String>(
+                          value: "hrmib",
+                          child: Row(children: [
+                            const Icon(Icons.data_usage),
+                            Text(loc.hostResource),
+                          ])),
+                      PopupMenuItem<String>(
+                          value: "process",
+                          child: Row(children: [
+                            const Icon(Icons.memory),
+                            Text(loc.hostResource),
                           ])),
                       PopupMenuItem<String>(
                           value: "edit",
@@ -117,6 +130,12 @@ class NodeListPage extends ConsumerWidget {
         return;
       case "traffic":
         traffic(context, ref, i);
+        return;
+      case "hrmib":
+        hrmib(context, ref, i);
+        return;
+      case "process":
+        process(context, ref, i);
         return;
     }
   }
@@ -175,6 +194,30 @@ class NodeListPage extends ConsumerWidget {
   }
 
   void traffic(BuildContext context, WidgetRef ref, int i) {
+    final nodes = ref.read(nodesProvider);
+    final settings = ref.read(settingsProvider);
+    if (i < 0 || i >= nodes.nodes.length) {
+      return;
+    }
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => TrafficPage(node: nodes.nodes[i], settings: settings)),
+    );
+  }
+
+  void hrmib(BuildContext context, WidgetRef ref, int i) {
+    final nodes = ref.read(nodesProvider);
+    final settings = ref.read(settingsProvider);
+    if (i < 0 || i >= nodes.nodes.length) {
+      return;
+    }
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => HostResourcePage(node: nodes.nodes[i], settings: settings)),
+    );
+  }
+
+  void process(BuildContext context, WidgetRef ref, int i) {
     final nodes = ref.read(nodesProvider);
     final settings = ref.read(settingsProvider);
     if (i < 0 || i >= nodes.nodes.length) {

@@ -45,5 +45,7 @@
     "mibBrowser": "MIBブラウザー",
     "hostResource": "ホストリソース",
     "processes": "プロセス",
+    "key": "項目",
+    "value": "値",
     "save":"保存"
 }
