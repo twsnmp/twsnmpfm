@@ -5,7 +5,7 @@
     "traffic": "Traffic",
     "editNode": "Edit Node",
     "icon": "Icon",
-    "name": "Node Name",
+    "nodeName": "Node Name",
     "nameHint": "The name of the node.",
     "nameError": "Node name is required",
     "ip": "IP Address",
@@ -47,5 +47,10 @@
     "processes": "Processes",
     "key": "Name",
     "value": "Value",
+    "path": "Path",
+    "type": "Type",
+    "status": "Status",
+    "showProcessMode": "Process Sort Mode",
+    "processName": "Process Name",
     "save":"Save"
 }

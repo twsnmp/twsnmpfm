@@ -8,6 +8,7 @@ import 'package:twsnmpfm/mib_browser_page.dart';
 import 'package:twsnmpfm/traffic_page.dart';
 import 'package:twsnmpfm/vpanel_page.dart';
 import 'package:twsnmpfm/host_resource_page.dart';
+import 'package:twsnmpfm/processes_page.dart';
 import 'package:twsnmpfm/settings.dart';
 import 'package:twsnmpfm/settings_page.dart';
 
@@ -82,7 +83,7 @@ class NodeListPage extends ConsumerWidget {
                           value: "process",
                           child: Row(children: [
                             const Icon(Icons.memory),
-                            Text(loc.hostResource),
+                            Text(loc.processes),
                           ])),
                       PopupMenuItem<String>(
                           value: "edit",
@@ -225,7 +226,7 @@ class NodeListPage extends ConsumerWidget {
     }
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => TrafficPage(node: nodes.nodes[i], settings: settings)),
+      MaterialPageRoute(builder: (context) => ProcessesPage(node: nodes.nodes[i], settings: settings)),
     );
   }
 

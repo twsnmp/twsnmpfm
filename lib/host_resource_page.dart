@@ -52,9 +52,9 @@ class _HostResourceState extends State<HostResourcePage> {
     if (_timer != null) {
       return;
     }
+    _chartData.length = 0;
     _getHostResource();
     _timer = Timer.periodic(Duration(seconds: _interval.toInt()), _getHostResourceTimer);
-    _chartData.length = 0;
   }
 
   void _getHostResourceTimer(Timer t) async {

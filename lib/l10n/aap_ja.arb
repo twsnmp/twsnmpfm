@@ -5,7 +5,7 @@
     "traffic": "トラフィック",
     "editNode": "ノードの編集",
     "icon": "アイコン",
-    "name": "ノード名",
+    "nodeName": "ノード名",
     "nameHint": "ノードに好きな名前をつけてください。",
     "nameError": "ノード名は必須です。",
     "ip": "IPアドレス",
@@ -47,5 +47,10 @@
     "processes": "プロセス",
     "key": "項目",
     "value": "値",
+    "path": "パス",
+    "type": "種別",
+    "status": "状態",
+    "showProcessMode": "プロセスのソート順",
+    "processName": "プロセス名",
     "save":"保存"
 }

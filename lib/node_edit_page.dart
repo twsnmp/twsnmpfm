@@ -48,8 +48,7 @@ class NodeEditFormState extends State<NodeEditForm> {
                   value: widget.node.icon,
                   items: [
                     DropdownMenuItem(value: "laptop", child: Text(loc.laptop)),
-                    DropdownMenuItem(
-                        value: "desktop", child: Text(loc.desktop)),
+                    DropdownMenuItem(value: "desktop", child: Text(loc.desktop)),
                     DropdownMenuItem(value: "lan", child: Text(loc.lan)),
                     DropdownMenuItem(value: "cloud", child: Text(loc.cloud)),
                     DropdownMenuItem(value: "server", child: Text(loc.server)),
@@ -74,10 +73,7 @@ class NodeEditFormState extends State<NodeEditForm> {
                 widget.node.name = value;
               });
             },
-            decoration: InputDecoration(
-                icon: const Icon(Icons.edit),
-                labelText: loc.name,
-                hintText: loc.nameHint),
+            decoration: InputDecoration(icon: const Icon(Icons.edit), labelText: loc.nodeName, hintText: loc.nameHint),
           ),
           TextFormField(
             initialValue: widget.node.ip,
@@ -92,10 +88,7 @@ class NodeEditFormState extends State<NodeEditForm> {
                 widget.node.ip = value;
               });
             },
-            decoration: InputDecoration(
-                icon: const Icon(Icons.lan),
-                labelText: loc.ip,
-                hintText: loc.ipHint),
+            decoration: InputDecoration(icon: const Icon(Icons.lan), labelText: loc.ip, hintText: loc.ipHint),
           ),
           TextFormField(
             initialValue: widget.node.community,
@@ -110,10 +103,7 @@ class NodeEditFormState extends State<NodeEditForm> {
                 widget.node.community = value;
               });
             },
-            decoration: InputDecoration(
-                icon: const Icon(Icons.security),
-                labelText: loc.community,
-                hintText: loc.communityHint),
+            decoration: InputDecoration(icon: const Icon(Icons.security), labelText: loc.community, hintText: loc.communityHint),
           ),
           Padding(
             padding: const EdgeInsets.all(16.0),
