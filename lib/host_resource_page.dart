@@ -102,7 +102,7 @@ class _HostResourceState extends State<HostResourcePage> {
         }
         final index = a[1];
         m = await session.get(Oid.fromString(_mibdb!.nameToOid("hrStorageDescr.$index")));
-        if (m.pdu.error.value != 0) {
+        if (m.pdu.error.value != 0 || m.pdu.varbinds.first.tag > 70) {
           log.warning(m.pdu.error.toString());
           continue;
         }
@@ -111,19 +111,19 @@ class _HostResourceState extends State<HostResourcePage> {
           continue;
         }
         m = await session.get(Oid.fromString(_mibdb!.nameToOid("hrStorageSize.$index")));
-        if (m.pdu.error.value != 0) {
+        if (m.pdu.error.value != 0 || m.pdu.varbinds.first.tag > 70) {
           log.warning(m.pdu.error.toString());
           continue;
         }
         final size = double.parse(m.pdu.varbinds.first.value.toString());
         m = await session.get(Oid.fromString(_mibdb!.nameToOid("hrStorageUsed.$index")));
-        if (m.pdu.error.value != 0) {
+        if (m.pdu.error.value != 0 || m.pdu.varbinds.first.tag > 70) {
           log.warning(m.pdu.error.toString());
           continue;
         }
         final used = double.parse(m.pdu.varbinds.first.value.toString());
         m = await session.get(Oid.fromString(_mibdb!.nameToOid("hrStorageAllocationUnits.$index")));
-        if (m.pdu.error.value != 0) {
+        if (m.pdu.error.value != 0 || m.pdu.varbinds.first.tag > 70) {
           log.warning(m.pdu.error.toString());
           continue;
         }

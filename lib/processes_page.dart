@@ -36,8 +36,8 @@ class _ProcessesState extends State<ProcessesPage> {
   @override
   void initState() {
     _interval = widget.settings.interval.toDouble();
-    if (_interval < 10) {
-      _interval = 10;
+    if (_interval < 30) {
+      _interval = 30;
     }
     _timeout = widget.settings.timeout;
     _retry = widget.settings.retry;
@@ -91,28 +91,28 @@ class _ProcessesState extends State<ProcessesPage> {
         final name = _mibdb!.oidToName(m.pdu.varbinds.first.value.toString());
 
         m = await session.get(Oid.fromString(_mibdb!.nameToOid("hrSWRunType.$index")));
-        if (m.pdu.error.value != 0) {
+        if (m.pdu.error.value != 0 || m.pdu.varbinds.first.tag > 70) {
           log.warning(m.pdu.error.toString());
           continue;
         }
         final type = int.parse(m.pdu.varbinds.first.value.toString());
 
         m = await session.get(Oid.fromString(_mibdb!.nameToOid("hrSWRunStatus.$index")));
-        if (m.pdu.error.value != 0) {
+        if (m.pdu.error.value != 0 || m.pdu.varbinds.first.tag > 70) {
           log.warning(m.pdu.error.toString());
           continue;
         }
         final status = int.parse(m.pdu.varbinds.first.value.toString());
 
         m = await session.get(Oid.fromString(_mibdb!.nameToOid("hrSWRunPath.$index")));
-        if (m.pdu.error.value != 0) {
+        if (m.pdu.error.value != 0 || m.pdu.varbinds.first.tag > 70) {
           log.warning(m.pdu.error.toString());
           continue;
         }
         final path = m.pdu.varbinds.first.value.toString();
 
         m = await session.get(Oid.fromString(_mibdb!.nameToOid("hrSWRunPerfCPU.$index")));
-        if (m.pdu.error.value != 0) {
+        if (m.pdu.error.value != 0 || m.pdu.varbinds.first.tag > 70) {
           log.warning(m.pdu.error.toString());
           continue;
         }
@@ -126,7 +126,7 @@ class _ProcessesState extends State<ProcessesPage> {
         totalCPU += cpu;
 
         m = await session.get(Oid.fromString(_mibdb!.nameToOid("hrSWRunPerfMem.$index")));
-        if (m.pdu.error.value != 0) {
+        if (m.pdu.error.value != 0 || m.pdu.varbinds.first.tag > 70) {
           log.warning(m.pdu.error.toString());
           continue;
         }
@@ -235,9 +235,9 @@ class _ProcessesState extends State<ProcessesPage> {
                     Slider(
                         label: "${_interval.toInt()}${loc.sec}",
                         value: _interval,
-                        min: 10,
+                        min: 30,
                         max: 300,
-                        divisions: (300 - 10) ~/ 5,
+                        divisions: (300 - 30) ~/ 5,
                         onChanged: (value) => {
                               setState(() {
                                 _interval = value;
