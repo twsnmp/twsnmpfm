@@ -11,12 +11,24 @@ import 'package:twsnmpfm/host_resource_page.dart';
 import 'package:twsnmpfm/processes_page.dart';
 import 'package:twsnmpfm/settings.dart';
 import 'package:twsnmpfm/settings_page.dart';
+import 'package:twsnmpfm/app_open_ad_manager.dart';
 
-class NodeListPage extends ConsumerWidget {
+class NodeListPage extends ConsumerStatefulWidget {
   const NodeListPage({Key? key}) : super(key: key);
+  @override
+  NodeListState createState() => NodeListState();
+}
+
+class NodeListState extends ConsumerState<NodeListPage> {
+  @override
+  void initState() {
+    super.initState();
+    AppOpenAdManager appOpenAdManager = AppOpenAdManager()..loadAd();
+    WidgetsBinding.instance.addObserver(AppLifecycleReactor(appOpenAdManager: appOpenAdManager));
+  }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final nodes = ref.watch(nodesProvider);
     final loc = AppLocalizations.of(context)!;
     return Scaffold(
@@ -240,5 +252,18 @@ class NodeListPage extends ConsumerWidget {
       return;
     }
     settings.save();
+  }
+}
+
+class AppLifecycleReactor extends WidgetsBindingObserver {
+  final AppOpenAdManager appOpenAdManager;
+
+  AppLifecycleReactor({required this.appOpenAdManager});
+
+  @override
+  Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
+    if (state == AppLifecycleState.resumed) {
+      appOpenAdManager.showAdIfAvailable();
+    }
   }
 }

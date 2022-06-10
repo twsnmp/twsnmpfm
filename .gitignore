@@ -26,3 +26,4 @@ doc/api/
 .flutter-plugins-dependencies
 lib/generated_plugin_registrant.dart
 macos/Flutter/GeneratedPluginRegistrant.swift
+lib/ad_helper.dart
