@@ -30,6 +30,7 @@ dependencies:
   sprintf: ^6.0.0
   p5: ^0.1.0
   google_mobile_ads: ^1.2.0
+  basic_utils: ^4.4.1
 
 dev_dependencies:
   flutter_test:
