@@ -101,7 +101,7 @@ class NodeListState extends ConsumerState<NodeListPage> {
                       PopupMenuItem<String>(
                           value: "port",
                           child: Row(children: [
-                            const Icon(Icons.network_check),
+                            const Icon(Icons.drag_indicator),
                             Text(loc.port),
                           ])),
                       PopupMenuItem<String>(

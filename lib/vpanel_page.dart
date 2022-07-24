@@ -262,7 +262,9 @@ class _VPanelState extends State<VPanelPage> {
                       onChanged: (bool value) {
                         setState(() {
                           _showAllPort = value;
-                          _getVPanel();
+                          if (_timer != null) {
+                            _getVPanel();
+                          }
                         });
                       },
                     ),
