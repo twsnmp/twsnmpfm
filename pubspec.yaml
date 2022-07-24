@@ -44,6 +44,7 @@ flutter:
   generate: true
   assets:
     - assets/conf/mib.txt
+    - assets/conf/services.txt
 
 flutter_icons:
   android: true

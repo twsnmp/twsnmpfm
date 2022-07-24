@@ -9,6 +9,7 @@ import 'package:twsnmpfm/traffic_page.dart';
 import 'package:twsnmpfm/vpanel_page.dart';
 import 'package:twsnmpfm/host_resource_page.dart';
 import 'package:twsnmpfm/processes_page.dart';
+import 'package:twsnmpfm/port_page.dart';
 import 'package:twsnmpfm/settings.dart';
 import 'package:twsnmpfm/settings_page.dart';
 import 'package:twsnmpfm/app_open_ad_manager.dart';
@@ -98,6 +99,12 @@ class NodeListState extends ConsumerState<NodeListPage> {
                             Text(loc.processes),
                           ])),
                       PopupMenuItem<String>(
+                          value: "port",
+                          child: Row(children: [
+                            const Icon(Icons.network_check),
+                            Text(loc.port),
+                          ])),
+                      PopupMenuItem<String>(
                           value: "edit",
                           child: Row(children: [
                             const Icon(Icons.edit),
@@ -149,6 +156,9 @@ class NodeListState extends ConsumerState<NodeListPage> {
         return;
       case "process":
         process(context, ref, i);
+        return;
+      case "port":
+        port(context, ref, i);
         return;
     }
   }
@@ -239,6 +249,18 @@ class NodeListState extends ConsumerState<NodeListPage> {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => ProcessesPage(node: nodes.nodes[i], settings: settings)),
+    );
+  }
+
+  void port(BuildContext context, WidgetRef ref, int i) {
+    final nodes = ref.read(nodesProvider);
+    final settings = ref.read(settingsProvider);
+    if (i < 0 || i >= nodes.nodes.length) {
+      return;
+    }
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => PortPage(node: nodes.nodes[i], settings: settings)),
     );
   }
 

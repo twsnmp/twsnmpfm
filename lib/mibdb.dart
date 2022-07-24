@@ -41,7 +41,7 @@ class MIBDB {
     final a = oid.split(".");
     final List<String> suffix = [];
     while (a.isNotEmpty) {
-      suffix.add(a.removeLast());
+      suffix.insert(0, a.removeLast());
       final o = a.join(".");
       if (_oidToName.containsKey(o)) {
         return "${_oidToName[o]!}.${suffix.join('.')}";

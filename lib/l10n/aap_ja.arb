@@ -45,6 +45,7 @@
     "mibBrowser": "MIBブラウザー",
     "hostResource": "ホストリソース",
     "processes": "プロセス",
+    "port": "TCP/UDPポート",
     "key": "項目",
     "value": "値",
     "path": "パス",
