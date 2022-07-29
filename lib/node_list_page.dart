@@ -10,6 +10,7 @@ import 'package:twsnmpfm/vpanel_page.dart';
 import 'package:twsnmpfm/host_resource_page.dart';
 import 'package:twsnmpfm/processes_page.dart';
 import 'package:twsnmpfm/port_page.dart';
+import 'package:twsnmpfm/cert_page.dart';
 import 'package:twsnmpfm/settings.dart';
 import 'package:twsnmpfm/settings_page.dart';
 import 'package:twsnmpfm/app_open_ad_manager.dart';
@@ -32,6 +33,7 @@ class NodeListState extends ConsumerState<NodeListPage> {
   Widget build(BuildContext context) {
     final nodes = ref.watch(nodesProvider);
     final loc = AppLocalizations.of(context)!;
+    const h = 35.0;
     return Scaffold(
       appBar: AppBar(
         title: const Text('TWSNMP For Mobile'),
@@ -62,18 +64,21 @@ class NodeListState extends ConsumerState<NodeListPage> {
                     onSelected: (value) => {nodeMenuAction(value, i, context, ref)},
                     itemBuilder: (context) => <PopupMenuItem<String>>[
                       PopupMenuItem<String>(
+                          height: h,
                           value: "ping",
                           child: Row(children: const [
                             Icon(Icons.network_ping),
                             Text("Ping"),
                           ])),
                       PopupMenuItem<String>(
+                          height: h,
                           value: "snmp",
                           child: Row(children: [
                             const Icon(Icons.storage),
                             Text(loc.mibBrowser),
                           ])),
                       PopupMenuItem<String>(
+                        height: h,
                         value: "panel",
                         child: Row(children: [
                           const Icon(Icons.lan),
@@ -81,36 +86,49 @@ class NodeListState extends ConsumerState<NodeListPage> {
                         ]),
                       ),
                       PopupMenuItem<String>(
+                          height: h,
                           value: "traffic",
                           child: Row(children: [
                             const Icon(Icons.show_chart),
                             Text(loc.traffic),
                           ])),
                       PopupMenuItem<String>(
+                          height: h,
                           value: "hrmib",
                           child: Row(children: [
                             const Icon(Icons.data_usage),
                             Text(loc.hostResource),
                           ])),
                       PopupMenuItem<String>(
+                          height: h,
                           value: "process",
                           child: Row(children: [
                             const Icon(Icons.memory),
                             Text(loc.processes),
                           ])),
                       PopupMenuItem<String>(
+                          height: h,
                           value: "port",
                           child: Row(children: [
                             const Icon(Icons.drag_indicator),
                             Text(loc.port),
                           ])),
                       PopupMenuItem<String>(
+                          height: h,
+                          value: "cert",
+                          child: Row(children: [
+                            const Icon(Icons.security),
+                            Text(loc.cert),
+                          ])),
+                      PopupMenuItem<String>(
+                          height: h,
                           value: "edit",
                           child: Row(children: [
                             const Icon(Icons.edit),
                             Text(loc.edit),
                           ])),
                       PopupMenuItem<String>(
+                        height: h,
                         value: "delete",
                         child: Row(children: [
                           const Icon(Icons.delete, color: Colors.red),
@@ -159,6 +177,9 @@ class NodeListState extends ConsumerState<NodeListPage> {
         return;
       case "port":
         port(context, ref, i);
+        return;
+      case "cert":
+        cert(context, ref, i);
         return;
     }
   }
@@ -261,6 +282,18 @@ class NodeListState extends ConsumerState<NodeListPage> {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => PortPage(node: nodes.nodes[i], settings: settings)),
+    );
+  }
+
+  void cert(BuildContext context, WidgetRef ref, int i) {
+    final nodes = ref.read(nodesProvider);
+    final settings = ref.read(settingsProvider);
+    if (i < 0 || i >= nodes.nodes.length) {
+      return;
+    }
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => CertPage(node: nodes.nodes[i], settings: settings)),
     );
   }
 
