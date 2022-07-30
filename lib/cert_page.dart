@@ -27,7 +27,7 @@ class _CertState extends State<CertPage> {
   void initState() {
     _target = widget.node.name;
     _targetList.add(_target);
-    _targetList.add(widget.node.name);
+    _targetList.add(widget.node.ip);
     super.initState();
   }
 
