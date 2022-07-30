@@ -59,7 +59,7 @@
     "issuer": "発行者",
     "startValidity": "有効期限開始",
     "endValidity": "有効期限終了",
-    "certDur": "有効期限",
+    "certDur": "有効日数",
     "version": "バージョン",
     "serialNumber": "シリアル番号",
     "signatureAlgorithm": "署名アルゴリズム",
@@ -72,5 +72,6 @@
     "subjectAlternativNames": "サブジェクト別名",
     "cRLDistributionPoints": "CRL配布ポイント",
     "ipOrHostPort": "IPまたはホスト名:ポート番号",
+    "getIPFromName": "IP検索",
     "save":"保存"
 }

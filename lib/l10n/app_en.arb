@@ -60,7 +60,7 @@
     "startValidity": "Start Validity",
     "endValidity": "End Validity",
     "version": "Version",
-    "certDur": "Term of Validity",
+    "certDur": "Days of Validity",
     "serialNumber": "Serial Number",
     "signatureAlgorithm": "Signature Algorithm",
     "sha1Thumbprint": "SHA1 Thumbprint",
@@ -72,5 +72,6 @@
     "subjectAlternativNames": "Subject Alternativ Names",
     "cRLDistributionPoints": "CRL Distribution Points",
     "ipOrHostPort": "IP or Host Name :Port",
+    "getIPFromName": "Get IP",
     "save":"Save"
 }

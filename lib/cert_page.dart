@@ -16,6 +16,7 @@ class CertPage extends StatefulWidget {
 
 class _CertState extends State<CertPage> {
   String _target = "";
+  final List<String> _targetList = [];
   bool _process = false;
   String _errorMsg = '';
   List<Widget> listTiles = [];
@@ -24,7 +25,9 @@ class _CertState extends State<CertPage> {
 
   @override
   void initState() {
-    _target = widget.node.ip;
+    _target = widget.node.name;
+    _targetList.add(_target);
+    _targetList.add(widget.node.name);
     super.initState();
   }
 
@@ -62,6 +65,9 @@ class _CertState extends State<CertPage> {
         if (socket.peerCertificate == null) {
           return;
         }
+        if (!_targetList.contains(_target)) {
+          _targetList.add(_target);
+        }
         var data = X509Utils.x509CertificateFromPem(socket.peerCertificate!.pem);
         listTiles.add(ListTile(
           dense: true,
@@ -93,7 +99,7 @@ class _CertState extends State<CertPage> {
           title: Text(loc.endValidity),
           subtitle: Text(socket.peerCertificate!.endValidity.toIso8601String()),
         ));
-        var d = socket.peerCertificate!.endValidity.difference(socket.peerCertificate!.endValidity);
+        var d = socket.peerCertificate!.endValidity.difference(socket.peerCertificate!.startValidity);
         var c = Colors.red;
         if (d.inDays < 399) {
           c = Colors.blue;
@@ -104,7 +110,7 @@ class _CertState extends State<CertPage> {
           dense: true,
           leading: Icon(Icons.hourglass_top, color: c),
           title: Text(loc.certDur),
-          subtitle: Text(d.toString()),
+          subtitle: Text(d.inDays.toString()),
         ));
         listTiles.add(ListTile(
           dense: true,
@@ -137,20 +143,31 @@ class _CertState extends State<CertPage> {
             title: Text(loc.sha256Thumbprint),
             subtitle: Text(data.sha256Thumbprint ?? ""),
           ));
+          var kalg = data.publicKeyData.algorithmReadableName ?? data.publicKeyData.algorithm.toString();
           listTiles.add(ListTile(
             dense: true,
             leading: const Icon(Icons.key),
             title: Text(loc.algorithmReadableName),
-            subtitle: Text(data.publicKeyData.algorithmReadableName ?? data.publicKeyData.algorithm.toString()),
+            subtitle: Text(kalg),
           ));
           c = Colors.grey;
           if (data.publicKeyData.length != null) {
-            if (data.publicKeyData.length! < 2048) {
-              c = Colors.red;
-            } else if (data.publicKeyData.length! < 4096) {
-              c = Colors.amber;
+            if (kalg.startsWith("ec")) {
+              if (data.publicKeyData.length! < 256) {
+                c = Colors.red;
+              } else if (data.publicKeyData.length! < 512) {
+                c = Colors.amber;
+              } else {
+                c = Colors.blue;
+              }
             } else {
-              c = Colors.blue;
+              if (data.publicKeyData.length! < 2048) {
+                c = Colors.red;
+              } else if (data.publicKeyData.length! < 4096) {
+                c = Colors.amber;
+              } else {
+                c = Colors.blue;
+              }
             }
           }
           listTiles.add(ListTile(
@@ -196,6 +213,7 @@ class _CertState extends State<CertPage> {
         }
         _process = false;
       });
+      socket.close();
     } catch (e) {
       setState(() {
         listTiles = [];
@@ -207,20 +225,21 @@ class _CertState extends State<CertPage> {
 
   List<Widget> _getView(AppLocalizations loc) {
     List<Widget> r = [
-      TextFormField(
-        initialValue: _target,
-        validator: (value) {
-          if (value == null) {
-            return "Null";
+      Text(loc.ipOrHostPort, style: const TextStyle(color: Colors.blue)),
+      Autocomplete<String>(
+        initialValue: TextEditingValue(text: _target),
+        optionsBuilder: (value) {
+          if (value.text.isEmpty) {
+            return [];
           }
-          return null;
+          _target = value.text;
+          return _targetList.where((n) => n.toLowerCase().contains(value.text.toLowerCase()));
         },
-        onChanged: (value) {
+        onSelected: (value) {
           setState(() {
             _target = value;
           });
         },
-        decoration: InputDecoration(icon: const Icon(Icons.lan), labelText: loc.ipOrHostPort, hintText: loc.ipOrHostPort),
       ),
       Text(_errorMsg, style: const TextStyle(color: Colors.red))
     ];
@@ -236,7 +255,7 @@ class _CertState extends State<CertPage> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: Text("${loc.cert} ${widget.node.name}"),
+          title: Text(loc.cert),
         ),
         body: SingleChildScrollView(
           scrollDirection: Axis.vertical,
