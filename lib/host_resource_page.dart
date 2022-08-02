@@ -206,6 +206,7 @@ class _HostResourceState extends State<HostResourcePage> {
           title: Text("${loc.hostResource} ${widget.node.name}"),
         ),
         body: SingleChildScrollView(
+          padding: const EdgeInsets.all(10),
           scrollDirection: Axis.vertical,
           child: Form(
             child: Column(

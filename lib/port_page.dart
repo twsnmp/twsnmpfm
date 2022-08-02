@@ -26,7 +26,7 @@ class _PortState extends State<PortPage> {
   MIBDB? _mibdb;
   Timer? _timer;
   List<TcpUdpPort> _ports = [];
-  bool _showUdp = false;
+  String _selectedProtocol = "tcp";
   List<DataRow> _rows = [];
   Map<int, String> tcpPortNameMap = {};
   Map<int, String> udpPortNameMap = {};
@@ -91,7 +91,7 @@ class _PortState extends State<PortPage> {
   }
 
   void _getPortList() {
-    if (_showUdp) {
+    if (_selectedProtocol == "udp") {
       _getUdpPortList();
     } else {
       _getTcpPortList();
@@ -288,27 +288,26 @@ class _PortState extends State<PortPage> {
         ),
         body: SingleChildScrollView(
           scrollDirection: Axis.vertical,
+          padding: const EdgeInsets.all(10),
           child: Form(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Row(
-                  children: [
-                    const Expanded(child: Text("UDP")),
-                    Switch(
-                      value: _showUdp,
-                      onChanged: (bool value) {
-                        setState(() {
-                          _showUdp = value;
-                          if (_timer != null) {
-                            _getPortList();
-                          }
-                        });
-                      },
-                    ),
-                  ],
-                ),
+                DropdownButton<String>(
+                    value: _selectedProtocol,
+                    items: const [
+                      DropdownMenuItem(value: "tcp", child: Text("TCP")),
+                      DropdownMenuItem(value: "udp", child: Text("UDP")),
+                    ],
+                    onChanged: (String? value) {
+                      setState(() {
+                        _selectedProtocol = value ?? "tcp";
+                      });
+                      if (_timer != null) {
+                        _getPortList();
+                      }
+                    }),
                 Row(
                   children: [
                     Expanded(child: Text("${loc.interval}(${_interval.toInt()}${loc.sec})")),

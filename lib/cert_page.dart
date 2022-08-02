@@ -258,6 +258,7 @@ class _CertState extends State<CertPage> {
           title: Text(loc.cert),
         ),
         body: SingleChildScrollView(
+          padding: const EdgeInsets.all(10),
           scrollDirection: Axis.vertical,
           child: Form(
             child: Column(

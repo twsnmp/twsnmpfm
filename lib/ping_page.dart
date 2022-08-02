@@ -162,6 +162,7 @@ class _PingPageState extends State<PingPage> {
           title: Text("Ping ${widget.ip}"),
         ),
         body: SingleChildScrollView(
+          padding: const EdgeInsets.all(10),
           child: Form(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,

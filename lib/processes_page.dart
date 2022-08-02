@@ -210,6 +210,7 @@ class _ProcessesState extends State<ProcessesPage> {
           title: Text("${loc.processes} ${widget.node.name}"),
         ),
         body: SingleChildScrollView(
+          padding: const EdgeInsets.all(10),
           scrollDirection: Axis.vertical,
           child: Form(
             child: Column(

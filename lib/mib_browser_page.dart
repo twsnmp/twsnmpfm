@@ -222,6 +222,7 @@ class _MibBrowserState extends State<MibBrowserPage> {
           title: Text("${loc!.mibBrowser} ${widget.node.name}"),
         ),
         body: SingleChildScrollView(
+          padding: const EdgeInsets.all(10),
           scrollDirection: Axis.vertical,
           child: Form(
             child: Column(
