@@ -1,5 +1,7 @@
 PODS:
   - Flutter (1.0.0)
+  - flutter_beep (0.0.1):
+    - Flutter
   - flutter_icmp_ping (0.0.1):
     - Flutter
   - Google-Mobile-Ads-SDK (8.13.0):
@@ -57,6 +59,7 @@ PODS:
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
+  - flutter_beep (from `.symlinks/plugins/flutter_beep/ios`)
   - flutter_icmp_ping (from `.symlinks/plugins/flutter_icmp_ping/ios`)
   - google_mobile_ads (from `.symlinks/plugins/google_mobile_ads/ios`)
   - shared_preferences_ios (from `.symlinks/plugins/shared_preferences_ios/ios`)
@@ -73,6 +76,8 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   Flutter:
     :path: Flutter
+  flutter_beep:
+    :path: ".symlinks/plugins/flutter_beep/ios"
   flutter_icmp_ping:
     :path: ".symlinks/plugins/flutter_icmp_ping/ios"
   google_mobile_ads:
@@ -82,6 +87,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Flutter: 50d75fe2f02b26cc09d224853bb45737f8b3214a
+  flutter_beep: 54fb393b22dfa0f0e4573c81b1c74dd71c4e5af8
   flutter_icmp_ping: 07e508847df7fa9262d050bb0b203de074bbe517
   Google-Mobile-Ads-SDK: 05e5d68bb42a61b2e5bef336a52789785605aa22
   google_mobile_ads: 36eaaacc5c08ca2b9c4878232ab98152b11805cc

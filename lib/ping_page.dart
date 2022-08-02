@@ -5,6 +5,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:twsnmpfm/ping_chart.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:twsnmpfm/settings.dart';
+import 'package:flutter_beep/flutter_beep.dart';
 
 class PingPage extends StatefulWidget {
   final String ip;
@@ -25,9 +26,10 @@ class _PingPageState extends State<PingPage> {
   final List<num> _rtts = [];
   final List<TimeSeriesPingRTT> _chartData = [];
   String _lastResult = "";
+  String _errMsg = "";
   Ping? ping;
   AppLocalizations? loc;
-  bool _err = false;
+  bool _beep = false;
 
   @override
   void initState() {
@@ -44,12 +46,25 @@ class _PingPageState extends State<PingPage> {
     _maxTTL = 0;
     _minTTL = 255;
     _rtts.length = 0;
-    _err = false;
+    _errMsg = "";
     ping = Ping(widget.ip, count: _count.toInt(), timeout: _timeout.toInt(), ttl: _ttl.toInt());
     ping?.stream.listen((event) {
       final ttl = event.response?.ttl ?? '';
       setState(() {
         if (ttl != '') {
+          i++;
+          final err = event.error?.toString() ?? '';
+          if (_beep) {
+            FlutterBeep.beep(err == '');
+          }
+          if (err != '') {
+            setState(() {
+              _lastResult = '$i/$_count rtt=? ttl=?';
+              _errMsg = err;
+              _setStats();
+            });
+            return;
+          }
           final nrtt = event.response?.time?.inMicroseconds.toDouble() ?? 0.0;
           _rtts.add(nrtt / 1000);
           _chartData.add(TimeSeriesPingRTT(DateTime.now(), nrtt / 1000));
@@ -60,7 +75,6 @@ class _PingPageState extends State<PingPage> {
           if (nttl > _maxTTL) {
             _maxTTL = nttl;
           }
-          i++;
           setState(() {
             _lastResult = '$i/$_count rtt=${nrtt / 1000}mSec ttl=$ttl';
             _setStats();
@@ -74,9 +88,10 @@ class _PingPageState extends State<PingPage> {
               _lastResult = "ping done $rx/$tx";
             } else {
               _lastResult = err;
-              _err = true;
+              _errMsg = err;
             }
             _setStats();
+            ping?.stop();
             ping = null;
           });
         }
@@ -216,12 +231,29 @@ class _PingPageState extends State<PingPage> {
                             }),
                   ],
                 ),
+                Row(
+                  children: [
+                    const Expanded(child: Text("BEEP")),
+                    Switch(
+                      value: _beep,
+                      onChanged: (bool value) {
+                        setState(() {
+                          _beep = value;
+                        });
+                      },
+                    ),
+                  ],
+                ),
                 Text(
                   _lastResult,
-                  style: TextStyle(fontSize: 16, color: _err ? Colors.red : Colors.black87),
+                  style: const TextStyle(fontSize: 16, color: Colors.black87),
+                ),
+                Text(
+                  _errMsg,
+                  style: const TextStyle(fontSize: 12, color: Colors.red),
                 ),
                 SizedBox(
-                  height: 200,
+                  height: 180,
                   child: PingChart(_createChartData()),
                 ),
                 DataTable(
