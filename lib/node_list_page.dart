@@ -11,6 +11,7 @@ import 'package:twsnmpfm/host_resource_page.dart';
 import 'package:twsnmpfm/processes_page.dart';
 import 'package:twsnmpfm/port_page.dart';
 import 'package:twsnmpfm/cert_page.dart';
+import 'package:twsnmpfm/server_test_page.dart';
 import 'package:twsnmpfm/settings.dart';
 import 'package:twsnmpfm/settings_page.dart';
 import 'package:twsnmpfm/app_open_ad_manager.dart';
@@ -122,6 +123,13 @@ class NodeListState extends ConsumerState<NodeListPage> {
                           ])),
                       PopupMenuItem<String>(
                           height: h,
+                          value: "server",
+                          child: Row(children: [
+                            const Icon(Icons.rule),
+                            Text(loc.serverTest),
+                          ])),
+                      PopupMenuItem<String>(
+                          height: h,
                           value: "edit",
                           child: Row(children: [
                             const Icon(Icons.edit),
@@ -180,6 +188,9 @@ class NodeListState extends ConsumerState<NodeListPage> {
         return;
       case "cert":
         cert(context, ref, i);
+        return;
+      case "server":
+        server(context, ref, i);
         return;
     }
   }
@@ -294,6 +305,18 @@ class NodeListState extends ConsumerState<NodeListPage> {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => CertPage(node: nodes.nodes[i], settings: settings)),
+    );
+  }
+
+  void server(BuildContext context, WidgetRef ref, int i) {
+    final nodes = ref.read(nodesProvider);
+    final settings = ref.read(settingsProvider);
+    if (i < 0 || i >= nodes.nodes.length) {
+      return;
+    }
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => ServerTestPage(node: nodes.nodes[i], settings: settings)),
     );
   }
 

@@ -73,5 +73,6 @@
     "cRLDistributionPoints": "CRL配布ポイント",
     "ipOrHostPort": "IPまたはホスト名:ポート番号",
     "getIPFromName": "IP検索",
+    "serverTest": "サーバーテスト",
     "save":"保存"
 }

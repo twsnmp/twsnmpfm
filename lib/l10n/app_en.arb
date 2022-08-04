@@ -73,5 +73,6 @@
     "cRLDistributionPoints": "CRL Distribution Points",
     "ipOrHostPort": "IP or Host Name :Port",
     "getIPFromName": "Get IP",
+    "serverTest": "Server Test",
     "save":"Save"
 }
