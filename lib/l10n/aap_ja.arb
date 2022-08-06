@@ -74,5 +74,12 @@
     "ipOrHostPort": "IPまたはホスト名:ポート番号",
     "getIPFromName": "IP検索",
     "serverTest": "サーバーテスト",
+    "requiredError": "この項目は必須です。",
+    "syslogMsg": "メッセージ",
+    "facility": "ファシリティー",
+    "severity": "優先度",
+    "timeStamp": "日時",
+    "length": "長さ",
+    "host": "ホスト名",
     "save":"保存"
 }

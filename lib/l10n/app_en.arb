@@ -74,5 +74,12 @@
     "ipOrHostPort": "IP or Host Name :Port",
     "getIPFromName": "Get IP",
     "serverTest": "Server Test",
+    "requiredError": "This field is required",
+    "syslogMsg": "Syslog Message",
+    "facility": "Facility",
+    "severity": "Severity",
+    "timeStamp": "Time",
+    "length": "Length",
+    "host": "Host Name",
     "save":"Save"
 }

@@ -33,6 +33,7 @@ dependencies:
   basic_utils: ^4.4.1
   flutter_beep: ^1.0.0
   ntp: ^2.0.0
+  udp: ^5.0.3
 
 dev_dependencies:
   flutter_test:
