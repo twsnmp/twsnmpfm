@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
@@ -59,7 +61,9 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
   int _startTime = 0;
 
   // for DHCP Test
-  bool _dhcpUnicast = false;
+  int _dhcpPort = 67; // Server 67/Client 68
+  UDP? _dhcpUDP;
+  final List<DataRow> _dhcpHist = [];
 
   // for Mail Test
   String _mailUser = "";
@@ -305,7 +309,7 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
                     dataRowHeight: 20,
                     columns: [
                       DataColumn(
-                        label: Text(loc?.timeStamp ?? "Time"),
+                        label: Text(loc?.time ?? "Time"),
                       ),
                       DataColumn(
                         label: Text(loc?.length ?? "Length"),
@@ -393,7 +397,7 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
                     dataRowHeight: 20,
                     columns: [
                       DataColumn(
-                        label: Text(loc?.timeStamp ?? "Time"),
+                        label: Text(loc?.time ?? "Time"),
                       ),
                       DataColumn(
                         label: Text(loc?.length ?? "Length"),
@@ -416,33 +420,34 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              TextFormField(
-                initialValue: _target,
-                autocorrect: false,
-                enableSuggestions: false,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return loc?.requiredError;
-                  }
-                  return null;
-                },
-                onChanged: (value) {
-                  setState(() {
-                    _target = value;
-                  });
-                },
-                decoration: InputDecoration(icon: const Icon(Icons.lan), labelText: loc?.server, hintText: loc?.server),
-              ),
               Row(
                 children: [
-                  Expanded(child: Text(loc?.dhcpUnicast ?? "Unicast")),
-                  Switch(
-                    value: _dhcpUnicast,
-                    onChanged: (bool value) {
-                      _dhcpUnicast = value;
-                    },
-                  ),
+                  Expanded(child: Text(loc?.dhcpPort ?? "DHCP Port")),
+                  DropdownButton<int>(
+                      value: _dhcpPort,
+                      items: const [
+                        DropdownMenuItem(value: 67, child: Text("Server(67)")),
+                        DropdownMenuItem(value: 68, child: Text("Client(68)")),
+                      ],
+                      onChanged: (int? value) {
+                        if (value == null || value == _dhcpPort) {
+                          return;
+                        }
+                        setState(() {
+                          _dhcpPort = value;
+                          if (_process) {
+                            _stop();
+                            _start();
+                          }
+                        });
+                      }),
                 ],
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  _sendDhcpDiscover();
+                },
+                child: const Text("Send Discover"),
               ),
               Text(
                 _errorMsg,
@@ -460,16 +465,16 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
                     dataRowHeight: 20,
                     columns: [
                       DataColumn(
-                        label: Text(loc?.timeStamp ?? "Time"),
+                        label: Text(loc?.time ?? "Time"),
                       ),
                       DataColumn(
-                        label: Text(loc?.length ?? "Length"),
+                        label: Text(loc?.dhcpAddress ?? "Address"),
                       ),
                       DataColumn(
-                        label: Text(loc?.syslogMsg ?? "Message"),
+                        label: Text(loc?.dhcpType ?? "Type"),
                       ),
                     ],
-                    rows: _syslogHist,
+                    rows: _dhcpHist,
                   )),
             ],
           ),
@@ -606,7 +611,7 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
                     dataRowHeight: 20,
                     columns: [
                       DataColumn(
-                        label: Text(loc?.timeStamp ?? "Time"),
+                        label: Text(loc?.time ?? "Time"),
                       ),
                       DataColumn(
                         label: Text(loc?.length ?? "Length"),
@@ -735,7 +740,7 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
       setState(() {
         _syslogHist.add(
           DataRow(cells: [
-            DataCell(Text(DateFormat("yyyy-MM-dd HH:mm:ss").format(DateTime.now()))),
+            DataCell(Text(DateFormat("HH:mm:ss").format(DateTime.now()))),
             DataCell(Text(len.toString())),
             DataCell(Text(msg)),
           ]),
@@ -799,18 +804,17 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
         }
       }
       var sender = await UDP.bind(Endpoint.any());
-      print("trap");
       final len = await sender.send(m.encodedBytes, Endpoint.unicast(InternetAddress(ip), port: Port(port)));
-      print(len);
       setState(() {
         _trapHist.add(
           DataRow(cells: [
-            DataCell(Text(DateFormat("yyyy-MM-dd HH:mm:ss").format(DateTime.now()))),
+            DataCell(Text(DateFormat("HH:mm:ss").format(DateTime.now()))),
             DataCell(Text(len.toString())),
             DataCell(Text(_trapOID)),
           ]),
         );
       });
+      await Future.delayed(Duration(seconds: _timeout.toInt() + 2));
     } catch (e) {
       setState(() {
         _errorMsg = e.toString();
@@ -828,36 +832,126 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
       _process = true;
     });
     try {
-      int port = 514;
-      String ip = _target;
-      if (_target.contains(":")) {
-        final a = _target.split(":");
-        if (a.length == 2) {
-          ip = a[0];
-          port = a[1].toInt();
-        }
+      _dhcpUDP = await UDP.bind(Endpoint.any(port: Port(_dhcpPort)));
+      if (_dhcpUDP == null) {
+        return;
       }
-      var sender = await UDP.bind(Endpoint.any());
-      final msg = _getSyslogMsg();
-      final len = await sender.send(msg.codeUnits, Endpoint.unicast(InternetAddress(ip), port: Port(port)));
-      setState(() {
-        _syslogHist.add(
-          DataRow(cells: [
-            DataCell(Text(DateFormat("yyyy-MM-dd HH:mm:ss").format(DateTime.now()))),
-            DataCell(Text(len.toString())),
-            DataCell(Text(msg)),
-          ]),
-        );
+      _dhcpUDP!.asStream().listen((datagram) {
+        if (datagram == null) {
+          return;
+        }
+        setState(() {
+          _dhcpHist.add(
+            DataRow(cells: [
+              DataCell(Text(DateFormat("HH:mm:ss").format(DateTime.now()))),
+              DataCell(Text(datagram.address.address)),
+              DataCell(Text(_getDHCPType(datagram.data))),
+            ]),
+          );
+        });
       });
     } catch (e) {
       setState(() {
         _errorMsg = e.toString();
-      });
-    } finally {
-      setState(() {
         _process = false;
       });
+      _dhcpUDP?.close();
     }
+  }
+
+  void _sendDhcpDiscover() async {
+    if (_dhcpUDP == null) {
+      return;
+    }
+    await _dhcpUDP!.send(_makeDHCPPkt(), Endpoint.broadcast(port: const Port(67)));
+  }
+
+  List<int> _makeDHCPPkt() {
+    List<int> r = [];
+    r.add(0x01); // BOOTP Request
+    r.add(0x01); // HW Type Ethernet
+    r.add(0x06); // HW Addr len 6
+    r.add(0x00);
+    r.add(0x00); // XID
+    r.add(0x01);
+    r.add(0x02);
+    r.add(0x03);
+
+    r.add(0x00); // Sec
+    r.add(0x00);
+
+    r.add(0x80); // Flag Bcast
+    r.add(0x00);
+
+    r.add(0x00); // Client IP
+    r.add(0x00);
+    r.add(0x00);
+    r.add(0x00);
+
+    r.add(0x00); // Your IP
+    r.add(0x00);
+    r.add(0x00);
+    r.add(0x00);
+
+    r.add(0x00); // Next IP
+    r.add(0x00);
+    r.add(0x00);
+    r.add(0x00);
+
+    r.add(0x00); // Relay IP
+    r.add(0x00);
+    r.add(0x00);
+    r.add(0x00);
+
+    r.add(0x5d); //MAC Address
+    r.add(0x01);
+    r.add(0x02);
+    r.add(0x03);
+    r.add(0x04);
+    r.add(0x05);
+    // Padding
+    for (var i = 0; i < 10; i++) {
+      r.add(0x00);
+    }
+    // Server host name
+    for (var i = 0; i < 16 * 4; i++) {
+      r.add(0x00);
+    }
+    // Boot File Name
+    for (var i = 0; i < 16 * 8; i++) {
+      r.add(0x00);
+    }
+    // Magic
+    r.add(0x63);
+    r.add(0x82);
+    r.add(0x53);
+    r.add(0x63);
+    // Discover
+    r.add(0x35);
+    r.add(0x01);
+    r.add(0x01);
+    // End
+    r.add(0xff);
+    return r;
+  }
+
+  String _getDHCPType(Uint8List data) {
+    for (var i = 0; i < data.length - 7; i++) {
+      if (data[i] == 0x63 && data[i + 1] == 0x82 && data[i + 2] == 0x53 && data[i + 3] == 0x63 && data[i + 4] == 0x35 && data[i + 5] == 0x01) {
+        final mac = sprintf("%02x:%02x:%02x:%02x:%02x:%02x", [data[28], data[29], data[30], data[31], data[32], data[33]]);
+        switch (data[i + 6]) {
+          case 0x01:
+            return "Discover($mac)";
+          case 0x02:
+            return "Offer";
+          case 0x03:
+            return "Request";
+          case 0x04:
+            return "Ack";
+        }
+      }
+    }
+    return "Unknow";
   }
 
   void _sendMail() async {
@@ -881,7 +975,7 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
       setState(() {
         _syslogHist.add(
           DataRow(cells: [
-            DataCell(Text(DateFormat("yyyy-MM-dd HH:mm:ss").format(DateTime.now()))),
+            DataCell(Text(DateFormat("HH:mm:ss").format(DateTime.now()))),
             DataCell(Text(len.toString())),
             DataCell(Text(msg)),
           ]),
@@ -927,6 +1021,8 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
   void _stop() {
     _timer?.cancel();
     _timer = null;
+    _dhcpUDP?.close();
+    _dhcpUDP = null;
     setState(() {
       _process = false;
     });
