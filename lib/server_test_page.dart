@@ -13,6 +13,7 @@ import 'package:ntp/ntp.dart';
 import 'package:sprintf/sprintf.dart';
 import 'package:udp/udp.dart';
 import 'dart:io';
+import 'package:dart_snmp/dart_snmp.dart';
 
 class ServerTestPage extends StatefulWidget {
   final Node node;
@@ -30,7 +31,9 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
   String _errorMsg = '';
   String _lastResult = '';
   bool _process = false;
-  MIBDB? _mibdb;
+
+  String _target = "";
+
   // for NTP Test
   String _ntpTarget = '';
   final List<String> _ntpTargetList = [];
@@ -40,13 +43,31 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
   Timer? _timer;
 
   // for Syslog Test
-  String _syslogDst = "";
   int _syslogFacility = 16; // local0
   int _syslogSeverity = 6; // info
   int _syslogFormat = 0; // BSD
   String _syslogMsg = "twsnmpfm: syslogtest";
   String _syslogHost = "twsnmpfm";
   final List<DataRow> _syslogHist = [];
+
+  // for SNMP TRAP Test
+  MIBDB? _mibdb;
+  String _trapOID = "coldStart";
+  String _trapCommunity = "trap";
+  final List<String> _trapOIDs = ["coldStart", "warmStart", "linkUp", "linkDown", "authenticationFailure"];
+  final List<DataRow> _trapHist = [];
+  int _startTime = 0;
+
+  // for DHCP Test
+  bool _dhcpUnicast = false;
+
+  // for Mail Test
+  String _mailUser = "";
+  String _mailPassword = "";
+  String _mailFrom = "";
+  String _mailTo = "";
+  String _mailSubject = "Mail from TWSNMP For Mobile";
+  String _mailBody = "Mail from TWSNMP For Mobile";
 
   _ServerTestState() {
     _loadMIBDB();
@@ -56,7 +77,6 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
   void initState() {
     _timeout = widget.settings.timeout.toDouble();
     _ntpTarget = widget.node.ip;
-    _syslogDst = widget.node.ip;
     _ntpTargetList.add(_ntpTarget);
     _ntpTargetList.add(widget.node.name);
     _ntpTargetList.add("time.windows.com");
@@ -64,8 +84,11 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
     _ntpTargetList.add("time.asia.apple.com");
     _ntpTargetList.add("ntp.jst.mfeed.ad.jp");
     _ntpTargetList.add("time.cloudflare.com");
+    _target = widget.node.ip;
+    _syslogHost = Platform.localHostname;
+    _startTime = DateTime.now().millisecondsSinceEpoch;
     super.initState();
-    _tabController = TabController(vsync: this, length: 4);
+    _tabController = TabController(vsync: this, length: 5);
     _tabController?.addListener(() {
       _stop();
     });
@@ -156,6 +179,7 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
           ),
         ),
       );
+
   SingleChildScrollView _syslogTestView() => SingleChildScrollView(
         padding: const EdgeInsets.all(10),
         child: Form(
@@ -164,7 +188,7 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               TextFormField(
-                initialValue: _syslogDst,
+                initialValue: _target,
                 autocorrect: false,
                 enableSuggestions: false,
                 validator: (value) {
@@ -175,7 +199,7 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
                 },
                 onChanged: (value) {
                   setState(() {
-                    _syslogDst = value;
+                    _target = value;
                   });
                 },
                 decoration: InputDecoration(icon: const Icon(Icons.lan), labelText: loc?.server, hintText: loc?.server),
@@ -296,6 +320,308 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
           ),
         ),
       );
+
+  SingleChildScrollView _trapTestView() => SingleChildScrollView(
+        padding: const EdgeInsets.all(10),
+        child: Form(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              TextFormField(
+                initialValue: _target,
+                autocorrect: false,
+                enableSuggestions: false,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return loc?.requiredError;
+                  }
+                  return null;
+                },
+                onChanged: (value) {
+                  setState(() {
+                    _target = value;
+                  });
+                },
+                decoration: InputDecoration(icon: const Icon(Icons.lan), labelText: loc?.server, hintText: loc?.server),
+              ),
+              TextFormField(
+                initialValue: _trapCommunity,
+                autocorrect: false,
+                enableSuggestions: false,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return loc?.requiredError;
+                  }
+                  return null;
+                },
+                onChanged: (value) {
+                  setState(() {
+                    _trapCommunity = value;
+                  });
+                },
+                decoration: InputDecoration(icon: const Icon(Icons.password), labelText: loc?.community, hintText: loc?.community),
+              ),
+              Text(loc?.trapOID ?? "Trap OID", style: const TextStyle(fontSize: 12)),
+              Autocomplete<String>(
+                initialValue: TextEditingValue(text: _trapOID),
+                optionsBuilder: (value) {
+                  if (value.text.isEmpty) {
+                    return [];
+                  }
+                  return _trapOIDs.where((n) => n.toLowerCase().contains(value.text.toLowerCase()));
+                },
+                onSelected: (value) {
+                  setState(() {
+                    _trapOID = value;
+                  });
+                },
+              ),
+              Text(
+                _errorMsg,
+                style: const TextStyle(fontSize: 12, color: Colors.red),
+              ),
+              SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: DataTable(
+                    headingTextStyle: const TextStyle(
+                      color: Colors.blueGrey,
+                      fontSize: 16,
+                    ),
+                    headingRowHeight: 22,
+                    dataTextStyle: const TextStyle(color: Colors.black, fontSize: 14),
+                    dataRowHeight: 20,
+                    columns: [
+                      DataColumn(
+                        label: Text(loc?.timeStamp ?? "Time"),
+                      ),
+                      DataColumn(
+                        label: Text(loc?.length ?? "Length"),
+                      ),
+                      DataColumn(
+                        label: Text(loc?.trapOID ?? "SNMP Trap OID"),
+                      ),
+                    ],
+                    rows: _trapHist,
+                  )),
+            ],
+          ),
+        ),
+      );
+
+  SingleChildScrollView _dhcpTestView() => SingleChildScrollView(
+        padding: const EdgeInsets.all(10),
+        child: Form(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              TextFormField(
+                initialValue: _target,
+                autocorrect: false,
+                enableSuggestions: false,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return loc?.requiredError;
+                  }
+                  return null;
+                },
+                onChanged: (value) {
+                  setState(() {
+                    _target = value;
+                  });
+                },
+                decoration: InputDecoration(icon: const Icon(Icons.lan), labelText: loc?.server, hintText: loc?.server),
+              ),
+              Row(
+                children: [
+                  Expanded(child: Text(loc?.dhcpUnicast ?? "Unicast")),
+                  Switch(
+                    value: _dhcpUnicast,
+                    onChanged: (bool value) {
+                      _dhcpUnicast = value;
+                    },
+                  ),
+                ],
+              ),
+              Text(
+                _errorMsg,
+                style: const TextStyle(fontSize: 12, color: Colors.red),
+              ),
+              SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: DataTable(
+                    headingTextStyle: const TextStyle(
+                      color: Colors.blueGrey,
+                      fontSize: 16,
+                    ),
+                    headingRowHeight: 22,
+                    dataTextStyle: const TextStyle(color: Colors.black, fontSize: 14),
+                    dataRowHeight: 20,
+                    columns: [
+                      DataColumn(
+                        label: Text(loc?.timeStamp ?? "Time"),
+                      ),
+                      DataColumn(
+                        label: Text(loc?.length ?? "Length"),
+                      ),
+                      DataColumn(
+                        label: Text(loc?.syslogMsg ?? "Message"),
+                      ),
+                    ],
+                    rows: _syslogHist,
+                  )),
+            ],
+          ),
+        ),
+      );
+
+  SingleChildScrollView _mailTestView() => SingleChildScrollView(
+        padding: const EdgeInsets.all(10),
+        child: Form(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              TextFormField(
+                initialValue: _target,
+                autocorrect: false,
+                enableSuggestions: false,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return loc?.requiredError;
+                  }
+                  return null;
+                },
+                onChanged: (value) {
+                  setState(() {
+                    _target = value;
+                  });
+                },
+                decoration: InputDecoration(icon: const Icon(Icons.lan), labelText: loc?.server, hintText: loc?.server),
+              ),
+              TextFormField(
+                initialValue: _mailUser,
+                autocorrect: false,
+                enableSuggestions: false,
+                onChanged: (value) {
+                  setState(() {
+                    _mailUser = value;
+                  });
+                },
+                decoration: InputDecoration(icon: const Icon(Icons.account_balance), labelText: loc?.user, hintText: loc?.user),
+              ),
+              TextFormField(
+                initialValue: _mailPassword,
+                autocorrect: false,
+                enableSuggestions: false,
+                onChanged: (value) {
+                  setState(() {
+                    _mailPassword = value;
+                  });
+                },
+                decoration: InputDecoration(icon: const Icon(Icons.account_balance), labelText: loc?.password, hintText: loc?.password),
+              ),
+              TextFormField(
+                initialValue: _mailFrom,
+                autocorrect: false,
+                enableSuggestions: false,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return loc?.requiredError;
+                  }
+                  return null;
+                },
+                onChanged: (value) {
+                  setState(() {
+                    _mailFrom = value;
+                  });
+                },
+                decoration: InputDecoration(icon: const Icon(Icons.lan), labelText: loc?.mailFrom, hintText: loc?.mailFrom),
+              ),
+              TextFormField(
+                initialValue: _mailTo,
+                autocorrect: false,
+                enableSuggestions: false,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return loc?.requiredError;
+                  }
+                  return null;
+                },
+                onChanged: (value) {
+                  setState(() {
+                    _mailTo = value;
+                  });
+                },
+                decoration: InputDecoration(icon: const Icon(Icons.mail), labelText: loc?.syslogMsg, hintText: loc?.syslogMsg),
+              ),
+              TextFormField(
+                initialValue: _mailSubject,
+                autocorrect: false,
+                enableSuggestions: false,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return loc?.requiredError;
+                  }
+                  return null;
+                },
+                onChanged: (value) {
+                  setState(() {
+                    _mailSubject = value;
+                  });
+                },
+                decoration: InputDecoration(icon: const Icon(Icons.mail), labelText: loc?.syslogMsg, hintText: loc?.syslogMsg),
+              ),
+              TextFormField(
+                initialValue: _mailBody,
+                autocorrect: false,
+                enableSuggestions: false,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return loc?.requiredError;
+                  }
+                  return null;
+                },
+                onChanged: (value) {
+                  setState(() {
+                    _mailBody = value;
+                  });
+                },
+                decoration: InputDecoration(icon: const Icon(Icons.mail), labelText: loc?.mailBody, hintText: loc?.mailBody),
+              ),
+              Text(
+                _errorMsg,
+                style: const TextStyle(fontSize: 12, color: Colors.red),
+              ),
+              SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: DataTable(
+                    headingTextStyle: const TextStyle(
+                      color: Colors.blueGrey,
+                      fontSize: 16,
+                    ),
+                    headingRowHeight: 22,
+                    dataTextStyle: const TextStyle(color: Colors.black, fontSize: 14),
+                    dataRowHeight: 20,
+                    columns: [
+                      DataColumn(
+                        label: Text(loc?.timeStamp ?? "Time"),
+                      ),
+                      DataColumn(
+                        label: Text(loc?.length ?? "Length"),
+                      ),
+                      DataColumn(
+                        label: Text(loc?.syslogMsg ?? "Message"),
+                      ),
+                    ],
+                    rows: _syslogHist,
+                  )),
+            ],
+          ),
+        ),
+      );
+
   void _setNTPStats() {
     if (_ntpOffset.isEmpty) {
       return;
@@ -395,9 +721,9 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
     });
     try {
       int port = 514;
-      String ip = _syslogDst;
-      if (_syslogDst.contains(":")) {
-        final a = _syslogDst.split(":");
+      String ip = _target;
+      if (_target.contains(":")) {
+        final a = _target.split(":");
         if (a.length == 2) {
           ip = a[0];
           port = a[1].toInt();
@@ -448,6 +774,130 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
     }
   }
 
+  void _sendTrap() async {
+    setState(() {
+      _errorMsg = "";
+      _process = true;
+    });
+    try {
+      final List<Varbind> vbl = [];
+      vbl.add(Varbind(Oid.fromString(_mibdb!.nameToOid("sysUpTime.0")), VarbindType.TimeTicks, (DateTime.now().microsecondsSinceEpoch - _startTime) ~/ 10));
+      vbl.add(Varbind(Oid.fromString(_mibdb!.nameToOid("snmpTrapOID")), VarbindType.Oid, _mibdb!.nameToOid(_trapOID)));
+      vbl.add(Varbind(Oid.fromString(_mibdb!.nameToOid("snmpTrapEnterprise")), VarbindType.Oid, _mibdb!.nameToOid("enterprises.17861")));
+      if (_trapOID.startsWith("link")) {
+        vbl.add(Varbind(Oid.fromString(_mibdb!.nameToOid("ifIndex.1")), VarbindType.Integer, 1));
+      }
+      var p = Pdu(PduType.TrapV2, DateTime.now().millisecondsSinceEpoch, vbl);
+      var m = Message(SnmpVersion.V2c, _trapCommunity, p);
+      int port = 162;
+      String ip = _target;
+      if (_target.contains(":")) {
+        final a = _target.split(":");
+        if (a.length == 2) {
+          ip = a[0];
+          port = a[1].toInt();
+        }
+      }
+      var sender = await UDP.bind(Endpoint.any());
+      print("trap");
+      final len = await sender.send(m.encodedBytes, Endpoint.unicast(InternetAddress(ip), port: Port(port)));
+      print(len);
+      setState(() {
+        _trapHist.add(
+          DataRow(cells: [
+            DataCell(Text(DateFormat("yyyy-MM-dd HH:mm:ss").format(DateTime.now()))),
+            DataCell(Text(len.toString())),
+            DataCell(Text(_trapOID)),
+          ]),
+        );
+      });
+    } catch (e) {
+      setState(() {
+        _errorMsg = e.toString();
+      });
+    } finally {
+      setState(() {
+        _process = false;
+      });
+    }
+  }
+
+  void _dhcpTest() async {
+    setState(() {
+      _errorMsg = "";
+      _process = true;
+    });
+    try {
+      int port = 514;
+      String ip = _target;
+      if (_target.contains(":")) {
+        final a = _target.split(":");
+        if (a.length == 2) {
+          ip = a[0];
+          port = a[1].toInt();
+        }
+      }
+      var sender = await UDP.bind(Endpoint.any());
+      final msg = _getSyslogMsg();
+      final len = await sender.send(msg.codeUnits, Endpoint.unicast(InternetAddress(ip), port: Port(port)));
+      setState(() {
+        _syslogHist.add(
+          DataRow(cells: [
+            DataCell(Text(DateFormat("yyyy-MM-dd HH:mm:ss").format(DateTime.now()))),
+            DataCell(Text(len.toString())),
+            DataCell(Text(msg)),
+          ]),
+        );
+      });
+    } catch (e) {
+      setState(() {
+        _errorMsg = e.toString();
+      });
+    } finally {
+      setState(() {
+        _process = false;
+      });
+    }
+  }
+
+  void _sendMail() async {
+    setState(() {
+      _errorMsg = "";
+      _process = true;
+    });
+    try {
+      int port = 514;
+      String ip = _target;
+      if (_target.contains(":")) {
+        final a = _target.split(":");
+        if (a.length == 2) {
+          ip = a[0];
+          port = a[1].toInt();
+        }
+      }
+      var sender = await UDP.bind(Endpoint.any());
+      final msg = _getSyslogMsg();
+      final len = await sender.send(msg.codeUnits, Endpoint.unicast(InternetAddress(ip), port: Port(port)));
+      setState(() {
+        _syslogHist.add(
+          DataRow(cells: [
+            DataCell(Text(DateFormat("yyyy-MM-dd HH:mm:ss").format(DateTime.now()))),
+            DataCell(Text(len.toString())),
+            DataCell(Text(msg)),
+          ]),
+        );
+      });
+    } catch (e) {
+      setState(() {
+        _errorMsg = e.toString();
+      });
+    } finally {
+      setState(() {
+        _process = false;
+      });
+    }
+  }
+
   void _start() {
     final index = _tabController?.index ?? 0;
     switch (index) {
@@ -456,7 +906,20 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
         _startNTPTest();
         break;
       case 1:
+        // syslog Test
         _sendSyslog();
+        break;
+      case 2:
+        // trap Test
+        _sendTrap();
+        break;
+      case 3:
+        // DHCP Test
+        _dhcpTest();
+        break;
+      case 4:
+        // Mail Test
+        _sendMail();
         break;
     }
   }
@@ -480,16 +943,22 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
           controller: _tabController,
           tabs: const [
             Tab(
-              child: Text("NTP"),
+              child: Text("NTP", style: TextStyle(fontSize: 12)),
             ),
             Tab(
-              child: Text("syslog"),
+              child: Text(
+                "syslog",
+                style: TextStyle(fontSize: 12),
+              ),
             ),
             Tab(
-              child: Text("TRAP"),
+              child: Text("Trap", style: TextStyle(fontSize: 12)),
             ),
             Tab(
-              child: Text("DHCP"),
+              child: Text("DHCP", style: TextStyle(fontSize: 12)),
+            ),
+            Tab(
+              child: Text("Mail", style: TextStyle(fontSize: 12)),
             ),
           ],
         ),
@@ -499,12 +968,9 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
         children: [
           _ntpTestView(),
           _syslogTestView(),
-          const Icon(
-            Icons.ac_unit,
-          ),
-          const Icon(
-            Icons.baby_changing_station,
-          ),
+          _trapTestView(),
+          _dhcpTestView(),
+          _mailTestView(),
         ],
       ),
       floatingActionButton: FloatingActionButton(

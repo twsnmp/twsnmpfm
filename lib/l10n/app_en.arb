@@ -81,5 +81,13 @@
     "timeStamp": "Time",
     "length": "Length",
     "host": "Host Name",
+    "trapOID": "SNMP Trap OID",
+    "dhcpUnicast": "Unicast",
+    "user": "User",
+    "password": "Password",
+    "mailFrom": "From",
+    "mailTo": "To",
+    "mailSubject": "Subject",
+    "mailBody": "Message",
     "save":"Save"
 }

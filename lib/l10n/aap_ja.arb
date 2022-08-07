@@ -81,5 +81,13 @@
     "timeStamp": "日時",
     "length": "長さ",
     "host": "ホスト名",
+    "trapOID": "SNMP Trap種別",
+    "dhcpUnicast": "ユニキャストで送信",
+    "user": "ユーザー",
+    "password": "パスワード",
+    "mailFrom": "送信元",
+    "mailTo": "宛先",
+    "mailSubject": "件名",
+    "mailBody": "メッセージ",
     "save":"保存"
 }
