@@ -16,6 +16,8 @@ import 'package:sprintf/sprintf.dart';
 import 'package:udp/udp.dart';
 import 'dart:io';
 import 'package:dart_snmp/dart_snmp.dart';
+import 'package:mailer/mailer.dart' as mailer;
+import 'package:mailer/smtp_server.dart';
 
 class ServerTestPage extends StatefulWidget {
   final Node node;
@@ -72,6 +74,7 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
   String _mailTo = "";
   String _mailSubject = "Mail from TWSNMP For Mobile";
   String _mailBody = "Mail from TWSNMP For Mobile";
+  final List<DataRow> _mailHist = [];
 
   _ServerTestState() {
     _loadMIBDB();
@@ -514,7 +517,7 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
                     _mailUser = value;
                   });
                 },
-                decoration: InputDecoration(icon: const Icon(Icons.account_balance), labelText: loc?.user, hintText: loc?.user),
+                decoration: InputDecoration(icon: const Icon(Icons.account_circle), labelText: loc?.user, hintText: loc?.user),
               ),
               TextFormField(
                 initialValue: _mailPassword,
@@ -525,7 +528,7 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
                     _mailPassword = value;
                   });
                 },
-                decoration: InputDecoration(icon: const Icon(Icons.account_balance), labelText: loc?.password, hintText: loc?.password),
+                decoration: InputDecoration(icon: const Icon(Icons.password), labelText: loc?.password, hintText: loc?.password),
               ),
               TextFormField(
                 initialValue: _mailFrom,
@@ -542,7 +545,7 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
                     _mailFrom = value;
                   });
                 },
-                decoration: InputDecoration(icon: const Icon(Icons.lan), labelText: loc?.mailFrom, hintText: loc?.mailFrom),
+                decoration: InputDecoration(icon: const Icon(Icons.person), labelText: loc?.mailFrom, hintText: loc?.mailFrom),
               ),
               TextFormField(
                 initialValue: _mailTo,
@@ -559,7 +562,7 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
                     _mailTo = value;
                   });
                 },
-                decoration: InputDecoration(icon: const Icon(Icons.mail), labelText: loc?.syslogMsg, hintText: loc?.syslogMsg),
+                decoration: InputDecoration(icon: const Icon(Icons.person), labelText: loc?.mailTo, hintText: loc?.mailTo),
               ),
               TextFormField(
                 initialValue: _mailSubject,
@@ -576,7 +579,7 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
                     _mailSubject = value;
                   });
                 },
-                decoration: InputDecoration(icon: const Icon(Icons.mail), labelText: loc?.syslogMsg, hintText: loc?.syslogMsg),
+                decoration: InputDecoration(icon: const Icon(Icons.subject), labelText: loc?.mailSubject, hintText: loc?.mailSubject),
               ),
               TextFormField(
                 initialValue: _mailBody,
@@ -593,7 +596,7 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
                     _mailBody = value;
                   });
                 },
-                decoration: InputDecoration(icon: const Icon(Icons.mail), labelText: loc?.mailBody, hintText: loc?.mailBody),
+                decoration: InputDecoration(icon: const Icon(Icons.email), labelText: loc?.mailBody, hintText: loc?.mailBody),
               ),
               Text(
                 _errorMsg,
@@ -614,13 +617,13 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
                         label: Text(loc?.time ?? "Time"),
                       ),
                       DataColumn(
-                        label: Text(loc?.length ?? "Length"),
+                        label: Text(loc?.mailSubject ?? "Subject"),
                       ),
                       DataColumn(
-                        label: Text(loc?.syslogMsg ?? "Message"),
+                        label: Text(loc?.status ?? "Status"),
                       ),
                     ],
-                    rows: _syslogHist,
+                    rows: _mailHist,
                   )),
             ],
           ),
@@ -960,7 +963,7 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
       _process = true;
     });
     try {
-      int port = 514;
+      int port = 25;
       String ip = _target;
       if (_target.contains(":")) {
         final a = _target.split(":");
@@ -969,15 +972,24 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
           port = a[1].toInt();
         }
       }
-      var sender = await UDP.bind(Endpoint.any());
-      final msg = _getSyslogMsg();
-      final len = await sender.send(msg.codeUnits, Endpoint.unicast(InternetAddress(ip), port: Port(port)));
+      SmtpServer? server;
+      if (_mailUser != "" && _mailPassword != "") {
+        server = SmtpServer(ip, port: port, username: _mailUser, password: _mailPassword, allowInsecure: true, ignoreBadCertificate: true);
+      } else {
+        server = SmtpServer(ip, port: port, allowInsecure: true, ignoreBadCertificate: true);
+      }
+      final message = mailer.Message()
+        ..from = _mailFrom
+        ..recipients.add(_mailTo)
+        ..subject = _mailSubject
+        ..text = _mailBody;
+      final sendReport = await mailer.send(message, server);
       setState(() {
-        _syslogHist.add(
+        _mailHist.add(
           DataRow(cells: [
             DataCell(Text(DateFormat("HH:mm:ss").format(DateTime.now()))),
-            DataCell(Text(len.toString())),
-            DataCell(Text(msg)),
+            DataCell(Text(_mailSubject)),
+            DataCell(Text(sendReport.toString())),
           ]),
         );
       });
