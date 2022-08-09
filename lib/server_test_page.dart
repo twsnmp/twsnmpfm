@@ -18,6 +18,7 @@ import 'dart:io';
 import 'package:dart_snmp/dart_snmp.dart';
 import 'package:mailer/mailer.dart' as mailer;
 import 'package:mailer/smtp_server.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ServerTestPage extends StatefulWidget {
   final Node node;
@@ -31,7 +32,7 @@ class ServerTestPage extends StatefulWidget {
 class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderStateMixin {
   TabController? _tabController;
   AppLocalizations? loc;
-  double _timeout = 2;
+  double _ntpTimeout = 2;
   String _errorMsg = '';
   String _lastResult = '';
   bool _process = false;
@@ -82,7 +83,6 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
 
   @override
   void initState() {
-    _timeout = widget.settings.timeout.toDouble();
     _ntpTarget = widget.node.ip;
     _ntpTargetList.add(_ntpTarget);
     _ntpTargetList.add(widget.node.name);
@@ -92,19 +92,71 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
     _ntpTargetList.add("ntp.jst.mfeed.ad.jp");
     _ntpTargetList.add("time.cloudflare.com");
     _target = widget.node.ip;
-    _syslogHost = Platform.localHostname;
     _startTime = DateTime.now().millisecondsSinceEpoch;
     super.initState();
     _tabController = TabController(vsync: this, length: 5);
     _tabController?.addListener(() {
       _stop();
     });
+    _load();
+  }
+
+  void _load() async {
+    if (Platform.operatingSystem == 'macos') {
+      return;
+    }
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    // NTP
+    _ntpTimeout = prefs.getDouble("ntpTimeout") ?? widget.settings.timeout.toDouble();
+    // syslog
+    _syslogFacility = prefs.getInt("syslogFacility") ?? 0;
+    _syslogSeverity = prefs.getInt("syslogSeverity") ?? 6;
+    _syslogFormat = prefs.getInt("syslogFormat") ?? 0;
+    _syslogHost = prefs.getString("syslogHost") ?? Platform.localHostname;
+    _syslogMsg = prefs.getString("syslogMsg") ?? "syslog from TWSNMP FM";
+    // Trap
+    _trapCommunity = prefs.getString("trapCommunity") ?? "trap";
+    _trapOID = prefs.getString("trapOID") ?? "coldStart";
+    // DHCP
+    // Mail
+    _mailUser = prefs.getString("mailUser") ?? "";
+    _mailPassword = "";
+    _mailFrom = prefs.getString("mailFrom") ?? "";
+    _mailTo = prefs.getString("mailTo") ?? "";
+    _mailSubject = prefs.getString("mailSubject") ?? "Mail From TWSNMP FM";
+    _mailBody = prefs.getString("mailBody") ?? "Mail From TWSNMP FM";
+  }
+
+  void _save() async {
+    if (Platform.operatingSystem == 'macos') {
+      return;
+    }
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    // NTP
+    await prefs.setDouble('ntpTimeout', _ntpTimeout);
+    // syslog
+    await prefs.setInt('syslogFacility', _syslogFacility);
+    await prefs.setInt('syslogSeverity', _syslogSeverity);
+    await prefs.setInt('syslogFormat', _syslogFormat);
+    await prefs.setString('syslogHost', _syslogHost);
+    await prefs.setString('syslogMsg', _syslogMsg);
+    // trap
+    await prefs.setString('trapCommunity', _trapCommunity);
+    await prefs.setString('trapOID', _trapOID);
+    // DHCP
+    // Mail
+    await prefs.setString('mailUser', _mailUser);
+    await prefs.setString('mailFrom', _mailFrom);
+    await prefs.setString('mailTo', _mailTo);
+    await prefs.setString('mailSubject', _mailSubject);
+    await prefs.setString('mailBody', _mailBody);
   }
 
   @override
   void dispose() {
     _tabController?.dispose();
     _timer?.cancel();
+    _save();
     super.dispose();
   }
 
@@ -138,16 +190,16 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
               ),
               Row(
                 children: [
-                  Expanded(child: Text("${loc!.timeout}(${_timeout.toInt()}${loc!.sec})")),
+                  Expanded(child: Text("${loc!.timeout}(${_ntpTimeout.toInt()}${loc!.sec})")),
                   Slider(
-                      label: "${_timeout.toInt()}",
-                      value: _timeout,
+                      label: "${_ntpTimeout.toInt()}",
+                      value: _ntpTimeout,
                       min: 1,
                       max: 10,
                       divisions: (10 - 1),
                       onChanged: (value) => {
                             setState(() {
-                              _timeout = value;
+                              _ntpTimeout = value;
                             })
                           }),
                 ],
@@ -704,7 +756,7 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
       setState(() {
         _errorMsg = "";
       });
-      final int offset = await NTP.getNtpOffset(localTime: DateTime.now(), lookUpAddress: _ntpTarget, timeout: Duration(seconds: _timeout.toInt()));
+      final int offset = await NTP.getNtpOffset(localTime: DateTime.now(), lookUpAddress: _ntpTarget, timeout: Duration(seconds: _ntpTimeout.toInt()));
       setState(() {
         _lastResult = "offset $offset mSec";
         _ntpChartData.add(TimeSeriesNTPOffset(DateTime.now(), offset.toDouble()));
@@ -817,7 +869,6 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
           ]),
         );
       });
-      await Future.delayed(Duration(seconds: _timeout.toInt() + 2));
     } catch (e) {
       setState(() {
         _errorMsg = e.toString();
