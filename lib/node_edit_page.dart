@@ -98,6 +98,7 @@ class NodeEditFormState extends State<NodeEditForm> {
           initialValue: widget.node.name,
           autocorrect: false,
           enableSuggestions: false,
+          keyboardType: TextInputType.text,
           validator: (value) {
             if (value == null || value.isEmpty) {
               return loc.nameError;
@@ -129,6 +130,7 @@ class NodeEditFormState extends State<NodeEditForm> {
         TextFormField(
           autocorrect: false,
           enableSuggestions: false,
+          keyboardType: const TextInputType.numberWithOptions(decimal: true),
           controller: _ipController,
           validator: (value) {
             if (value == null || value.isEmpty || !validator.ip(value)) {
@@ -146,6 +148,7 @@ class NodeEditFormState extends State<NodeEditForm> {
         TextFormField(
           autocorrect: false,
           enableSuggestions: false,
+          keyboardType: TextInputType.text,
           initialValue: widget.node.community,
           validator: (value) {
             if (value == null) {
