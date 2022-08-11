@@ -6,6 +6,7 @@ import 'package:twsnmpfm/mibdb.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:twsnmpfm/settings.dart';
 import 'package:basic_utils/basic_utils.dart';
+import 'package:flutter_simple_treeview/flutter_simple_treeview.dart';
 
 class SearchPage extends StatefulWidget {
   final Settings settings;
@@ -54,14 +55,17 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
   final List<DropdownMenuItem<int>> _rrTypeList = [];
 
   String _macAddress = "";
-  Map<String, String> _macToVendorMap = {};
+  final Map<String, String> _macToVendorMap = {};
 
-  Map<int, String> tcpPortNameMap = {};
-  Map<int, String> udpPortNameMap = {};
+  final Map<int, String> tcpPortNameMap = {};
+  final Map<int, String> udpPortNameMap = {};
   String _portNumber = "25";
   String _portProt = "tcp";
 
   MIBDB? _mibdb;
+  List<String> _mibNames = [];
+  TreeNode? _mibTreeRoot;
+  final Map<String, TreeNode> _mibTreeMap = {};
 
   final List<DataRow> _results = [];
 
@@ -89,6 +93,60 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
   void _loadMIBDB() async {
     final mibfile = await rootBundle.loadString('assets/conf/mib.txt');
     _mibdb = MIBDB(mibfile);
+    if (_mibdb == null) {
+      return;
+    }
+    // Make MIB Tree
+    _mibNames = _mibdb!.getAllNames();
+    final List<String> oids = [];
+    var minLen = "1.3.6.1".length;
+    for (var n in _mibNames) {
+      var oid = _mibdb!.nameToOid(n);
+      if (oid.length < minLen) {
+        continue;
+      }
+      oids.add(oid);
+    }
+    oids.sort((a, b) {
+      final aa = a.split(".");
+      final ba = b.split(".");
+      for (var i = 0; i < aa.length && i < ba.length; i++) {
+        var l = int.parse(aa[i]);
+        var m = int.parse(ba[i]);
+        if (l == m) {
+          continue;
+        }
+        return l < m ? -1 : 1;
+      }
+      return aa.length.compareTo(ba.length);
+    });
+    _addToMibTree("iso.org.dod.internet", "1.3.6.1", "");
+    for (var oid in oids) {
+      var n = _mibdb!.oidToName(oid);
+      if (n == "") {
+        continue;
+      }
+      final oida = oid.split(".");
+      if (oida.length < 2) {
+        continue;
+      }
+      oida.removeLast();
+      _addToMibTree(n, oid, oida.join("."));
+    }
+  }
+
+  void _addToMibTree(String name, String oid, String poid) {
+    final n = TreeNode(content: Text("$name($oid)"), children: []);
+    if (poid == "") {
+      _mibTreeRoot = n;
+    } else {
+      final p = _mibTreeMap[poid];
+      if (p == null) {
+        return;
+      }
+      p.children?.add(n);
+    }
+    _mibTreeMap[oid] = n;
   }
 
   void _loadPortNameMap() async {
@@ -328,16 +386,15 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
         ),
       );
 
-  SingleChildScrollView _mibTreeView() => SingleChildScrollView(
-        padding: const EdgeInsets.all(10),
-        child: Form(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[],
-          ),
-        ),
-      );
+  SingleChildScrollView _mibTreeView() {
+    var tv = _mibTreeRoot != null
+        ? TreeView(
+            nodes: [_mibTreeRoot!],
+            indent: 15,
+          )
+        : TreeView(nodes: const []);
+    return SingleChildScrollView(padding: const EdgeInsets.all(10), child: SingleChildScrollView(scrollDirection: Axis.horizontal, child: tv));
+  }
 
   void _dnsSearch() async {
     setState(() {
