@@ -95,5 +95,8 @@
     "search": "Search",
     "ipOrHost": "IP or Host Name",
     "rrType": "DNS Record Type",
+    "macAddress": "MAC Address",
+    "vendorCode": "Vendor Code",
+    "vendorName": "Vendor Name",
     "save":"Save"
 }

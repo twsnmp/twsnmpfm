@@ -20,8 +20,7 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
   AppLocalizations? loc;
   String _errorMsg = '';
   bool _process = false;
-  String _target = "";
-  MIBDB? _mibdb;
+  String _dnsTarget = "";
   int _rrType = 1;
   final Map<int, String> _rrTypeMap = {
     1: "A(IPv4)",
@@ -54,10 +53,22 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
   };
   final List<DropdownMenuItem<int>> _rrTypeList = [];
 
+  String _macAddress = "";
+  Map<String, String> _macToVendorMap = {};
+
+  Map<int, String> tcpPortNameMap = {};
+  Map<int, String> udpPortNameMap = {};
+  String _portNumber = "25";
+  String _portProt = "tcp";
+
+  MIBDB? _mibdb;
+
   final List<DataRow> _results = [];
 
   _SearchState() {
     _loadMIBDB();
+    _loadPortNameMap();
+    _loadMacToVendorMap();
   }
 
   @override
@@ -80,6 +91,50 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
     _mibdb = MIBDB(mibfile);
   }
 
+  void _loadPortNameMap() async {
+    final svcfile = await rootBundle.loadString('assets/conf/services.txt');
+    final list = svcfile.split("\n");
+    for (var i = 0; i < list.length; i++) {
+      var l = list[i].trim();
+      if (l.length < 4 || l.startsWith("#")) {
+        continue;
+      }
+      final f = l.split(RegExp(r'\s+'));
+      if (l.length < 2) {
+        continue;
+      }
+      final sn = f[0];
+      final a = f[1].split("/");
+      if (a.length != 2) {
+        continue;
+      }
+      final p = int.parse(a[0]);
+      if (a[1] == "tcp") {
+        tcpPortNameMap[p] = sn;
+      } else if (a[1] == "udp") {
+        udpPortNameMap[p] = sn;
+      }
+    }
+  }
+
+  void _loadMacToVendorMap() async {
+    final svcfile = await rootBundle.loadString('assets/conf/mac-vendors-export.csv');
+    final list = svcfile.split("\n");
+    for (var i = 0; i < list.length; i++) {
+      var l = list[i].trim();
+      if (l.length < 4 || l.startsWith("Mac")) {
+        continue;
+      }
+      final f = l.split(",");
+      if (l.length < 2) {
+        continue;
+      }
+      final pre = f[0];
+      final vendor = f[1].replaceAll('"', '');
+      _macToVendorMap[pre] = vendor;
+    }
+  }
+
   SingleChildScrollView _dnsView() => SingleChildScrollView(
         padding: const EdgeInsets.all(10),
         child: Form(
@@ -88,7 +143,7 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               TextFormField(
-                initialValue: _target,
+                initialValue: _dnsTarget,
                 autocorrect: false,
                 enableSuggestions: false,
                 keyboardType: TextInputType.text,
@@ -100,10 +155,10 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
                 },
                 onChanged: (value) {
                   setState(() {
-                    _target = value;
+                    _dnsTarget = value;
                   });
                 },
-                decoration: InputDecoration(icon: const Icon(Icons.edit), labelText: loc?.ipOrHost ?? "IP or Host", hintText: loc?.ipOrHost ?? ""),
+                decoration: InputDecoration(icon: const Icon(Icons.search), labelText: loc?.ipOrHost ?? "IP or Host", hintText: loc?.ipOrHost ?? ""),
               ),
               Row(
                 children: [
@@ -125,45 +180,181 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
                 _errorMsg,
                 style: const TextStyle(fontSize: 12, color: Colors.red),
               ),
-              DataTable(
-                headingTextStyle: const TextStyle(
-                  color: Colors.blueGrey,
-                  fontSize: 16,
-                ),
-                headingRowHeight: 22,
-                dataTextStyle: const TextStyle(color: Colors.black, fontSize: 14),
-                dataRowHeight: 20,
-                columns: [
-                  DataColumn(
-                    label: Text(loc!.key),
-                  ),
-                  DataColumn(
-                    label: Text(loc!.value),
-                  ),
-                ],
-                rows: _results,
-              ),
+              SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: DataTable(
+                    headingTextStyle: const TextStyle(
+                      color: Colors.blueGrey,
+                      fontSize: 16,
+                    ),
+                    headingRowHeight: 22,
+                    dataTextStyle: const TextStyle(color: Colors.black, fontSize: 14),
+                    dataRowHeight: 20,
+                    columns: [
+                      DataColumn(
+                        label: Text(loc!.key),
+                      ),
+                      DataColumn(
+                        label: Text(loc!.value),
+                      ),
+                    ],
+                    rows: _results,
+                  )),
             ],
           ),
         ),
       );
 
-  void _dnsStart() async {
+  SingleChildScrollView _macToVendorView() => SingleChildScrollView(
+        padding: const EdgeInsets.all(10),
+        child: Form(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              TextFormField(
+                initialValue: _macAddress,
+                autocorrect: false,
+                enableSuggestions: false,
+                keyboardType: TextInputType.text,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return loc!.requiredError;
+                  }
+                  return null;
+                },
+                onChanged: (value) {
+                  setState(() {
+                    _macAddress = value;
+                  });
+                },
+                decoration: InputDecoration(icon: const Icon(Icons.search), labelText: loc?.macAddress ?? "MAC Address", hintText: loc?.macAddress ?? ""),
+              ),
+              SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: DataTable(
+                    headingTextStyle: const TextStyle(
+                      color: Colors.blueGrey,
+                      fontSize: 16,
+                    ),
+                    headingRowHeight: 22,
+                    dataTextStyle: const TextStyle(color: Colors.black, fontSize: 14),
+                    dataRowHeight: 20,
+                    columns: [
+                      DataColumn(
+                        label: Text(loc!.vendorCode),
+                      ),
+                      DataColumn(
+                        label: Text(loc!.vendorName),
+                      ),
+                    ],
+                    rows: _results,
+                  )),
+            ],
+          ),
+        ),
+      );
+
+  SingleChildScrollView _portView() => SingleChildScrollView(
+        padding: const EdgeInsets.all(10),
+        child: Form(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              TextFormField(
+                initialValue: _portNumber,
+                autocorrect: false,
+                enableSuggestions: false,
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return loc!.requiredError;
+                  }
+                  return null;
+                },
+                onChanged: (value) {
+                  setState(() {
+                    _portNumber = value;
+                  });
+                },
+                decoration: InputDecoration(icon: const Icon(Icons.numbers), labelText: loc?.port ?? "Port", hintText: loc?.port ?? ""),
+              ),
+              Row(
+                children: [
+                  const Expanded(child: Text("TCP/UDP")),
+                  DropdownButton<String>(
+                      value: _portProt,
+                      items: const [
+                        DropdownMenuItem(value: "tcp", child: Text("TCP")),
+                        DropdownMenuItem(value: "udp", child: Text("UDP")),
+                      ],
+                      onChanged: (String? value) {
+                        if (value == null) {
+                          return;
+                        }
+                        setState(() {
+                          _portProt = value;
+                        });
+                      }),
+                ],
+              ),
+              Text(
+                _errorMsg,
+                style: const TextStyle(fontSize: 12, color: Colors.red),
+              ),
+              SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: DataTable(
+                    headingTextStyle: const TextStyle(
+                      color: Colors.blueGrey,
+                      fontSize: 16,
+                    ),
+                    headingRowHeight: 22,
+                    dataTextStyle: const TextStyle(color: Colors.black, fontSize: 14),
+                    dataRowHeight: 20,
+                    columns: [
+                      DataColumn(
+                        label: Text(loc!.key),
+                      ),
+                      DataColumn(
+                        label: Text(loc!.value),
+                      ),
+                    ],
+                    rows: _results,
+                  )),
+            ],
+          ),
+        ),
+      );
+
+  SingleChildScrollView _mibTreeView() => SingleChildScrollView(
+        padding: const EdgeInsets.all(10),
+        child: Form(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[],
+          ),
+        ),
+      );
+
+  void _dnsSearch() async {
     setState(() {
       _process = true;
       _results.length = 0;
       _errorMsg = "";
     });
     try {
-      var ip = InternetAddress.tryParse(_target);
+      var ip = InternetAddress.tryParse(_dnsTarget);
       if (ip == null) {
-        var ips = await InternetAddress.lookup(_target);
+        var ips = await InternetAddress.lookup(_dnsTarget);
         for (var ip in ips) {
           setState(() {
             _results.add(DataRow(cells: [DataCell(Text("Local DNS ${ip.type.name}")), DataCell(Text(ip.address))]));
           });
         }
-        var rs = await DnsUtils.lookupRecord(_target, DnsUtils.intToRRecordType(_rrType));
+        var rs = await DnsUtils.lookupRecord(_dnsTarget, DnsUtils.intToRRecordType(_rrType));
         if (rs != null) {
           for (var r in rs) {
             if (r.rType != _rrType) continue;
@@ -180,7 +371,7 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
         setState(() {
           _results.add(DataRow(cells: [const DataCell(Text("Local DNS Host")), DataCell(Text(h.host))]));
         });
-        var rs = await DnsUtils.reverseDns(_target);
+        var rs = await DnsUtils.reverseDns(_dnsTarget);
         if (rs != null) {
           setState(() {
             for (var r in rs) {
@@ -203,19 +394,56 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
     }
   }
 
-  void _start() {
-    final index = _tabController?.index ?? 0;
-    switch (index) {
-      case 0:
-        _dnsStart();
-        break;
+  void _macToVendorSearch() {
+    var a = _macAddress.split(":");
+    while (a.length > 3) {
+      a.removeLast();
+    }
+    final k = a.join(":").toUpperCase();
+    final v = _macToVendorMap[k] ?? "Unknown";
+    setState(() {
+      _results.add(DataRow(cells: [DataCell(Text(k)), DataCell(Text(v))]));
+    });
+  }
+
+  void _portSearch() {
+    final port = int.parse(_portNumber);
+    if (_portProt == "tcp") {
+      final k = "TCP:$port";
+      final v = tcpPortNameMap[port] ?? "Unknown";
+      setState(() {
+        _results.add(DataRow(cells: [DataCell(Text(k)), DataCell(Text(v))]));
+      });
+    } else {
+      final k = "UDP:$port";
+      final v = udpPortNameMap[port] ?? "Unknown";
+      setState(() {
+        _results.add(DataRow(cells: [DataCell(Text(k)), DataCell(Text(v))]));
+      });
     }
   }
 
-  void _stop() {
-    setState(() {
-      _process = false;
-    });
+  void _mibSearch() {}
+
+  void _search() {
+    if (_process) {
+      return;
+    }
+    final index = _tabController?.index ?? 0;
+    switch (index) {
+      case 0:
+        _dnsSearch();
+        break;
+      case 1:
+        _macToVendorSearch();
+        break;
+      case 2:
+        _portSearch();
+        break;
+      case 3:
+        _mibSearch();
+        break;
+    }
   }
 
   @override
@@ -233,24 +461,26 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
             Tab(child: Text("Port")),
             Tab(child: Text("MIB")),
           ],
+          onTap: (v) {
+            setState(() {
+              _errorMsg = "";
+              _results.length = 0;
+            });
+          },
         ),
       ),
       body: TabBarView(
         controller: _tabController,
         children: [
           _dnsView(),
-          _dnsView(),
-          _dnsView(),
-          _dnsView(),
+          _macToVendorView(),
+          _portView(),
+          _mibTreeView(),
         ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          if (_process) {
-            _stop();
-          } else {
-            _start();
-          }
+          _search();
         },
         child: _process ? const Icon(Icons.stop, color: Colors.red) : const Icon(Icons.play_circle),
       ),

@@ -95,5 +95,8 @@
     "search": "検索",
     "ipOrHost": "IPアドレスまたはホスト名",
     "rrType": "DNSレコードタイプ",
+    "macAddress": "MACアドレス",
+    "vendorCode": "ベンダーコード",
+    "vendorName": "ベンダー名",
     "save":"保存"
 }

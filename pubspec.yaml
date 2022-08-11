@@ -49,6 +49,7 @@ flutter:
   assets:
     - assets/conf/mib.txt
     - assets/conf/services.txt
+    - assets/conf/mac-vendors-export.csv
 
 flutter_icons:
   android: true
