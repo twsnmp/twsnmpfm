@@ -92,5 +92,8 @@
     "mailTo": "宛先",
     "mailSubject": "件名",
     "mailBody": "メッセージ",
+    "search": "検索",
+    "ipOrHost": "IPアドレスまたはホスト名",
+    "rrType": "DNSレコードタイプ",
     "save":"保存"
 }

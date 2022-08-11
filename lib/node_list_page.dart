@@ -14,6 +14,7 @@ import 'package:twsnmpfm/cert_page.dart';
 import 'package:twsnmpfm/server_test_page.dart';
 import 'package:twsnmpfm/settings.dart';
 import 'package:twsnmpfm/settings_page.dart';
+import 'package:twsnmpfm/search_page.dart';
 import 'package:twsnmpfm/app_open_ad_manager.dart';
 
 class NodeListPage extends ConsumerStatefulWidget {
@@ -39,6 +40,15 @@ class NodeListState extends ConsumerState<NodeListPage> {
       appBar: AppBar(
         title: const Text('TWSNMP For Mobile'),
         actions: [
+          IconButton(
+            tooltip: loc.search,
+            icon: const Icon(
+              Icons.search,
+            ),
+            onPressed: () {
+              search(context, ref);
+            },
+          ),
           IconButton(
             tooltip: loc.settings,
             icon: const Icon(
@@ -330,6 +340,14 @@ class NodeListState extends ConsumerState<NodeListPage> {
       return;
     }
     settings.save();
+  }
+
+  void search(BuildContext context, WidgetRef ref) async {
+    final settings = ref.read(settingsProvider);
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => SearchPage(settings: settings)),
+    );
   }
 }
 

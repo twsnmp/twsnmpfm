@@ -224,12 +224,12 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
                 headingRowHeight: 22,
                 dataTextStyle: const TextStyle(color: Colors.black, fontSize: 14),
                 dataRowHeight: 20,
-                columns: const [
+                columns: [
                   DataColumn(
-                    label: Text('項目'),
+                    label: Text(loc!.key),
                   ),
                   DataColumn(
-                    label: Text('値'),
+                    label: Text(loc!.value),
                   ),
                 ],
                 rows: _ntpStats,

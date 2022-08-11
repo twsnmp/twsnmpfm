@@ -92,5 +92,8 @@
     "time": "Time",
     "mailSubject": "Subject",
     "mailBody": "Message",
+    "search": "Search",
+    "ipOrHost": "IP or Host Name",
+    "rrType": "DNS Record Type",
     "save":"Save"
 }
