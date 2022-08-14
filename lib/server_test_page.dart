@@ -93,12 +93,12 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
     _ntpTargetList.add("time.cloudflare.com");
     _target = widget.node.ip;
     _startTime = DateTime.now().millisecondsSinceEpoch;
-    super.initState();
+    _load();
     _tabController = TabController(vsync: this, length: 5);
     _tabController?.addListener(() {
       _stop();
     });
-    _load();
+    super.initState();
   }
 
   void _load() async {
@@ -113,7 +113,7 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
     _syslogSeverity = prefs.getInt("syslogSeverity") ?? 6;
     _syslogFormat = prefs.getInt("syslogFormat") ?? 0;
     _syslogHost = prefs.getString("syslogHost") ?? Platform.localHostname;
-    _syslogMsg = prefs.getString("syslogMsg") ?? "syslog from TWSNMP FM";
+    _syslogMsg = prefs.getString("syslogMsg") ?? "tag: from TWSNMP FM";
     // Trap
     _trapCommunity = prefs.getString("trapCommunity") ?? "trap";
     _trapOID = prefs.getString("trapOID") ?? "coldStart";
@@ -304,7 +304,7 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
                       value: _syslogFormat,
                       items: const [
                         DropdownMenuItem(value: 0, child: Text("BSD")),
-                        DropdownMenuItem(value: 1, child: Text("IETF")),
+                        DropdownMenuItem(value: 1, child: Text("RFC5424(IETF)")),
                         DropdownMenuItem(value: 2, child: Text("TWSNMP FC")),
                       ],
                       onChanged: (int? value) {
