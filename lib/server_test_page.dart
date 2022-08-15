@@ -264,9 +264,8 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
                 decoration: InputDecoration(icon: const Icon(Icons.lan), labelText: loc?.server, hintText: loc?.server),
               ),
               Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
+                  const Expanded(child: Text("PRI:")),
                   DropdownButton<int>(
                       value: _syslogFacility,
                       items: const [
@@ -300,20 +299,23 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
                           _syslogSeverity = value ?? 6;
                         });
                       }),
-                  DropdownButton<int>(
-                      value: _syslogFormat,
-                      items: const [
-                        DropdownMenuItem(value: 0, child: Text("BSD")),
-                        DropdownMenuItem(value: 1, child: Text("RFC5424(IETF)")),
-                        DropdownMenuItem(value: 2, child: Text("TWSNMP FC")),
-                      ],
-                      onChanged: (int? value) {
-                        setState(() {
-                          _syslogFormat = value ?? 0;
-                        });
-                      }),
                 ],
               ),
+              Row(children: [
+                const Expanded(child: Text("Format:")),
+                DropdownButton<int>(
+                    value: _syslogFormat,
+                    items: const [
+                      DropdownMenuItem(value: 0, child: Text("BSD")),
+                      DropdownMenuItem(value: 1, child: Text("RFC5424(IETF)")),
+                      DropdownMenuItem(value: 2, child: Text("BSD(ISO Time)")),
+                    ],
+                    onChanged: (int? value) {
+                      setState(() {
+                        _syslogFormat = value ?? 0;
+                      });
+                    })
+              ]),
               TextFormField(
                 initialValue: _syslogHost,
                 autocorrect: false,
@@ -1107,7 +1109,7 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
             Tab(
               child: Text(
                 "syslog",
-                style: TextStyle(fontSize: 12),
+                style: TextStyle(fontSize: 10),
               ),
             ),
             Tab(
