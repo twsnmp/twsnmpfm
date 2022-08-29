@@ -51,8 +51,8 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
   int _syslogFacility = 16; // local0
   int _syslogSeverity = 6; // info
   int _syslogFormat = 0; // BSD
-  String _syslogMsg = "twsnmpfm: syslogtest";
-  String _syslogHost = "twsnmpfm";
+  String _syslogMsg = "tag: from TWSNMP FM";
+  String _syslogHost = "twsnmpfm.local";
   final List<DataRow> _syslogHist = [];
 
   // for SNMP TRAP Test
@@ -93,12 +93,12 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
     _ntpTargetList.add("time.cloudflare.com");
     _target = widget.node.ip;
     _startTime = DateTime.now().millisecondsSinceEpoch;
-    _load();
     _tabController = TabController(vsync: this, length: 5);
     _tabController?.addListener(() {
       _stop();
     });
     super.initState();
+    _load();
   }
 
   void _load() async {
@@ -106,25 +106,27 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
       return;
     }
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    // NTP
-    _ntpTimeout = prefs.getDouble("ntpTimeout") ?? widget.settings.timeout.toDouble();
-    // syslog
-    _syslogFacility = prefs.getInt("syslogFacility") ?? 0;
-    _syslogSeverity = prefs.getInt("syslogSeverity") ?? 6;
-    _syslogFormat = prefs.getInt("syslogFormat") ?? 0;
-    _syslogHost = prefs.getString("syslogHost") ?? Platform.localHostname;
-    _syslogMsg = prefs.getString("syslogMsg") ?? "tag: from TWSNMP FM";
-    // Trap
-    _trapCommunity = prefs.getString("trapCommunity") ?? "trap";
-    _trapOID = prefs.getString("trapOID") ?? "coldStart";
-    // DHCP
-    // Mail
-    _mailUser = prefs.getString("mailUser") ?? "";
-    _mailPassword = "";
-    _mailFrom = prefs.getString("mailFrom") ?? "";
-    _mailTo = prefs.getString("mailTo") ?? "";
-    _mailSubject = prefs.getString("mailSubject") ?? "Mail From TWSNMP FM";
-    _mailBody = prefs.getString("mailBody") ?? "Mail From TWSNMP FM";
+    setState(() {
+      // NTP
+      _ntpTimeout = prefs.getDouble("ntpTimeout") ?? widget.settings.timeout.toDouble();
+      // syslog
+      _syslogFacility = prefs.getInt("syslogFacility") ?? 0;
+      _syslogSeverity = prefs.getInt("syslogSeverity") ?? 6;
+      _syslogFormat = prefs.getInt("syslogFormat") ?? 0;
+      _syslogHost = prefs.getString("syslogHost") ?? Platform.localHostname;
+      _syslogMsg = prefs.getString("syslogMsg") ?? "tag: from TWSNMP FM";
+      // Trap
+      _trapCommunity = prefs.getString("trapCommunity") ?? "trap";
+      _trapOID = prefs.getString("trapOID") ?? "coldStart";
+      // DHCP
+      // Mail
+      _mailUser = prefs.getString("mailUser") ?? "";
+      _mailPassword = "";
+      _mailFrom = prefs.getString("mailFrom") ?? "";
+      _mailTo = prefs.getString("mailTo") ?? "";
+      _mailSubject = prefs.getString("mailSubject") ?? "Mail From TWSNMP FM";
+      _mailBody = prefs.getString("mailBody") ?? "Mail From TWSNMP FM";
+    });
   }
 
   void _save() async {
