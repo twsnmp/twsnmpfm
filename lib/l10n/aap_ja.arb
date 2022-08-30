@@ -98,5 +98,8 @@
     "macAddress": "MACアドレス",
     "vendorCode": "ベンダーコード",
     "vendorName": "ベンダー名",
+    "tx": "送信",
+    "rx": "受信",
+    "error": "エラー",
     "save":"保存"
 }

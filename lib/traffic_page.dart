@@ -9,6 +9,8 @@ import 'package:twsnmpfm/settings.dart';
 import 'dart:async';
 import 'package:twsnmpfm/time_line_chart.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
+import 'package:intl/intl.dart';
+import 'package:flutter/foundation.dart';
 
 class TrafficPage extends StatefulWidget {
   final Node node;
@@ -24,6 +26,7 @@ class _TrafficState extends State<TrafficPage> {
   double _interval = 5;
   int _timeout = 1;
   int _retry = 1;
+  AppLocalizations? loc;
 
   final List<TimeLineSeries> _chartData = [];
   TimeLineSeries? _lastData;
@@ -35,6 +38,8 @@ class _TrafficState extends State<TrafficPage> {
   List<String> _txMIBs = [];
   List<String> _rxMIBs = [];
   List<String> _errorMIBs = [];
+  final List<DataRow> _logs = [];
+  String _unit = '';
 
   @override
   void initState() {
@@ -71,39 +76,82 @@ class _TrafficState extends State<TrafficPage> {
         _txMIBs = ["tcpOutSegs.0"];
         _rxMIBs = ["tcpInSegs.0"];
         _errorMIBs = ["tcpRetransSegs.0"];
+        _unit = "Pkts/Sec";
         break;
       case "udp":
         _txMIBs = ["udpOutDatagrams.0"];
         _rxMIBs = ["udpInDatagrams.0"];
         _errorMIBs = ["udpNoPorts.0", "udpInErrors.0"];
+        _unit = "Pkts/Sec";
+        break;
+      case "ip":
+        _txMIBs = ["ipOutRequests.0"];
+        _rxMIBs = ["ipInReceives.0"];
+        _errorMIBs = ["ipInHdrErrors.0", "ipInAddrErrors.0", "ipInUnknownProtos.0", "ipInDiscards.0", "ipOutDiscards.0", "ipOutNoRoutes.0"];
+        _unit = "Pkts/Sec";
+        break;
+      case "ipfrag":
+        _txMIBs = ["ipFragCreates.0"];
+        _rxMIBs = ["ipReasmReqds.0"];
+        _errorMIBs = ["ipFragFails.0", "ipReasmFails.0"];
+        _unit = "Pkts/Sec";
+        break;
+      case "icmp":
+        _txMIBs = ["icmpOutMsgs.0"];
+        _rxMIBs = ["icmpInMsgs.0"];
+        _errorMIBs = ["icmpInErrors.0", "icmpOutErrors.0"];
+        _unit = "Pkts/Sec";
+        break;
+      case "icmpdu":
+        _txMIBs = ["icmpOutDestUnreachs.0"];
+        _rxMIBs = ["icmpInDestUnreachs.0"];
+        _errorMIBs = [];
+        _unit = "Pkts/Sec";
+        break;
+      case "tcpcon":
+        _txMIBs = ["tcpActiveOpens.0"];
+        _rxMIBs = ["tcpPassiveOpens.0"];
+        _errorMIBs = ["tcpAttemptFails.0", "tcpEstabResets.0"];
+        _unit = "Con/Sec";
+        break;
+      case "snmp":
+        _txMIBs = ["snmpOutPkts.0"];
+        _rxMIBs = ["snmpInPkts.0"];
+        _errorMIBs = ["snmpInBadVersions.0", "snmpInASNParseErrs.0", "snmpInBadCommunityNames.0"];
+        _unit = "Pkts/Sec";
         break;
       case "ifPPS":
         _txMIBs = ["ifOutUcastPkts.$index", "ifOutUcastPkts.$index"];
         _rxMIBs = ["ifInUcastPkts.$index", "ifInUcastPkts.$index"];
         _errorMIBs = ["ifInDiscards.$index", "ifInErrors.$index", "ifInUnknownProtos.$index"];
+        _unit = "Pkts/Sec";
         break;
       case "ifHCPPS":
         _txMIBs = ["ifHCOutUcastPkts.$index", "ifHCOutMulticastPkts.$index", "ifHCOutBroadcastPkts.$index"];
         _rxMIBs = ["ifHCInUcastPkts.$index", "ifHCInMulticastPkts.$index", "ifHCInBroadcastPkts.$index"];
         _errorMIBs = ["ifInDiscards.$index", "ifInErrors.$index", "ifInUnknownProtos.$index"];
+        _unit = "Pkts/Sec";
         break;
       case "ifBPS":
         _txMIBs = ["ifOutOctets.$index"];
         _rxMIBs = ["ifInOctets.$index"];
         _errorMIBs = [];
+        _unit = "Bytes/Sec";
         break;
       case "ifHCBPS":
         _txMIBs = ["ifHCOutOctets.$index"];
         _rxMIBs = ["ifHCInOctets.$index"];
         _errorMIBs = [];
+        _unit = "Bytes/Sec";
         break;
     }
+    setState(() {
+      _chartData.length = 0;
+      _lastData = null;
+      _logs.length = 0;
+    });
     _getTraffic();
     _timer = Timer.periodic(Duration(seconds: _interval.toInt()), _getTrafficTimer);
-    _chartData.length = 0;
-    setState(() {
-      _lastData = null;
-    });
   }
 
   int _findTarget() {
@@ -129,6 +177,7 @@ class _TrafficState extends State<TrafficPage> {
       for (var n in _txMIBs) {
         var m = await session.get(Oid.fromString(_mibdb!.nameToOid(n)));
         if (m.pdu.error.value != 0) {
+          debugPrint('get $n  err=${m.pdu.error.value}');
           continue;
         }
         tx += double.parse(m.pdu.varbinds.first.value.toString());
@@ -136,6 +185,7 @@ class _TrafficState extends State<TrafficPage> {
       for (var n in _rxMIBs) {
         var m = await session.get(Oid.fromString(_mibdb!.nameToOid(n)));
         if (m.pdu.error.value != 0) {
+          debugPrint('get $n  err=${m.pdu.error.value}');
           continue;
         }
         rx += double.parse(m.pdu.varbinds.first.value.toString());
@@ -143,10 +193,12 @@ class _TrafficState extends State<TrafficPage> {
       for (var n in _errorMIBs) {
         var m = await session.get(Oid.fromString(_mibdb!.nameToOid(n)));
         if (m.pdu.error.value != 0) {
+          debugPrint('get $n  err=${m.pdu.error.value}');
           continue;
         }
         err += double.parse(m.pdu.varbinds.first.value.toString());
       }
+      debugPrint('tx=$tx rx=$rx err=$err $_txMIBs $_rxMIBs $_errorMIBs');
       final now = DateTime.now();
       session.close();
       if (_lastData == null) {
@@ -160,6 +212,14 @@ class _TrafficState extends State<TrafficPage> {
         final errps = (err - _lastData!.value[2]) / diff;
         setState(() {
           _chartData.add(TimeLineSeries(now, <double>[txps, rxps, errps]));
+          _logs.add(
+            DataRow(cells: [
+              DataCell(Text(DateFormat("HH:mm:ss").format(now))),
+              DataCell(Text(txps.toStringAsFixed(3))),
+              DataCell(Text(rxps.toStringAsFixed(3))),
+              DataCell(Text(errps.toStringAsFixed(3))),
+            ]),
+          );
         });
       }
       _lastData = TimeLineSeries(now, <double>[tx, rx, err]);
@@ -174,7 +234,13 @@ class _TrafficState extends State<TrafficPage> {
     await _loadMIBDB();
     _targetList = [
       _TrafficTarget("TCP", "tcp", "tcp", ""),
+      _TrafficTarget("TCP Connection", "tcpcon", "tcpcon", ""),
       _TrafficTarget("UDP", "udp", "udp", ""),
+      _TrafficTarget("IP", "ip", "ip", ""),
+      _TrafficTarget("IP Frag", "ipfrag", "ipfrag", ""),
+      _TrafficTarget("ICMP", "icmp", "icmp", ""),
+      _TrafficTarget("ICMP DestUnreachs", "icmpdu", "icmpdu", ""),
+      _TrafficTarget("SNMP", "snmp", "snmp", ""),
     ];
     try {
       var t = InternetAddress(widget.node.ip);
@@ -242,21 +308,21 @@ class _TrafficState extends State<TrafficPage> {
   List<charts.Series<TimeLineSeries, DateTime>> _createChartData() {
     return [
       charts.Series<TimeLineSeries, DateTime>(
-        id: 'Tx',
+        id: loc?.tx ?? "Tx",
         colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
         domainFn: (TimeLineSeries t, _) => t.time,
         measureFn: (TimeLineSeries t, _) => t.value[0],
         data: _chartData,
       ),
       charts.Series<TimeLineSeries, DateTime>(
-        id: 'Rx',
+        id: loc?.rx ?? "Rx",
         colorFn: (_, __) => charts.MaterialPalette.green.shadeDefault,
         domainFn: (TimeLineSeries t, _) => t.time,
         measureFn: (TimeLineSeries t, _) => t.value[1],
         data: _chartData,
       ),
       charts.Series<TimeLineSeries, DateTime>(
-        id: 'Error',
+        id: loc?.error ?? "Error",
         colorFn: (_, __) => charts.MaterialPalette.red.shadeDefault,
         domainFn: (TimeLineSeries t, _) => t.time,
         measureFn: (TimeLineSeries t, _) => t.value[2],
@@ -273,11 +339,11 @@ class _TrafficState extends State<TrafficPage> {
 
   @override
   Widget build(BuildContext context) {
-    final loc = AppLocalizations.of(context)!;
+    loc = AppLocalizations.of(context);
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: Text("${loc.traffic} ${widget.node.name}"),
+          title: Text("${loc?.traffic} ${widget.node.name}"),
         ),
         body: SingleChildScrollView(
           padding: const EdgeInsets.all(10),
@@ -288,7 +354,7 @@ class _TrafficState extends State<TrafficPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Row(children: [
-                  Expanded(child: Text(loc.target)),
+                  Expanded(child: Text(loc!.target)),
                   DropdownButton<String>(
                       value: _selectedTarget,
                       items: _targetMenuItems,
@@ -300,9 +366,9 @@ class _TrafficState extends State<TrafficPage> {
                 ]),
                 Row(
                   children: [
-                    Expanded(child: Text("${loc.interval}(${_interval.toInt()}${loc.sec})")),
+                    Expanded(child: Text("${loc?.interval}(${_interval.toInt()}${loc?.sec})")),
                     Slider(
-                        label: "${_interval.toInt()}${loc.sec}",
+                        label: "${_interval.toInt()}${loc?.sec}",
                         value: _interval,
                         min: 5,
                         max: 60,
@@ -319,6 +385,32 @@ class _TrafficState extends State<TrafficPage> {
                   height: 200,
                   child: TimeLineChart(_createChartData()),
                 ),
+                SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: DataTable(
+                      headingTextStyle: const TextStyle(
+                        color: Colors.blueGrey,
+                        fontSize: 16,
+                      ),
+                      headingRowHeight: 22,
+                      dataTextStyle: const TextStyle(color: Colors.black, fontSize: 14),
+                      dataRowHeight: 20,
+                      columns: [
+                        DataColumn(
+                          label: Text(loc!.time),
+                        ),
+                        DataColumn(
+                          label: Text('${loc!.tx}($_unit)'),
+                        ),
+                        DataColumn(
+                          label: Text('${loc!.rx}($_unit)'),
+                        ),
+                        DataColumn(
+                          label: Text('${loc!.error}($_unit)'),
+                        ),
+                      ],
+                      rows: _logs,
+                    )),
               ],
             ),
           ),

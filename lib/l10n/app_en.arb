@@ -98,5 +98,8 @@
     "macAddress": "MAC Address",
     "vendorCode": "Vendor Code",
     "vendorName": "Vendor Name",
+    "tx": "Tx",
+    "rx": "Rx",
+    "error": "Error",
     "save":"Save"
 }
