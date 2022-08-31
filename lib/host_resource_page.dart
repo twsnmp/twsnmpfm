@@ -156,9 +156,11 @@ class _HostResourceState extends State<HostResourcePage> {
       });
       session.close();
     } catch (e) {
-      setState(() {
-        _errorMsg = e.toString();
-      });
+      if (_timer != null) {
+        setState(() {
+          _errorMsg = e.toString();
+        });
+      }
     }
   }
 
@@ -194,6 +196,7 @@ class _HostResourceState extends State<HostResourcePage> {
   @override
   void dispose() {
     _timer?.cancel();
+    _timer = null;
     super.dispose();
   }
 

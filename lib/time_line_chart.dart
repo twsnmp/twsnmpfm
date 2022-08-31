@@ -11,7 +11,13 @@ class TimeLineChart extends StatelessWidget {
     return charts.TimeSeriesChart(
       seriesList,
       dateTimeFactory: const charts.LocalDateTimeFactory(),
-      behaviors: [charts.SeriesLegend()],
+      behaviors: [
+        charts.SeriesLegend(
+          desiredMaxColumns: 3,
+          cellPadding: const EdgeInsets.only(right: 4.0, bottom: 4.0),
+          entryTextStyle: const charts.TextStyleSpec(fontSize: 11),
+        )
+      ],
     );
   }
 }
