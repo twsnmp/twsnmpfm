@@ -10,7 +10,6 @@ import 'dart:async';
 import 'package:twsnmpfm/time_line_chart.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:intl/intl.dart';
-import 'package:flutter/foundation.dart';
 
 class TrafficPage extends StatefulWidget {
   final Node node;

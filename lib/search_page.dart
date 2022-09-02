@@ -7,6 +7,8 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:twsnmpfm/settings.dart';
 import 'package:basic_utils/basic_utils.dart';
 import 'package:flutter_simple_treeview/flutter_simple_treeview.dart';
+import 'package:udp/udp.dart';
+import 'package:sprintf/sprintf.dart';
 
 class SearchPage extends StatefulWidget {
   final Settings settings;
@@ -21,6 +23,16 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
   AppLocalizations? loc;
   String _errorMsg = '';
   bool _process = false;
+  String _stunServer = "";
+  final Map<String, String> _stunServerMap = {
+    "": "",
+    "stun1.l.google.com": "stun1.l.google.com:19302",
+    "stun2.l.google.com": "stun2.l.google.com:19302",
+    "stun3.l.google.com": "stun3.l.google.com:19302",
+    "stun4.l.google.com": "stun4.l.google.com:19302",
+  };
+  final List<DropdownMenuItem<String>> _stunServerList = [];
+
   String _dnsTarget = "";
   int _rrType = 1;
   final Map<int, String> _rrTypeMap = {
@@ -78,9 +90,12 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(vsync: this, length: 4);
+    _tabController = TabController(vsync: this, length: 5);
     _rrTypeMap.forEach((key, value) {
       _rrTypeList.add(DropdownMenuItem(value: key, child: Text(value)));
+    });
+    _stunServerMap.forEach((key, value) {
+      _stunServerList.add(DropdownMenuItem(value: value, child: Text(key)));
     });
   }
 
@@ -192,6 +207,58 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
       _macToVendorMap[pre] = vendor;
     }
   }
+
+  SingleChildScrollView _myIPView() => SingleChildScrollView(
+        padding: const EdgeInsets.all(10),
+        child: Form(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              Row(
+                children: [
+                  const Expanded(child: Text("STUN Server")),
+                  DropdownButton<String>(
+                      value: _stunServer,
+                      items: _stunServerList,
+                      onChanged: (String? value) {
+                        if (value == null) {
+                          return;
+                        }
+                        setState(() {
+                          _stunServer = value;
+                        });
+                      }),
+                ],
+              ),
+              Text(
+                _errorMsg,
+                style: const TextStyle(fontSize: 12, color: Colors.red),
+              ),
+              SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: DataTable(
+                    headingTextStyle: const TextStyle(
+                      color: Colors.blueGrey,
+                      fontSize: 16,
+                    ),
+                    headingRowHeight: 22,
+                    dataTextStyle: const TextStyle(color: Colors.black, fontSize: 14),
+                    dataRowHeight: 20,
+                    columns: [
+                      DataColumn(
+                        label: Text(loc!.key),
+                      ),
+                      DataColumn(
+                        label: Text(loc!.value),
+                      ),
+                    ],
+                    rows: _results,
+                  )),
+            ],
+          ),
+        ),
+      );
 
   SingleChildScrollView _dnsView() => SingleChildScrollView(
         padding: const EdgeInsets.all(10),
@@ -396,6 +463,83 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
     return SingleChildScrollView(padding: const EdgeInsets.all(10), child: SingleChildScrollView(scrollDirection: Axis.horizontal, child: tv));
   }
 
+  void _myIP() async {
+    setState(() {
+      _process = true;
+      _results.length = 0;
+      _errorMsg = "";
+    });
+    try {
+      for (var i in await NetworkInterface.list()) {
+        for (var addr in i.addresses) {
+          if (!addr.isLoopback) {
+            setState(() {
+              _results.add(DataRow(cells: [DataCell(Text("${i.name}:${addr.type.name}")), DataCell(Text(addr.address))]));
+            });
+          }
+        }
+      }
+      if (_stunServer != "") {
+        var stunIP = "";
+        var stunPort = 0;
+        var a = _stunServer.split(":");
+        if (a.length > 1) {
+          var ips = await InternetAddress.lookup(a[0]);
+          for (var ip in ips) {
+            if (ip.type.name == "IPv4") {
+              stunIP = ip.address;
+              break;
+            }
+          }
+          stunPort = int.parse(a[1]);
+        }
+        if (stunIP != "") {
+          var strun = await UDP.bind(Endpoint.any());
+          strun.asStream(timeout: const Duration(seconds: 5)).listen((datagram) {
+            if (datagram != null && datagram.data.length == 32 && datagram.data[0] == 0x01 && datagram.data[1] == 0x01) {
+              var ip = sprintf("%d.%d.%d.%d", [datagram.data[28], datagram.data[29], datagram.data[30], datagram.data[31]]);
+              setState(() {
+                _results.add(DataRow(cells: [const DataCell(Text("STUN IP")), DataCell(Text(ip))]));
+              });
+            }
+            strun.close();
+          });
+          await strun.send(_makeSTUNPkt(), Endpoint.unicast(InternetAddress(stunIP), port: Port(stunPort)));
+        }
+      }
+    } catch (e) {
+      setState(() {
+        _errorMsg = e.toString();
+      });
+    } finally {
+      setState(() {
+        _process = false;
+      });
+    }
+  }
+
+  List<int> _makeSTUNPkt() {
+    final now = DateTime.now();
+    List<int> r = [];
+    r.add(0x00); // Bind Request
+    r.add(0x01);
+    r.add(0x00); // Length
+    r.add(0x08);
+    // TID
+    for (var i = 0; i < 16; i++) {
+      r.add(i * now.microsecond);
+    }
+    r.add(0x00); // Attr Type = Change
+    r.add(0x03);
+    r.add(0x00); // Attr Len =4
+    r.add(0x04);
+    r.add(0x00); // Attr
+    r.add(0x00);
+    r.add(0x00);
+    r.add(0x00); // No Change
+    return r;
+  }
+
   void _dnsSearch() async {
     setState(() {
       _process = true;
@@ -489,15 +633,18 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
     final index = _tabController?.index ?? 0;
     switch (index) {
       case 0:
-        _dnsSearch();
+        _myIP();
         break;
       case 1:
-        _macToVendorSearch();
+        _dnsSearch();
         break;
       case 2:
-        _portSearch();
+        _macToVendorSearch();
         break;
       case 3:
+        _portSearch();
+        break;
+      case 4:
         _mibSearch();
         break;
     }
@@ -513,10 +660,13 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
         bottom: TabBar(
           controller: _tabController,
           tabs: const [
-            Tab(child: Text("DNS")),
-            Tab(child: Text("MAC")),
-            Tab(child: Text("Port")),
-            Tab(child: Text("MIB")),
+            Tab(
+              child: Text("My IP", style: TextStyle(fontSize: 12)),
+            ),
+            Tab(child: Text("DNS", style: TextStyle(fontSize: 12))),
+            Tab(child: Text("MAC", style: TextStyle(fontSize: 12))),
+            Tab(child: Text("Port", style: TextStyle(fontSize: 12))),
+            Tab(child: Text("MIB", style: TextStyle(fontSize: 12))),
           ],
           onTap: (v) {
             setState(() {
@@ -529,6 +679,7 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
       body: TabBarView(
         controller: _tabController,
         children: [
+          _myIPView(),
           _dnsView(),
           _macToVendorView(),
           _portView(),
