@@ -107,7 +107,7 @@ class _HostResourceState extends State<HostResourcePage> {
           continue;
         }
         final name = t == "hrStorageRam" ? "Mem" : "Disk:${m.pdu.varbinds.first.value}";
-        if (name.contains(":/run") || name.contains(":/sys") || name.contains(":/dev") || name.contains(":/boot")) {
+        if (name.contains(":/run") || name.contains(":/sys") || name.contains(":/dev") || name.contains(":/var/lib/docker") || name.contains(":/boot")) {
           continue;
         }
         m = await session.get(Oid.fromString(_mibdb!.nameToOid("hrStorageSize.$index")));
