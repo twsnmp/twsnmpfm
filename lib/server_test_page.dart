@@ -93,7 +93,7 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
     _ntpTargetList.add("time.cloudflare.com");
     _target = widget.node.ip;
     _startTime = DateTime.now().millisecondsSinceEpoch;
-    _tabController = TabController(vsync: this, length: 5);
+    _tabController = TabController(vsync: this, length: Platform.isIOS ? 5 : 4);
     _tabController?.addListener(() {
       _stop();
     });
@@ -1075,12 +1075,12 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
         _sendTrap();
         break;
       case 3:
-        // DHCP Test
-        _dhcpTest();
-        break;
-      case 4:
         // Mail Test
         _sendMail();
+        break;
+      case 4:
+        // DHCP Test
+        _dhcpTest();
         break;
     }
   }
@@ -1105,25 +1105,23 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
         title: Text("${loc!.serverTest} ${widget.node.name}"),
         bottom: TabBar(
           controller: _tabController,
-          tabs: const [
-            Tab(
+          tabs: [
+            const Tab(
               child: Text("NTP", style: TextStyle(fontSize: 12)),
             ),
-            Tab(
+            const Tab(
               child: Text(
                 "syslog",
                 style: TextStyle(fontSize: 10),
               ),
             ),
-            Tab(
+            const Tab(
               child: Text("Trap", style: TextStyle(fontSize: 12)),
             ),
-            Tab(
-              child: Text("DHCP", style: TextStyle(fontSize: 12)),
-            ),
-            Tab(
+            const Tab(
               child: Text("Mail", style: TextStyle(fontSize: 12)),
             ),
+            if (Platform.isIOS) const Tab(child: Text("DHCP", style: TextStyle(fontSize: 12))),
           ],
         ),
       ),
@@ -1133,8 +1131,8 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
           _ntpTestView(dark),
           _syslogTestView(dark),
           _trapTestView(dark),
-          _dhcpTestView(dark),
           _mailTestView(dark),
+          if (Platform.isIOS) _dhcpTestView(dark),
         ],
       ),
       floatingActionButton: FloatingActionButton(
