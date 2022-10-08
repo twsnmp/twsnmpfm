@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:twsnmpfm/node_list_page.dart';
 import 'package:dart_ping_ios/dart_ping_ios.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:twsnmpfm/settings.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,16 +18,17 @@ void main() {
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final settings = ref.watch(settingsProvider);
     return MaterialApp(
       title: 'TWSNMP FM',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
+      theme: ThemeData.light(),
+      darkTheme: ThemeData.dark(),
+      themeMode: settings.themeMode,
       localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,

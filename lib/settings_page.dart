@@ -36,6 +36,7 @@ class SettingsFormState extends State<SettingsForm> {
   double _interval = 5;
   String _mibName = "";
   bool _showAllPort = false;
+  ThemeMode _themeMode = ThemeMode.system;
 
   @override
   void initState() {
@@ -46,6 +47,7 @@ class SettingsFormState extends State<SettingsForm> {
     _ttl = widget.settings.ttl.toDouble();
     _mibName = widget.settings.mibName;
     _showAllPort = widget.settings.showAllPort;
+    _themeMode = widget.settings.themeMode;
     super.initState();
   }
 
@@ -166,6 +168,23 @@ class SettingsFormState extends State<SettingsForm> {
               ),
             ],
           ),
+          Row(
+            children: [
+              Expanded(child: Text(loc.themeMode)),
+              DropdownButton<ThemeMode>(
+                  value: _themeMode,
+                  items: [
+                    DropdownMenuItem(value: ThemeMode.system, child: Text(loc.themeModeSystem)),
+                    DropdownMenuItem(value: ThemeMode.light, child: Text(loc.themeModeLight)),
+                    DropdownMenuItem(value: ThemeMode.dark, child: Text(loc.themeModeDark)),
+                  ],
+                  onChanged: (value) => {
+                        setState(() {
+                          _themeMode = value!;
+                        })
+                      }),
+            ],
+          ),
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: ElevatedButton(
@@ -178,6 +197,7 @@ class SettingsFormState extends State<SettingsForm> {
                   widget.settings.ttl = _ttl.toInt();
                   widget.settings.mibName = _mibName;
                   widget.settings.showAllPort = _showAllPort;
+                  widget.settings.themeMode = _themeMode;
                   Navigator.pop(context, widget.settings);
                 }
               },

@@ -101,5 +101,9 @@
     "tx": "送信",
     "rx": "受信",
     "error": "エラー",
+    "themeMode": "テーマ",
+    "themeModeSystem": "システム設定",
+    "themeModeLight": "ライト",
+    "themeModeDark": "ダーク",
     "save":"保存"
 }

@@ -13,6 +13,7 @@ class Settings extends ChangeNotifier {
   int interval = 5;
   String mibName = "system";
   bool showAllPort = false;
+  ThemeMode themeMode = ThemeMode.system;
 
   Settings() {
     _load();
@@ -28,8 +29,10 @@ class Settings extends ChangeNotifier {
     await prefs.setInt('timeout', timeout);
     await prefs.setInt('retry', retry);
     await prefs.setInt('interval', interval);
+    await prefs.setInt('themeMode', themeMode.index);
     await prefs.setString('mibName', mibName);
     await prefs.setBool('showAllPort', showAllPort);
+    notifyListeners();
   }
 
   Future _load() async {
@@ -44,6 +47,17 @@ class Settings extends ChangeNotifier {
     interval = prefs.getInt("interval") ?? 5;
     mibName = prefs.getString("mibName") ?? "system";
     showAllPort = prefs.getBool("showAllPort") ?? false;
+    final tm = prefs.getInt("themeMode") ?? 0;
+    switch (tm) {
+      case 1:
+        themeMode = ThemeMode.light;
+        break;
+      case 2:
+        themeMode = ThemeMode.dark;
+        break;
+      default:
+        themeMode = ThemeMode.system;
+    }
     notifyListeners();
   }
 }

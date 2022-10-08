@@ -240,6 +240,7 @@ class _VPanelState extends State<VPanelPage> {
 
   @override
   Widget build(BuildContext context) {
+    bool dark = Theme.of(context).brightness == Brightness.dark;
     final loc = AppLocalizations.of(context)!;
     final sketch = PanelSketch(_ports, _showAllPort);
     return SafeArea(
@@ -299,12 +300,12 @@ class _VPanelState extends State<VPanelPage> {
                 SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: DataTable(
-                      headingTextStyle: const TextStyle(
-                        color: Colors.blueGrey,
+                      headingTextStyle: TextStyle(
+                        color: dark ? Colors.white : Colors.blueGrey,
                         fontSize: 16,
                       ),
                       headingRowHeight: 22,
-                      dataTextStyle: const TextStyle(color: Colors.black, fontSize: 14),
+                      dataTextStyle: TextStyle(color: dark ? Colors.white : Colors.black, fontSize: 14),
                       dataRowHeight: 20,
                       columns: const [
                         DataColumn(label: Text("Index")),

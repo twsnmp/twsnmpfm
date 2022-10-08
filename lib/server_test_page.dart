@@ -167,7 +167,7 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
     _mibdb = MIBDB(mibfile);
   }
 
-  SingleChildScrollView _ntpTestView() => SingleChildScrollView(
+  SingleChildScrollView _ntpTestView(bool dark) => SingleChildScrollView(
         padding: const EdgeInsets.all(10),
         child: Form(
           child: Column(
@@ -208,7 +208,7 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
               ),
               Text(
                 _lastResult,
-                style: const TextStyle(fontSize: 16, color: Colors.black87),
+                style: TextStyle(fontSize: 16, color: dark ? Colors.white : Colors.black87),
               ),
               Text(
                 _errorMsg,
@@ -219,12 +219,12 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
                 child: NTPChart(_createNTPChartData()),
               ),
               DataTable(
-                headingTextStyle: const TextStyle(
-                  color: Colors.blueGrey,
+                headingTextStyle: TextStyle(
+                  color: dark ? Colors.white : Colors.blueGrey,
                   fontSize: 16,
                 ),
                 headingRowHeight: 22,
-                dataTextStyle: const TextStyle(color: Colors.black, fontSize: 14),
+                dataTextStyle: TextStyle(color: dark ? Colors.white : Colors.black, fontSize: 14),
                 dataRowHeight: 20,
                 columns: [
                   DataColumn(
@@ -241,7 +241,7 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
         ),
       );
 
-  SingleChildScrollView _syslogTestView() => SingleChildScrollView(
+  SingleChildScrollView _syslogTestView(bool dark) => SingleChildScrollView(
         padding: const EdgeInsets.all(10),
         child: Form(
           child: Column(
@@ -359,12 +359,12 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
               SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: DataTable(
-                    headingTextStyle: const TextStyle(
-                      color: Colors.blueGrey,
+                    headingTextStyle: TextStyle(
+                      color: dark ? Colors.white : Colors.blueGrey,
                       fontSize: 16,
                     ),
                     headingRowHeight: 22,
-                    dataTextStyle: const TextStyle(color: Colors.black, fontSize: 14),
+                    dataTextStyle: TextStyle(color: dark ? Colors.white : Colors.black, fontSize: 14),
                     dataRowHeight: 20,
                     columns: [
                       DataColumn(
@@ -384,7 +384,7 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
         ),
       );
 
-  SingleChildScrollView _trapTestView() => SingleChildScrollView(
+  SingleChildScrollView _trapTestView(bool dark) => SingleChildScrollView(
         padding: const EdgeInsets.all(10),
         child: Form(
           child: Column(
@@ -447,12 +447,12 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
               SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: DataTable(
-                    headingTextStyle: const TextStyle(
-                      color: Colors.blueGrey,
+                    headingTextStyle: TextStyle(
+                      color: dark ? Colors.white : Colors.blueGrey,
                       fontSize: 16,
                     ),
                     headingRowHeight: 22,
-                    dataTextStyle: const TextStyle(color: Colors.black, fontSize: 14),
+                    dataTextStyle: TextStyle(color: dark ? Colors.white : Colors.black, fontSize: 14),
                     dataRowHeight: 20,
                     columns: [
                       DataColumn(
@@ -472,7 +472,7 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
         ),
       );
 
-  SingleChildScrollView _dhcpTestView() => SingleChildScrollView(
+  SingleChildScrollView _dhcpTestView(bool dark) => SingleChildScrollView(
         padding: const EdgeInsets.all(10),
         child: Form(
           child: Column(
@@ -515,12 +515,12 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
               SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: DataTable(
-                    headingTextStyle: const TextStyle(
-                      color: Colors.blueGrey,
+                    headingTextStyle: TextStyle(
+                      color: dark ? Colors.white : Colors.blueGrey,
                       fontSize: 16,
                     ),
                     headingRowHeight: 22,
-                    dataTextStyle: const TextStyle(color: Colors.black, fontSize: 14),
+                    dataTextStyle: TextStyle(color: dark ? Colors.white : Colors.black, fontSize: 14),
                     dataRowHeight: 20,
                     columns: [
                       DataColumn(
@@ -540,7 +540,7 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
         ),
       );
 
-  SingleChildScrollView _mailTestView() => SingleChildScrollView(
+  SingleChildScrollView _mailTestView(bool dark) => SingleChildScrollView(
         padding: const EdgeInsets.all(10),
         child: Form(
           child: Column(
@@ -661,12 +661,12 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
               SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: DataTable(
-                    headingTextStyle: const TextStyle(
-                      color: Colors.blueGrey,
+                    headingTextStyle: TextStyle(
+                      color: dark ? Colors.white : Colors.blueGrey,
                       fontSize: 16,
                     ),
                     headingRowHeight: 22,
-                    dataTextStyle: const TextStyle(color: Colors.black, fontSize: 14),
+                    dataTextStyle: TextStyle(color: dark ? Colors.white : Colors.black, fontSize: 14),
                     dataRowHeight: 20,
                     columns: [
                       DataColumn(
@@ -1097,6 +1097,7 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
 
   @override
   Widget build(BuildContext context) {
+    bool dark = Theme.of(context).brightness == Brightness.dark;
     loc = AppLocalizations.of(context)!;
     return SafeArea(
         child: Scaffold(
@@ -1129,11 +1130,11 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
       body: TabBarView(
         controller: _tabController,
         children: [
-          _ntpTestView(),
-          _syslogTestView(),
-          _trapTestView(),
-          _dhcpTestView(),
-          _mailTestView(),
+          _ntpTestView(dark),
+          _syslogTestView(dark),
+          _trapTestView(dark),
+          _dhcpTestView(dark),
+          _mailTestView(dark),
         ],
       ),
       floatingActionButton: FloatingActionButton(

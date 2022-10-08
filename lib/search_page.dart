@@ -208,7 +208,7 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
     }
   }
 
-  SingleChildScrollView _myIPView() => SingleChildScrollView(
+  SingleChildScrollView _myIPView(bool dark) => SingleChildScrollView(
         padding: const EdgeInsets.all(10),
         child: Form(
           child: Column(
@@ -238,12 +238,12 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
               SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: DataTable(
-                    headingTextStyle: const TextStyle(
-                      color: Colors.blueGrey,
+                    headingTextStyle: TextStyle(
+                      color: dark ? Colors.white : Colors.blueGrey,
                       fontSize: 16,
                     ),
                     headingRowHeight: 22,
-                    dataTextStyle: const TextStyle(color: Colors.black, fontSize: 14),
+                    dataTextStyle: TextStyle(color: dark ? Colors.white : Colors.black, fontSize: 14),
                     dataRowHeight: 20,
                     columns: [
                       DataColumn(
@@ -260,7 +260,7 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
         ),
       );
 
-  SingleChildScrollView _dnsView() => SingleChildScrollView(
+  SingleChildScrollView _dnsView(bool dark) => SingleChildScrollView(
         padding: const EdgeInsets.all(10),
         child: Form(
           child: Column(
@@ -308,12 +308,12 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
               SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: DataTable(
-                    headingTextStyle: const TextStyle(
-                      color: Colors.blueGrey,
+                    headingTextStyle: TextStyle(
+                      color: dark ? Colors.white : Colors.blueGrey,
                       fontSize: 16,
                     ),
                     headingRowHeight: 22,
-                    dataTextStyle: const TextStyle(color: Colors.black, fontSize: 14),
+                    dataTextStyle: TextStyle(color: dark ? Colors.white : Colors.black, fontSize: 14),
                     dataRowHeight: 20,
                     columns: [
                       DataColumn(
@@ -330,7 +330,7 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
         ),
       );
 
-  SingleChildScrollView _macToVendorView() => SingleChildScrollView(
+  SingleChildScrollView _macToVendorView(bool dark) => SingleChildScrollView(
         padding: const EdgeInsets.all(10),
         child: Form(
           child: Column(
@@ -358,12 +358,12 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
               SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: DataTable(
-                    headingTextStyle: const TextStyle(
-                      color: Colors.blueGrey,
+                    headingTextStyle: TextStyle(
+                      color: dark ? Colors.white : Colors.blueGrey,
                       fontSize: 16,
                     ),
                     headingRowHeight: 22,
-                    dataTextStyle: const TextStyle(color: Colors.black, fontSize: 14),
+                    dataTextStyle: TextStyle(color: dark ? Colors.white : Colors.black, fontSize: 14),
                     dataRowHeight: 20,
                     columns: [
                       DataColumn(
@@ -380,7 +380,7 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
         ),
       );
 
-  SingleChildScrollView _portView() => SingleChildScrollView(
+  SingleChildScrollView _portView(bool dark) => SingleChildScrollView(
         padding: const EdgeInsets.all(10),
         child: Form(
           child: Column(
@@ -431,12 +431,12 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
               SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: DataTable(
-                    headingTextStyle: const TextStyle(
-                      color: Colors.blueGrey,
+                    headingTextStyle: TextStyle(
+                      color: dark ? Colors.white : Colors.blueGrey,
                       fontSize: 16,
                     ),
                     headingRowHeight: 22,
-                    dataTextStyle: const TextStyle(color: Colors.black, fontSize: 14),
+                    dataTextStyle: TextStyle(color: dark ? Colors.white : Colors.black, fontSize: 14),
                     dataRowHeight: 20,
                     columns: [
                       DataColumn(
@@ -652,6 +652,7 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
 
   @override
   Widget build(BuildContext context) {
+    bool dark = Theme.of(context).brightness == Brightness.dark;
     loc = AppLocalizations.of(context)!;
     return SafeArea(
         child: Scaffold(
@@ -679,10 +680,10 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
       body: TabBarView(
         controller: _tabController,
         children: [
-          _myIPView(),
-          _dnsView(),
-          _macToVendorView(),
-          _portView(),
+          _myIPView(dark),
+          _dnsView(dark),
+          _macToVendorView(dark),
+          _portView(dark),
           _mibTreeView(),
         ],
       ),

@@ -338,6 +338,7 @@ class _TrafficState extends State<TrafficPage> {
 
   @override
   Widget build(BuildContext context) {
+    bool dark = Theme.of(context).brightness == Brightness.dark;
     loc = AppLocalizations.of(context);
     return SafeArea(
       child: Scaffold(
@@ -387,12 +388,12 @@ class _TrafficState extends State<TrafficPage> {
                 SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: DataTable(
-                      headingTextStyle: const TextStyle(
-                        color: Colors.blueGrey,
+                      headingTextStyle: TextStyle(
+                        color: dark ? Colors.white : Colors.blueGrey,
                         fontSize: 16,
                       ),
                       headingRowHeight: 22,
-                      dataTextStyle: const TextStyle(color: Colors.black, fontSize: 14),
+                      dataTextStyle: TextStyle(color: dark ? Colors.white : Colors.black, fontSize: 14),
                       dataRowHeight: 20,
                       columns: [
                         DataColumn(

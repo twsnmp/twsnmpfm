@@ -171,6 +171,7 @@ class _PingPageState extends State<PingPage> {
   @override
   Widget build(BuildContext context) {
     loc = AppLocalizations.of(context)!;
+    bool dark = Theme.of(context).brightness == Brightness.dark;
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
@@ -246,7 +247,7 @@ class _PingPageState extends State<PingPage> {
                 ),
                 Text(
                   _lastResult,
-                  style: const TextStyle(fontSize: 16, color: Colors.black87),
+                  style: TextStyle(fontSize: 16, color: dark ? Colors.white : Colors.black87),
                 ),
                 Text(
                   _errMsg,
@@ -257,12 +258,12 @@ class _PingPageState extends State<PingPage> {
                   child: PingChart(_createChartData()),
                 ),
                 DataTable(
-                  headingTextStyle: const TextStyle(
-                    color: Colors.blueGrey,
+                  headingTextStyle: TextStyle(
+                    color: dark ? Colors.white : Colors.blueGrey,
                     fontSize: 16,
                   ),
                   headingRowHeight: 22,
-                  dataTextStyle: const TextStyle(color: Colors.black, fontSize: 14),
+                  dataTextStyle: TextStyle(color: dark ? Colors.white : Colors.black, fontSize: 14),
                   dataRowHeight: 20,
                   columns: const [
                     DataColumn(

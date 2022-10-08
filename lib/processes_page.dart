@@ -186,13 +186,27 @@ class _ProcessesState extends State<ProcessesPage> {
     });
   }
 
-  List<charts.Series<BarData, String>> _createChartSeries() {
+  List<charts.Series<BarData, String>> _createChartSeries(bool dark) {
     if (_sortCPU) {
       return [
-        charts.Series<BarData, String>(id: 'CPU', domainFn: (BarData d, _) => d.name, measureFn: (BarData d, _) => d.value, data: _topCPU, labelAccessorFn: (BarData d, _) => '${d.name}: ${d.value.toStringAsFixed(2)}%'),
+        charts.Series<BarData, String>(
+            id: 'CPU',
+            domainFn: (BarData d, _) => d.name,
+            measureFn: (BarData d, _) => d.value,
+            data: _topCPU,
+            outsideLabelStyleAccessorFn: (BarData d, _) => charts.TextStyleSpec(color: dark ? charts.MaterialPalette.white : charts.MaterialPalette.black),
+            labelAccessorFn: (BarData d, _) => '${d.name}: ${d.value.toStringAsFixed(2)}%'),
       ];
     }
-    return [charts.Series<BarData, String>(id: 'Memory', domainFn: (BarData d, _) => d.name, measureFn: (BarData d, _) => d.value, data: _topMem, labelAccessorFn: (BarData d, _) => '${d.name}: ${d.value.toStringAsFixed(2)}%')];
+    return [
+      charts.Series<BarData, String>(
+          id: 'Memory',
+          domainFn: (BarData d, _) => d.name,
+          measureFn: (BarData d, _) => d.value,
+          data: _topMem,
+          outsideLabelStyleAccessorFn: (BarData d, _) => charts.TextStyleSpec(color: dark ? charts.MaterialPalette.white : charts.MaterialPalette.black),
+          labelAccessorFn: (BarData d, _) => '${d.name}: ${d.value.toStringAsFixed(2)}%'),
+    ];
   }
 
   @override
@@ -203,6 +217,7 @@ class _ProcessesState extends State<ProcessesPage> {
 
   @override
   Widget build(BuildContext context) {
+    bool dark = Theme.of(context).brightness == Brightness.dark;
     final loc = AppLocalizations.of(context)!;
     return SafeArea(
       child: Scaffold(
@@ -249,18 +264,18 @@ class _ProcessesState extends State<ProcessesPage> {
                 Text(_errorMsg, style: const TextStyle(color: Colors.red)),
                 SizedBox(
                   height: 300,
-                  child: HorizontalBarLabelChart(_createChartSeries()),
+                  child: HorizontalBarLabelChart(_createChartSeries(dark)),
                 ),
                 const SizedBox(height: 10),
                 SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: DataTable(
-                      headingTextStyle: const TextStyle(
-                        color: Colors.blueGrey,
+                      headingTextStyle: TextStyle(
+                        color: dark ? Colors.white : Colors.blueGrey,
                         fontSize: 16,
                       ),
                       headingRowHeight: 22,
-                      dataTextStyle: const TextStyle(color: Colors.black, fontSize: 14),
+                      dataTextStyle: TextStyle(color: dark ? Colors.white : Colors.black, fontSize: 14),
                       dataRowHeight: 20,
                       columns: [
                         DataColumn(label: Text(loc.processName)),

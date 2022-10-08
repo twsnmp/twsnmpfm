@@ -101,5 +101,9 @@
     "tx": "Tx",
     "rx": "Rx",
     "error": "Error",
+    "themeMode": "Theme",
+    "themeModeSystem": "System",
+    "themeModeLight": "Light",
+    "themeModeDark": "Dark",
     "save":"Save"
 }
