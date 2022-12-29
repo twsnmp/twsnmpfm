@@ -123,8 +123,8 @@ class NodeEditFormState extends State<NodeEditForm> {
           },
           label: Text(loc.getIPFromName),
           style: ElevatedButton.styleFrom(
-            primary: Colors.green,
-            onPrimary: Colors.white,
+            foregroundColor: Colors.white,
+            backgroundColor: Colors.green,
           ),
         ),
         TextFormField(

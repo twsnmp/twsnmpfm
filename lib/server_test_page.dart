@@ -32,15 +32,15 @@ class ServerTestPage extends StatefulWidget {
 class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderStateMixin {
   TabController? _tabController;
   AppLocalizations? loc;
-  double _ntpTimeout = 2;
-  String _errorMsg = '';
-  String _lastResult = '';
   bool _process = false;
 
   String _target = "";
 
   // for NTP Test
+  double _ntpTimeout = 2;
   String _ntpTarget = '';
+  String _errorMsgNTP = '';
+  String _lastResultNTP = '';
   final List<String> _ntpTargetList = [];
   final List<DataRow> _ntpStats = [];
   final List<num> _ntpOffset = [];
@@ -53,12 +53,14 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
   int _syslogFormat = 0; // BSD
   String _syslogMsg = "tag: from TWSNMP FM";
   String _syslogHost = "twsnmpfm.local";
+  String _errorMsgSyslog = '';
   final List<DataRow> _syslogHist = [];
 
   // for SNMP TRAP Test
   MIBDB? _mibdb;
   String _trapOID = "coldStart";
   String _trapCommunity = "trap";
+  String _errorMsgTrap = '';
   final List<String> _trapOIDs = ["coldStart", "warmStart", "linkUp", "linkDown", "authenticationFailure"];
   final List<DataRow> _trapHist = [];
   int _startTime = 0;
@@ -66,6 +68,7 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
   // for DHCP Test
   int _dhcpPort = 67; // Server 67/Client 68
   UDP? _dhcpUDP;
+  String _errorMsgDHCP = '';
   final List<DataRow> _dhcpHist = [];
 
   // for Mail Test
@@ -75,6 +78,7 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
   String _mailTo = "";
   String _mailSubject = "Mail from TWSNMP For Mobile";
   String _mailBody = "Mail from TWSNMP For Mobile";
+  String _errorMsgMail = '';
   final List<DataRow> _mailHist = [];
 
   _ServerTestState() {
@@ -157,6 +161,7 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
   @override
   void dispose() {
     _tabController?.dispose();
+    _dhcpUDP?.close();
     _timer?.cancel();
     _save();
     super.dispose();
@@ -207,11 +212,11 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
                 ],
               ),
               Text(
-                _lastResult,
+                _lastResultNTP,
                 style: TextStyle(fontSize: 16, color: dark ? Colors.white : Colors.black87),
               ),
               Text(
-                _errorMsg,
+                _errorMsgNTP,
                 style: const TextStyle(fontSize: 12, color: Colors.red),
               ),
               SizedBox(
@@ -353,7 +358,7 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
                 decoration: InputDecoration(icon: const Icon(Icons.mail), labelText: loc?.syslogMsg, hintText: loc?.syslogMsg),
               ),
               Text(
-                _errorMsg,
+                _errorMsgSyslog,
                 style: const TextStyle(fontSize: 12, color: Colors.red),
               ),
               SingleChildScrollView(
@@ -441,7 +446,7 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
                 },
               ),
               Text(
-                _errorMsg,
+                _errorMsgTrap,
                 style: const TextStyle(fontSize: 12, color: Colors.red),
               ),
               SingleChildScrollView(
@@ -509,7 +514,7 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
                 child: const Text("Send Discover"),
               ),
               Text(
-                _errorMsg,
+                _errorMsgDHCP,
                 style: const TextStyle(fontSize: 12, color: Colors.red),
               ),
               SingleChildScrollView(
@@ -655,7 +660,7 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
                 decoration: InputDecoration(icon: const Icon(Icons.email), labelText: loc?.mailBody, hintText: loc?.mailBody),
               ),
               Text(
-                _errorMsg,
+                _errorMsgMail,
                 style: const TextStyle(fontSize: 12, color: Colors.red),
               ),
               SingleChildScrollView(
@@ -741,8 +746,8 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
       return;
     }
     setState(() {
-      _lastResult = "";
-      _errorMsg = "";
+      _lastResultNTP = "";
+      _errorMsgNTP = "";
       _process = true;
       _ntpChartData.length = 0;
       _ntpOffset.length = 0;
@@ -758,11 +763,11 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
   void _ntpTest() async {
     try {
       setState(() {
-        _errorMsg = "";
+        _errorMsgNTP = "";
       });
       final int offset = await NTP.getNtpOffset(localTime: DateTime.now(), lookUpAddress: _ntpTarget, timeout: Duration(seconds: _ntpTimeout.toInt()));
       setState(() {
-        _lastResult = "offset $offset mSec";
+        _lastResultNTP = "offset $offset mSec";
         _ntpChartData.add(TimeSeriesNTPOffset(DateTime.now(), offset.toDouble()));
         _ntpOffset.add(offset);
         _setNTPStats();
@@ -772,7 +777,7 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
       }
     } catch (e) {
       setState(() {
-        _errorMsg = e.toString();
+        _errorMsgNTP = e.toString();
       });
       _stop();
     }
@@ -780,7 +785,7 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
 
   void _sendSyslog() async {
     setState(() {
-      _errorMsg = "";
+      _errorMsgSyslog = "";
       _process = true;
     });
     try {
@@ -807,7 +812,7 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
       });
     } catch (e) {
       setState(() {
-        _errorMsg = e.toString();
+        _errorMsgSyslog = e.toString();
       });
     } finally {
       setState(() {
@@ -840,7 +845,7 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
 
   void _sendTrap() async {
     setState(() {
-      _errorMsg = "";
+      _errorMsgTrap = "";
       _process = true;
     });
     try {
@@ -875,7 +880,7 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
       });
     } catch (e) {
       setState(() {
-        _errorMsg = e.toString();
+        _errorMsgTrap = e.toString();
       });
     } finally {
       setState(() {
@@ -886,7 +891,7 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
 
   void _dhcpTest() async {
     setState(() {
-      _errorMsg = "";
+      _errorMsgDHCP = "";
       _process = true;
     });
     try {
@@ -910,7 +915,7 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
       });
     } catch (e) {
       setState(() {
-        _errorMsg = e.toString();
+        _errorMsgDHCP = e.toString();
         _process = false;
       });
       _dhcpUDP?.close();
@@ -1014,7 +1019,7 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
 
   void _sendMail() async {
     setState(() {
-      _errorMsg = "";
+      _errorMsgMail = "";
       _process = true;
     });
     try {
@@ -1050,7 +1055,7 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
       });
     } catch (e) {
       setState(() {
-        _errorMsg = e.toString();
+        _errorMsgMail = e.toString();
       });
     } finally {
       setState(() {
