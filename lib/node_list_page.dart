@@ -15,22 +15,15 @@ import 'package:twsnmpfm/server_test_page.dart';
 import 'package:twsnmpfm/settings.dart';
 import 'package:twsnmpfm/settings_page.dart';
 import 'package:twsnmpfm/search_page.dart';
-import 'package:twsnmpfm/app_open_ad_manager.dart';
 
 class NodeListPage extends ConsumerStatefulWidget {
-  const NodeListPage({Key? key}) : super(key: key);
+  const NodeListPage({super.key});
   @override
   NodeListState createState() => NodeListState();
 }
 
 class NodeListState extends ConsumerState<NodeListPage> {
   @override
-  void initState() {
-    super.initState();
-    AppOpenAdManager appOpenAdManager = AppOpenAdManager()..loadAd();
-    WidgetsBinding.instance.addObserver(AppLifecycleReactor(appOpenAdManager: appOpenAdManager));
-  }
-
   @override
   Widget build(BuildContext context) {
     final nodes = ref.watch(nodesProvider);
@@ -74,19 +67,25 @@ class NodeListState extends ConsumerState<NodeListPage> {
                     padding: EdgeInsets.zero,
                     onSelected: (value) => {nodeMenuAction(value, i, context, ref)},
                     itemBuilder: (context) => <PopupMenuItem<String>>[
-                      PopupMenuItem<String>(
+                      const PopupMenuItem<String>(
                           height: h,
                           value: "ping",
-                          child: Row(children: const [
+                          child: Row(children: [
                             Icon(Icons.network_ping),
-                            Text("Ping"),
+                            Text(
+                              "Ping",
+                              style: TextStyle(fontSize: 14),
+                            ),
                           ])),
                       PopupMenuItem<String>(
                           height: h,
                           value: "snmp",
                           child: Row(children: [
                             const Icon(Icons.storage),
-                            Text(loc.mibBrowser),
+                            Text(
+                              loc.mibBrowser,
+                              style: const TextStyle(fontSize: 14),
+                            ),
                           ])),
                       PopupMenuItem<String>(
                         height: h,
@@ -101,56 +100,80 @@ class NodeListState extends ConsumerState<NodeListPage> {
                           value: "traffic",
                           child: Row(children: [
                             const Icon(Icons.show_chart),
-                            Text(loc.traffic),
+                            Text(
+                              loc.traffic,
+                              style: const TextStyle(fontSize: 14),
+                            ),
                           ])),
                       PopupMenuItem<String>(
                           height: h,
                           value: "hrmib",
                           child: Row(children: [
                             const Icon(Icons.data_usage),
-                            Text(loc.hostResource),
+                            Text(
+                              loc.hostResource,
+                              style: const TextStyle(fontSize: 14),
+                            ),
                           ])),
                       PopupMenuItem<String>(
                           height: h,
                           value: "process",
                           child: Row(children: [
                             const Icon(Icons.memory),
-                            Text(loc.processes),
+                            Text(
+                              loc.processes,
+                              style: const TextStyle(fontSize: 14),
+                            ),
                           ])),
                       PopupMenuItem<String>(
                           height: h,
                           value: "port",
                           child: Row(children: [
                             const Icon(Icons.drag_indicator),
-                            Text(loc.port),
+                            Text(
+                              loc.port,
+                              style: const TextStyle(fontSize: 14),
+                            ),
                           ])),
                       PopupMenuItem<String>(
                           height: h,
                           value: "cert",
                           child: Row(children: [
                             const Icon(Icons.security),
-                            Text(loc.cert),
+                            Text(
+                              loc.cert,
+                              style: const TextStyle(fontSize: 14),
+                            ),
                           ])),
                       PopupMenuItem<String>(
                           height: h,
                           value: "server",
                           child: Row(children: [
                             const Icon(Icons.rule),
-                            Text(loc.serverTest),
+                            Text(
+                              loc.serverTest,
+                              style: const TextStyle(fontSize: 14),
+                            ),
                           ])),
                       PopupMenuItem<String>(
                           height: h,
                           value: "edit",
                           child: Row(children: [
                             const Icon(Icons.edit),
-                            Text(loc.edit),
+                            Text(
+                              loc.edit,
+                              style: const TextStyle(fontSize: 14),
+                            ),
                           ])),
                       PopupMenuItem<String>(
                         height: h,
                         value: "delete",
                         child: Row(children: [
                           const Icon(Icons.delete, color: Colors.red),
-                          Text(loc.delete),
+                          Text(
+                            loc.delete,
+                            style: const TextStyle(fontSize: 14),
+                          ),
                         ]),
                       ),
                     ],
@@ -348,18 +371,5 @@ class NodeListState extends ConsumerState<NodeListPage> {
       context,
       MaterialPageRoute(builder: (context) => SearchPage(settings: settings)),
     );
-  }
-}
-
-class AppLifecycleReactor extends WidgetsBindingObserver {
-  final AppOpenAdManager appOpenAdManager;
-
-  AppLifecycleReactor({required this.appOpenAdManager});
-
-  @override
-  Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
-    if (state == AppLifecycleState.resumed) {
-      appOpenAdManager.showAdIfAvailable();
-    }
   }
 }

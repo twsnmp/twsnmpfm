@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:statistics/statistics.dart';
 import 'package:dart_ping/dart_ping.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:twsnmpfm/ping_chart.dart';
-import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:twsnmpfm/settings.dart';
 import 'package:flutter_beep/flutter_beep.dart';
+import 'package:fl_chart/fl_chart.dart';
+import 'package:twsnmpfm/time_line_chart.dart';
 
 class PingPage extends StatefulWidget {
   final String ip;
   final Settings settings;
-  const PingPage({Key? key, required this.ip, required this.settings}) : super(key: key);
+  const PingPage({super.key, required this.ip, required this.settings});
 
   @override
   State<PingPage> createState() => _PingPageState();
@@ -24,7 +24,7 @@ class _PingPageState extends State<PingPage> {
   int _minTTL = 255;
   final List<DataRow> _stats = [];
   final List<num> _rtts = [];
-  final List<TimeSeriesPingRTT> _chartData = [];
+  final List<TimeLineSeries> _chartData = [];
   String _lastResult = "";
   String _errMsg = "";
   Ping? ping;
@@ -67,7 +67,7 @@ class _PingPageState extends State<PingPage> {
           }
           final nrtt = event.response?.time?.inMicroseconds.toDouble() ?? 0.0;
           _rtts.add(nrtt / 1000);
-          _chartData.add(TimeSeriesPingRTT(DateTime.now(), nrtt / 1000));
+          _chartData.add(TimeLineSeries(DateTime.now().millisecondsSinceEpoch.toDouble(), [nrtt / 1000]));
           final nttl = ttl.toString().toInt();
           if (nttl < _minTTL) {
             _minTTL = nttl;
@@ -156,14 +156,14 @@ class _PingPageState extends State<PingPage> {
     );
   }
 
-  List<charts.Series<TimeSeriesPingRTT, DateTime>> _createChartData() {
+  List<LineChartBarData> _createChartData() {
+    final List<FlSpot> spots = [];
+    for (var i = 0; i < _chartData.length; i++) {
+      spots.add(FlSpot(_chartData[i].time, _chartData[i].value[0]));
+    }
     return [
-      charts.Series<TimeSeriesPingRTT, DateTime>(
-        id: 'RTT',
-        colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
-        domainFn: (TimeSeriesPingRTT pd, _) => pd.time,
-        measureFn: (TimeSeriesPingRTT pd, _) => pd.rtt,
-        data: _chartData,
+      LineChartBarData(
+        spots: spots,
       )
     ];
   }
@@ -254,17 +254,18 @@ class _PingPageState extends State<PingPage> {
                   style: const TextStyle(fontSize: 12, color: Colors.red),
                 ),
                 SizedBox(
-                  height: 180,
-                  child: PingChart(_createChartData()),
+                  height: 160,
+                  child: TimeLineChart(_createChartData()),
                 ),
                 DataTable(
                   headingTextStyle: TextStyle(
                     color: dark ? Colors.white : Colors.blueGrey,
-                    fontSize: 16,
+                    fontSize: 14,
                   ),
-                  headingRowHeight: 22,
-                  dataTextStyle: TextStyle(color: dark ? Colors.white : Colors.black, fontSize: 14),
-                  dataRowHeight: 20,
+                  headingRowHeight: 20,
+                  dataTextStyle: TextStyle(color: dark ? Colors.white : Colors.black, fontSize: 12),
+                  dataRowMinHeight: 10,
+                  dataRowMaxHeight: 18,
                   columns: const [
                     DataColumn(
                       label: Text('項目'),

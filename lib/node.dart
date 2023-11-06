@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
-import 'dart:io';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -105,19 +104,13 @@ class Nodes extends ChangeNotifier {
     return nodes[i];
   }
 
-  Future _save() async {
-    if (Platform.operatingSystem == 'macos') {
-      return;
-    }
+  _save() async {
     List<String> strNodes = nodes.map((n) => json.encode(n.toMap())).toList();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setStringList('nodes', strNodes);
   }
 
-  Future _load() async {
-    if (Platform.operatingSystem == 'macos') {
-      return;
-    }
+  _load() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var result = prefs.getStringList('nodes');
     if (result != null) {

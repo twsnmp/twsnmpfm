@@ -8,7 +8,7 @@ import 'package:basic_utils/basic_utils.dart';
 class CertPage extends StatefulWidget {
   final Node node;
   final Settings settings;
-  const CertPage({Key? key, required this.node, required this.settings}) : super(key: key);
+  const CertPage({super.key, required this.node, required this.settings});
 
   @override
   State<CertPage> createState() => _CertState();
@@ -112,25 +112,27 @@ class _CertState extends State<CertPage> {
           title: Text(loc.certDur),
           subtitle: Text(d.inDays.toString()),
         ));
-        listTiles.add(ListTile(
-          dense: true,
-          leading: const Icon(Icons.pin),
-          title: Text(loc.version),
-          subtitle: Text(data.version.toString()),
-        ));
-        listTiles.add(ListTile(
-          dense: true,
-          leading: const Icon(Icons.pin),
-          title: Text(loc.serialNumber),
-          subtitle: Text(data.serialNumber.toString()),
-        ));
+        if (data.tbsCertificate != null) {
+          listTiles.add(ListTile(
+            dense: true,
+            leading: const Icon(Icons.pin),
+            title: Text(loc.version),
+            subtitle: Text(data.tbsCertificate!.version.toString()),
+          ));
+          listTiles.add(ListTile(
+            dense: true,
+            leading: const Icon(Icons.pin),
+            title: Text(loc.serialNumber),
+            subtitle: Text(data.tbsCertificate!.serialNumber.toString()),
+          ));
+        }
         listTiles.add(ListTile(
           dense: true,
           leading: const Icon(Icons.info),
           title: Text(loc.signatureAlgorithm),
           subtitle: Text(data.signatureAlgorithm),
         ));
-        if (data.extensions != null) {
+        if (data.tbsCertificate != null && data.tbsCertificate!.extensions != null) {
           listTiles.add(ListTile(
             dense: true,
             leading: const Icon(Icons.check_circle),
@@ -143,7 +145,7 @@ class _CertState extends State<CertPage> {
             title: Text(loc.sha256Thumbprint),
             subtitle: Text(data.sha256Thumbprint ?? ""),
           ));
-          var kalg = data.publicKeyData.algorithmReadableName ?? data.publicKeyData.algorithm.toString();
+          var kalg = data.tbsCertificate!.subjectPublicKeyInfo.algorithmReadableName ?? "";
           listTiles.add(ListTile(
             dense: true,
             leading: const Icon(Icons.key),
@@ -151,19 +153,19 @@ class _CertState extends State<CertPage> {
             subtitle: Text(kalg),
           ));
           c = Colors.grey;
-          if (data.publicKeyData.length != null) {
+          if (data.tbsCertificate!.subjectPublicKeyInfo.length != null) {
             if (kalg.startsWith("ec")) {
-              if (data.publicKeyData.length! < 256) {
+              if (data.tbsCertificate!.subjectPublicKeyInfo.length! < 256) {
                 c = Colors.red;
-              } else if (data.publicKeyData.length! < 512) {
+              } else if (data.tbsCertificate!.subjectPublicKeyInfo.length! < 512) {
                 c = Colors.amber;
               } else {
                 c = Colors.blue;
               }
             } else {
-              if (data.publicKeyData.length! < 2048) {
+              if (data.tbsCertificate!.subjectPublicKeyInfo.length! < 2048) {
                 c = Colors.red;
-              } else if (data.publicKeyData.length! < 4096) {
+              } else if (data.tbsCertificate!.subjectPublicKeyInfo.length! < 4096) {
                 c = Colors.amber;
               } else {
                 c = Colors.blue;
@@ -174,23 +176,23 @@ class _CertState extends State<CertPage> {
             dense: true,
             leading: Icon(Icons.key, color: c),
             title: Text(loc.keyLength),
-            subtitle: Text(data.publicKeyData.length.toString()),
+            subtitle: Text(data.tbsCertificate!.subjectPublicKeyInfo.length.toString()),
           ));
           listTiles.add(ListTile(
             dense: true,
             leading: const Icon(Icons.check_circle),
             title: Text(loc.keySha1Thumbprint),
-            subtitle: Text(data.publicKeyData.sha1Thumbprint ?? ""),
+            subtitle: Text(data.tbsCertificate!.subjectPublicKeyInfo.sha1Thumbprint ?? ""),
           ));
           listTiles.add(ListTile(
             dense: true,
             leading: const Icon(Icons.check_circle),
             title: Text(loc.keySha256Thumbprint),
-            subtitle: Text(data.publicKeyData.sha1Thumbprint ?? ""),
+            subtitle: Text(data.tbsCertificate!.subjectPublicKeyInfo.sha1Thumbprint ?? ""),
           ));
-          if (data.extensions != null) {
-            if (data.extensions!.subjectAlternativNames != null) {
-              for (var sa in data.extensions!.subjectAlternativNames!) {
+          if (data.tbsCertificate!.extensions != null) {
+            if (data.tbsCertificate!.extensions!.subjectAlternativNames != null) {
+              for (var sa in data.tbsCertificate!.extensions!.subjectAlternativNames!) {
                 listTiles.add(ListTile(
                   dense: true,
                   leading: const Icon(Icons.dns),
@@ -199,8 +201,8 @@ class _CertState extends State<CertPage> {
                 ));
               }
             }
-            if (data.extensions!.cRLDistributionPoints != null) {
-              for (var cdp in data.extensions!.cRLDistributionPoints!) {
+            if (data.tbsCertificate!.extensions!.cRLDistributionPoints != null) {
+              for (var cdp in data.tbsCertificate!.extensions!.cRLDistributionPoints!) {
                 listTiles.add(ListTile(
                   dense: true,
                   leading: const Icon(Icons.public),

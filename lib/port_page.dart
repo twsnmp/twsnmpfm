@@ -12,7 +12,7 @@ import 'package:twsnmpfm/settings.dart';
 class PortPage extends StatefulWidget {
   final Node node;
   final Settings settings;
-  const PortPage({Key? key, required this.node, required this.settings}) : super(key: key);
+  const PortPage({super.key, required this.node, required this.settings});
 
   @override
   State<PortPage> createState() => _PortState();
@@ -332,11 +332,12 @@ class _PortState extends State<PortPage> {
                     child: DataTable(
                       headingTextStyle: TextStyle(
                         color: dark ? Colors.white : Colors.blueGrey,
-                        fontSize: 16,
+                        fontSize: 14,
                       ),
-                      headingRowHeight: 22,
-                      dataTextStyle: TextStyle(color: dark ? Colors.white : Colors.black, fontSize: 14),
-                      dataRowHeight: 20,
+                      headingRowHeight: 20,
+                      dataTextStyle: TextStyle(color: dark ? Colors.white : Colors.black, fontSize: 12),
+                      dataRowMinHeight: 10,
+                      dataRowMaxHeight: 18,
                       columns: const [
                         DataColumn(label: Text("Port")),
                         DataColumn(label: Text("Address")),

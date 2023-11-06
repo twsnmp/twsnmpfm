@@ -7,13 +7,12 @@ import 'dart:io';
 import 'package:dart_snmp/dart_snmp.dart';
 import 'package:twsnmpfm/settings.dart';
 import 'dart:async';
-import 'package:twsnmpfm/horizontal_bar_lable_chart.dart';
-import 'package:charts_flutter/flutter.dart' as charts;
+import 'package:fl_chart/fl_chart.dart';
 
 class ProcessesPage extends StatefulWidget {
   final Node node;
   final Settings settings;
-  const ProcessesPage({Key? key, required this.node, required this.settings}) : super(key: key);
+  const ProcessesPage({super.key, required this.node, required this.settings});
 
   @override
   State<ProcessesPage> createState() => _ProcessesState();
@@ -26,8 +25,7 @@ class _ProcessesState extends State<ProcessesPage> {
 
   List<DataRow> _rows = [];
   final Map<String, int> _startCpuMap = {};
-  List<BarData> _topCPU = [];
-  List<BarData> _topMem = [];
+  List<PieChartSectionData> _sections = [];
   String _errorMsg = '';
   MIBDB? _mibdb;
   Timer? _timer;
@@ -134,21 +132,30 @@ class _ProcessesState extends State<ProcessesPage> {
         totalMem += mem;
         processes.add(Process(name, path, type, status, cpu, mem));
       }
-      final List<BarData> topCPU = [];
-      final List<BarData> topMem = [];
+      final List<ProcessData> topCPU = [];
+      final List<ProcessData> topMem = [];
       for (var p in processes) {
         p.cpuRate = totalCPU > 0 ? (p.cpu.toDouble() * 100.0) / totalCPU.toDouble() : 0.0;
         p.memRate = totalMem > 0 ? (p.mem.toDouble() * 100.0) / totalMem.toDouble() : 0.0;
-        topCPU.add(BarData(p.name, p.cpuRate ?? 0.0));
-        topMem.add(BarData(p.name, p.memRate ?? 0.0));
+        topCPU.add(ProcessData(p.name, p.cpuRate ?? 0.0));
+        topMem.add(ProcessData(p.name, p.memRate ?? 0.0));
       }
       topCPU.sort((a, b) => b.value.compareTo(a.value));
-      while (topCPU.length > 10) {
+      while (topCPU.length > 5) {
         topCPU.removeLast();
       }
+      double otherCPU = 100.0;
+      for (var c in topCPU) {
+        otherCPU -= c.value;
+      }
+
       topMem.sort((a, b) => b.value.compareTo(a.value));
-      while (topMem.length > 10) {
+      while (topMem.length > 5) {
         topMem.removeLast();
+      }
+      double otherMem = 100.0;
+      for (var m in topMem) {
+        otherMem -= m.value;
       }
       if (_sortCPU) {
         processes.sort((a, b) => b.cpu.compareTo(a.cpu));
@@ -157,6 +164,7 @@ class _ProcessesState extends State<ProcessesPage> {
       }
       setState(() {
         _rows = [];
+        _sections = [];
         for (var p in processes) {
           _rows.add(DataRow(cells: [
             DataCell(Text(p.name)),
@@ -167,15 +175,48 @@ class _ProcessesState extends State<ProcessesPage> {
             DataCell(Text("${p.memRate?.toStringAsFixed(2)}%")),
             DataCell(Text(p.getMemBytes())),
           ]));
-          _topCPU = topCPU;
-          _topMem = topMem;
+        }
+        final colors = [Colors.red, Colors.orange, Colors.yellow, Colors.green, Colors.blue];
+        if (_sortCPU) {
+          for (var i = 0; i < topCPU.length; i++) {
+            _sections.add(PieChartSectionData(
+              title: topCPU[i].name,
+              value: topCPU[i].value,
+              color: colors[i],
+              titleStyle: const TextStyle(fontSize: 10),
+            ));
+          }
+          _sections.add(PieChartSectionData(
+            title: "Other",
+            value: otherCPU,
+            color: Colors.blueGrey,
+            titleStyle: const TextStyle(fontSize: 10),
+          ));
+        } else {
+          for (var i = 0; i < topMem.length; i++) {
+            _sections.add(PieChartSectionData(
+              title: topMem[i].name,
+              value: topMem[i].value,
+              color: colors[i],
+              titleStyle: const TextStyle(fontSize: 10),
+            ));
+          }
+          _sections.add(PieChartSectionData(
+            title: "Other",
+            value: otherMem,
+            color: Colors.blueGrey,
+            titleStyle: const TextStyle(fontSize: 10),
+          ));
         }
       });
       session.close();
     } catch (e) {
-      setState(() {
-        _errorMsg = e.toString();
-      });
+      if (_timer != null) {
+        setState(() {
+          _errorMsg = e.toString();
+        });
+        _stop();
+      }
     }
   }
 
@@ -186,32 +227,10 @@ class _ProcessesState extends State<ProcessesPage> {
     });
   }
 
-  List<charts.Series<BarData, String>> _createChartSeries(bool dark) {
-    if (_sortCPU) {
-      return [
-        charts.Series<BarData, String>(
-            id: 'CPU',
-            domainFn: (BarData d, _) => d.name,
-            measureFn: (BarData d, _) => d.value,
-            data: _topCPU,
-            outsideLabelStyleAccessorFn: (BarData d, _) => charts.TextStyleSpec(color: dark ? charts.MaterialPalette.white : charts.MaterialPalette.black),
-            labelAccessorFn: (BarData d, _) => '${d.name}: ${d.value.toStringAsFixed(2)}%'),
-      ];
-    }
-    return [
-      charts.Series<BarData, String>(
-          id: 'Memory',
-          domainFn: (BarData d, _) => d.name,
-          measureFn: (BarData d, _) => d.value,
-          data: _topMem,
-          outsideLabelStyleAccessorFn: (BarData d, _) => charts.TextStyleSpec(color: dark ? charts.MaterialPalette.white : charts.MaterialPalette.black),
-          labelAccessorFn: (BarData d, _) => '${d.name}: ${d.value.toStringAsFixed(2)}%'),
-    ];
-  }
-
   @override
   void dispose() {
     _timer?.cancel();
+    _timer = null;
     super.dispose();
   }
 
@@ -263,8 +282,8 @@ class _ProcessesState extends State<ProcessesPage> {
                 ),
                 Text(_errorMsg, style: const TextStyle(color: Colors.red)),
                 SizedBox(
-                  height: 300,
-                  child: HorizontalBarLabelChart(_createChartSeries(dark)),
+                  height: 250,
+                  child: PieChart(PieChartData(sections: _sections)),
                 ),
                 const SizedBox(height: 10),
                 SingleChildScrollView(
@@ -272,11 +291,12 @@ class _ProcessesState extends State<ProcessesPage> {
                     child: DataTable(
                       headingTextStyle: TextStyle(
                         color: dark ? Colors.white : Colors.blueGrey,
-                        fontSize: 16,
+                        fontSize: 14,
                       ),
-                      headingRowHeight: 22,
-                      dataTextStyle: TextStyle(color: dark ? Colors.white : Colors.black, fontSize: 14),
-                      dataRowHeight: 20,
+                      headingRowHeight: 20,
+                      dataTextStyle: TextStyle(color: dark ? Colors.white : Colors.black, fontSize: 12),
+                      dataRowMinHeight: 10,
+                      dataRowMaxHeight: 18,
                       columns: [
                         DataColumn(label: Text(loc.processName)),
                         DataColumn(label: Text(loc.path)),
@@ -353,4 +373,10 @@ class Process {
     }
     return "${mem}KB";
   }
+}
+
+class ProcessData {
+  final String name;
+  final double value;
+  ProcessData(this.name, this.value);
 }

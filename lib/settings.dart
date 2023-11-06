@@ -19,7 +19,7 @@ class Settings extends ChangeNotifier {
     _load();
   }
 
-  Future save() async {
+  save() async {
     if (Platform.operatingSystem == 'macos') {
       return;
     }
@@ -35,7 +35,7 @@ class Settings extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future _load() async {
+  _load() async {
     if (Platform.operatingSystem == 'macos') {
       return;
     }

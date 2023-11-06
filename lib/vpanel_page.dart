@@ -14,7 +14,7 @@ import 'package:twsnmpfm/settings.dart';
 class VPanelPage extends StatefulWidget {
   final Node node;
   final Settings settings;
-  const VPanelPage({Key? key, required this.node, required this.settings}) : super(key: key);
+  const VPanelPage({super.key, required this.node, required this.settings});
 
   @override
   State<VPanelPage> createState() => _VPanelState();
@@ -302,11 +302,12 @@ class _VPanelState extends State<VPanelPage> {
                     child: DataTable(
                       headingTextStyle: TextStyle(
                         color: dark ? Colors.white : Colors.blueGrey,
-                        fontSize: 16,
+                        fontSize: 14,
                       ),
-                      headingRowHeight: 22,
-                      dataTextStyle: TextStyle(color: dark ? Colors.white : Colors.black, fontSize: 14),
-                      dataRowHeight: 20,
+                      headingRowHeight: 20,
+                      dataTextStyle: TextStyle(color: dark ? Colors.white : Colors.black, fontSize: 12),
+                      dataRowMinHeight: 10,
+                      dataRowMaxHeight: 18,
                       columns: const [
                         DataColumn(label: Text("Index")),
                         DataColumn(label: Text("Name")),

@@ -7,15 +7,15 @@ import 'dart:io';
 import 'package:dart_snmp/dart_snmp.dart';
 import 'package:twsnmpfm/settings.dart';
 import 'dart:async';
-import 'package:twsnmpfm/time_line_chart.dart';
-import 'package:charts_flutter/flutter.dart' as charts;
 import 'dart:math' as math;
 import 'package:statistics/statistics.dart';
+import 'package:fl_chart/fl_chart.dart';
+import 'package:twsnmpfm/time_line_chart.dart';
 
 class HostResourcePage extends StatefulWidget {
   final Node node;
   final Settings settings;
-  const HostResourcePage({Key? key, required this.node, required this.settings}) : super(key: key);
+  const HostResourcePage({super.key, required this.node, required this.settings});
 
   @override
   State<HostResourcePage> createState() => _HostResourceState();
@@ -27,11 +27,12 @@ class _HostResourceState extends State<HostResourcePage> {
   int _retry = 1;
 
   final List<TimeLineSeries> _chartData = [];
-  List<charts.Series<TimeLineSeries, DateTime>> _chartSeries = [];
+  List<LineChartBarData> _chartSeries = [];
   List<DataRow> _rows = [];
   String _errorMsg = '';
   MIBDB? _mibdb;
   Timer? _timer;
+  final List<Color> colors = [Colors.blue, Colors.green, Colors.yellow, Colors.cyan, Colors.orange, Colors.pink, Colors.blueGrey, Colors.teal];
 
   @override
   void initState() {
@@ -136,23 +137,33 @@ class _HostResourceState extends State<HostResourcePage> {
       for (var s in storages) {
         vals.add(s.usage());
       }
-      final now = DateTime.now();
+      final now = DateTime.now().millisecondsSinceEpoch.toDouble();
       setState(() {
         _chartData.add(TimeLineSeries(now, vals));
         _chartSeries = _createChartSeries(storages);
         _rows = [];
+        _rows.add(DataRow(cells: [
+          const DataCell(Text(
+            "CPU Avg",
+            style: TextStyle(color: Colors.red),
+          )),
+          DataCell(Text("${vals[0].toStringAsFixed(2)}%")),
+        ]));
         for (var i = 0; i < cpus.length; i++) {
           _rows.add(DataRow(cells: [
             DataCell(Text("CPU${i + 1}")),
             DataCell(Text("${cpus[i].toStringAsFixed(2)}%")),
           ]));
         }
-        for (var s in storages) {
+        storages.asMap().forEach((i, s) {
           _rows.add(DataRow(cells: [
-            DataCell(Text(s.name)),
+            DataCell(Text(
+              s.name,
+              style: TextStyle(color: colors[i % colors.length]),
+            )),
             DataCell(Text(s.info())),
           ]));
-        }
+        });
       });
       session.close();
     } catch (e) {
@@ -171,24 +182,28 @@ class _HostResourceState extends State<HostResourcePage> {
     });
   }
 
-  List<charts.Series<TimeLineSeries, DateTime>> _createChartSeries(List<Storage> storages) {
-    final colors = charts.MaterialPalette.getOrderedPalettes(storages.length + 1);
-    List<charts.Series<TimeLineSeries, DateTime>> r = [];
-    r.add(charts.Series<TimeLineSeries, DateTime>(
-      id: 'CPU',
-      colorFn: (_, __) => colors[0].shadeDefault,
-      domainFn: (TimeLineSeries t, _) => t.time,
-      measureFn: (TimeLineSeries t, _) => t.value[0],
-      data: _chartData,
+  List<LineChartBarData> _createChartSeries(List<Storage> storages) {
+    List<LineChartBarData> r = [];
+    final bool showDot = _chartData.length < 10;
+    r.add(LineChartBarData(
+      color: Colors.red[600],
+      spots: [],
+      dotData: FlDotData(show: showDot),
     ));
     for (var i = 0; i < storages.length; i++) {
-      r.add(charts.Series<TimeLineSeries, DateTime>(
-        id: storages[i].name,
-        colorFn: (_, __) => colors[i + 1].shadeDefault,
-        domainFn: (TimeLineSeries t, _) => t.time,
-        measureFn: (TimeLineSeries t, _) => t.value[i + 1],
-        data: _chartData,
+      r.add(LineChartBarData(
+        color: colors[i % colors.length],
+        dotData: FlDotData(show: showDot),
+        spots: [],
       ));
+    }
+    for (var i = 0; i < _chartData.length; i++) {
+      r[0].spots.add(FlSpot(_chartData[i].time, _chartData[i].value[0]));
+      for (var j = 0; j < storages.length; j++) {
+        if (_chartData[i].value.length >= j) {
+          r[j + 1].spots.add(FlSpot(_chartData[i].time, _chartData[i].value[j + 1]));
+        }
+      }
     }
     return r;
   }
@@ -235,7 +250,7 @@ class _HostResourceState extends State<HostResourcePage> {
                 ),
                 Text(_errorMsg, style: const TextStyle(color: Colors.red)),
                 SizedBox(
-                  height: 200,
+                  height: 160,
                   child: TimeLineChart(_chartSeries),
                 ),
                 const SizedBox(height: 10),
@@ -244,11 +259,12 @@ class _HostResourceState extends State<HostResourcePage> {
                     child: DataTable(
                       headingTextStyle: TextStyle(
                         color: dark ? Colors.white : Colors.blueGrey,
-                        fontSize: 16,
+                        fontSize: 14,
                       ),
-                      headingRowHeight: 22,
-                      dataTextStyle: TextStyle(color: dark ? Colors.white : Colors.black, fontSize: 14),
-                      dataRowHeight: 20,
+                      headingRowHeight: 20,
+                      dataTextStyle: TextStyle(color: dark ? Colors.white : Colors.black, fontSize: 12),
+                      dataRowMinHeight: 10,
+                      dataRowMaxHeight: 18,
                       columns: [
                         DataColumn(label: Text(loc.key)),
                         DataColumn(label: Text(loc.value)),

@@ -5,8 +5,6 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:twsnmpfm/node.dart';
 import 'package:twsnmpfm/mibdb.dart';
-import 'package:twsnmpfm/ntp_chart.dart';
-import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:twsnmpfm/settings.dart';
 import 'package:statistics/statistics.dart';
@@ -19,11 +17,13 @@ import 'package:dart_snmp/dart_snmp.dart';
 import 'package:mailer/mailer.dart' as mailer;
 import 'package:mailer/smtp_server.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:fl_chart/fl_chart.dart';
+import 'package:twsnmpfm/time_line_chart.dart';
 
 class ServerTestPage extends StatefulWidget {
   final Node node;
   final Settings settings;
-  const ServerTestPage({Key? key, required this.node, required this.settings}) : super(key: key);
+  const ServerTestPage({super.key, required this.node, required this.settings});
 
   @override
   State<ServerTestPage> createState() => _ServerTestState();
@@ -44,7 +44,7 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
   final List<String> _ntpTargetList = [];
   final List<DataRow> _ntpStats = [];
   final List<num> _ntpOffset = [];
-  final List<TimeSeriesNTPOffset> _ntpChartData = [];
+  final List<TimeLineSeries> _ntpChartData = [];
   Timer? _timer;
 
   // for Syslog Test
@@ -221,16 +221,17 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
               ),
               SizedBox(
                 height: 180,
-                child: NTPChart(_createNTPChartData()),
+                child: TimeLineChart(_createNTPChartData()),
               ),
               DataTable(
                 headingTextStyle: TextStyle(
                   color: dark ? Colors.white : Colors.blueGrey,
-                  fontSize: 16,
+                  fontSize: 14,
                 ),
-                headingRowHeight: 22,
-                dataTextStyle: TextStyle(color: dark ? Colors.white : Colors.black, fontSize: 14),
-                dataRowHeight: 20,
+                headingRowHeight: 20,
+                dataTextStyle: TextStyle(color: dark ? Colors.white : Colors.black, fontSize: 12),
+                dataRowMinHeight: 10,
+                dataRowMaxHeight: 18,
                 columns: [
                   DataColumn(
                     label: Text(loc!.key),
@@ -366,11 +367,12 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
                   child: DataTable(
                     headingTextStyle: TextStyle(
                       color: dark ? Colors.white : Colors.blueGrey,
-                      fontSize: 16,
+                      fontSize: 14,
                     ),
-                    headingRowHeight: 22,
-                    dataTextStyle: TextStyle(color: dark ? Colors.white : Colors.black, fontSize: 14),
-                    dataRowHeight: 20,
+                    headingRowHeight: 20,
+                    dataTextStyle: TextStyle(color: dark ? Colors.white : Colors.black, fontSize: 12),
+                    dataRowMinHeight: 10,
+                    dataRowMaxHeight: 18,
                     columns: [
                       DataColumn(
                         label: Text(loc?.time ?? "Time"),
@@ -454,11 +456,12 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
                   child: DataTable(
                     headingTextStyle: TextStyle(
                       color: dark ? Colors.white : Colors.blueGrey,
-                      fontSize: 16,
+                      fontSize: 14,
                     ),
-                    headingRowHeight: 22,
-                    dataTextStyle: TextStyle(color: dark ? Colors.white : Colors.black, fontSize: 14),
-                    dataRowHeight: 20,
+                    headingRowHeight: 20,
+                    dataTextStyle: TextStyle(color: dark ? Colors.white : Colors.black, fontSize: 12),
+                    dataRowMinHeight: 10,
+                    dataRowMaxHeight: 18,
                     columns: [
                       DataColumn(
                         label: Text(loc?.time ?? "Time"),
@@ -522,11 +525,12 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
                   child: DataTable(
                     headingTextStyle: TextStyle(
                       color: dark ? Colors.white : Colors.blueGrey,
-                      fontSize: 16,
+                      fontSize: 14,
                     ),
-                    headingRowHeight: 22,
-                    dataTextStyle: TextStyle(color: dark ? Colors.white : Colors.black, fontSize: 14),
-                    dataRowHeight: 20,
+                    headingRowHeight: 20,
+                    dataTextStyle: TextStyle(color: dark ? Colors.white : Colors.black, fontSize: 12),
+                    dataRowMinHeight: 10,
+                    dataRowMaxHeight: 18,
                     columns: [
                       DataColumn(
                         label: Text(loc?.time ?? "Time"),
@@ -668,11 +672,12 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
                   child: DataTable(
                     headingTextStyle: TextStyle(
                       color: dark ? Colors.white : Colors.blueGrey,
-                      fontSize: 16,
+                      fontSize: 14,
                     ),
-                    headingRowHeight: 22,
-                    dataTextStyle: TextStyle(color: dark ? Colors.white : Colors.black, fontSize: 14),
-                    dataRowHeight: 20,
+                    headingRowHeight: 20,
+                    dataTextStyle: TextStyle(color: dark ? Colors.white : Colors.black, fontSize: 12),
+                    dataRowMinHeight: 10,
+                    dataRowMaxHeight: 18,
                     columns: [
                       DataColumn(
                         label: Text(loc?.time ?? "Time"),
@@ -729,14 +734,14 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
     );
   }
 
-  List<charts.Series<TimeSeriesNTPOffset, DateTime>> _createNTPChartData() {
+  List<LineChartBarData> _createNTPChartData() {
+    final List<FlSpot> spots = [];
+    for (var i = 0; i < _ntpChartData.length; i++) {
+      spots.add(FlSpot(_ntpChartData[i].time, _ntpChartData[i].value[0]));
+    }
     return [
-      charts.Series<TimeSeriesNTPOffset, DateTime>(
-        id: 'DIFF',
-        colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
-        domainFn: (TimeSeriesNTPOffset pd, _) => pd.time,
-        measureFn: (TimeSeriesNTPOffset pd, _) => pd.diff,
-        data: _ntpChartData,
+      LineChartBarData(
+        spots: spots,
       )
     ];
   }
@@ -768,7 +773,7 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
       final int offset = await NTP.getNtpOffset(localTime: DateTime.now(), lookUpAddress: _ntpTarget, timeout: Duration(seconds: _ntpTimeout.toInt()));
       setState(() {
         _lastResultNTP = "offset $offset mSec";
-        _ntpChartData.add(TimeSeriesNTPOffset(DateTime.now(), offset.toDouble()));
+        _ntpChartData.add(TimeLineSeries(DateTime.now().millisecondsSinceEpoch.toDouble(), [offset.toDouble()]));
         _ntpOffset.add(offset);
         _setNTPStats();
       });
@@ -850,14 +855,14 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
     });
     try {
       final List<Varbind> vbl = [];
-      vbl.add(Varbind(Oid.fromString(_mibdb!.nameToOid("sysUpTime.0")), VarbindType.TimeTicks, (DateTime.now().microsecondsSinceEpoch - _startTime) ~/ 10));
-      vbl.add(Varbind(Oid.fromString(_mibdb!.nameToOid("snmpTrapOID")), VarbindType.Oid, _mibdb!.nameToOid(_trapOID)));
-      vbl.add(Varbind(Oid.fromString(_mibdb!.nameToOid("snmpTrapEnterprise")), VarbindType.Oid, _mibdb!.nameToOid("enterprises.17861")));
+      vbl.add(Varbind(Oid.fromString(_mibdb!.nameToOid("sysUpTime.0")), const VarbindType.fromInt(TIME_TICKS), (DateTime.now().microsecondsSinceEpoch - _startTime) ~/ 10));
+      vbl.add(Varbind(Oid.fromString(_mibdb!.nameToOid("snmpTrapOID")), const VarbindType.fromInt(OID), _mibdb!.nameToOid(_trapOID)));
+      vbl.add(Varbind(Oid.fromString(_mibdb!.nameToOid("snmpTrapEnterprise")), const VarbindType.fromInt(OID), _mibdb!.nameToOid("enterprises.17861")));
       if (_trapOID.startsWith("link")) {
-        vbl.add(Varbind(Oid.fromString(_mibdb!.nameToOid("ifIndex.1")), VarbindType.Integer, 1));
+        vbl.add(Varbind(Oid.fromString(_mibdb!.nameToOid("ifIndex.1")), const VarbindType.fromInt(INTEGER), 1));
       }
-      var p = Pdu(PduType.TrapV2, DateTime.now().millisecondsSinceEpoch, vbl);
-      var m = Message(SnmpVersion.V2c, _trapCommunity, p);
+      var p = Pdu(PduType.trapV2, DateTime.now().millisecondsSinceEpoch, vbl);
+      var m = Message(SnmpVersion.v2c, _trapCommunity, p);
       int port = 162;
       String ip = _target;
       if (_target.contains(":")) {

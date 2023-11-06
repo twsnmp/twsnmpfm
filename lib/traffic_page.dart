@@ -7,14 +7,14 @@ import 'dart:io';
 import 'package:dart_snmp/dart_snmp.dart';
 import 'package:twsnmpfm/settings.dart';
 import 'dart:async';
-import 'package:twsnmpfm/time_line_chart.dart';
-import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:intl/intl.dart';
+import 'package:fl_chart/fl_chart.dart';
+import 'package:twsnmpfm/time_line_chart.dart';
 
 class TrafficPage extends StatefulWidget {
   final Node node;
   final Settings settings;
-  const TrafficPage({Key? key, required this.node, required this.settings}) : super(key: key);
+  const TrafficPage({super.key, required this.node, required this.settings});
 
   @override
   State<TrafficPage> createState() => _TrafficState();
@@ -201,16 +201,16 @@ class _TrafficState extends State<TrafficPage> {
       final now = DateTime.now();
       session.close();
       if (_lastData == null) {
-        _lastData = TimeLineSeries(now, <double>[tx, rx, err]);
+        _lastData = TimeLineSeries(now.millisecondsSinceEpoch.toDouble(), <double>[tx, rx, err]);
         return;
       }
-      final diff = (now.second - _lastData!.time.second).toDouble();
+      final diff = (now.millisecondsSinceEpoch.toDouble() - _lastData!.time) / 1000.0;
       if (diff > 0) {
         final txps = (tx - _lastData!.value[0]) / diff;
         final rxps = (rx - _lastData!.value[1]) / diff;
         final errps = (err - _lastData!.value[2]) / diff;
         setState(() {
-          _chartData.add(TimeLineSeries(now, <double>[txps, rxps, errps]));
+          _chartData.add(TimeLineSeries(now.millisecondsSinceEpoch.toDouble(), <double>[txps, rxps, errps]));
           _logs.add(
             DataRow(cells: [
               DataCell(Text(DateFormat("HH:mm:ss").format(now))),
@@ -221,7 +221,7 @@ class _TrafficState extends State<TrafficPage> {
           );
         });
       }
-      _lastData = TimeLineSeries(now, <double>[tx, rx, err]);
+      _lastData = TimeLineSeries(now.millisecondsSinceEpoch.toDouble(), <double>[tx, rx, err]);
     } catch (e) {
       setState(() {
         _errorMsg = e.toString();
@@ -304,30 +304,17 @@ class _TrafficState extends State<TrafficPage> {
     });
   }
 
-  List<charts.Series<TimeLineSeries, DateTime>> _createChartData() {
-    return [
-      charts.Series<TimeLineSeries, DateTime>(
-        id: loc?.tx ?? "Tx",
-        colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
-        domainFn: (TimeLineSeries t, _) => t.time,
-        measureFn: (TimeLineSeries t, _) => t.value[0],
-        data: _chartData,
-      ),
-      charts.Series<TimeLineSeries, DateTime>(
-        id: loc?.rx ?? "Rx",
-        colorFn: (_, __) => charts.MaterialPalette.green.shadeDefault,
-        domainFn: (TimeLineSeries t, _) => t.time,
-        measureFn: (TimeLineSeries t, _) => t.value[1],
-        data: _chartData,
-      ),
-      charts.Series<TimeLineSeries, DateTime>(
-        id: loc?.error ?? "Error",
-        colorFn: (_, __) => charts.MaterialPalette.red.shadeDefault,
-        domainFn: (TimeLineSeries t, _) => t.time,
-        measureFn: (TimeLineSeries t, _) => t.value[2],
-        data: _chartData,
-      )
-    ];
+  List<LineChartBarData> _createChartData() {
+    List<LineChartBarData> ret = [];
+    ret.add(LineChartBarData(spots: [], color: Colors.blue));
+    ret.add(LineChartBarData(spots: [], color: Colors.green));
+    ret.add(LineChartBarData(spots: [], color: Colors.red));
+    for (var d in _chartData) {
+      for (var i = 0; i < ret.length; i++) {
+        ret[i].spots.add(FlSpot(d.time, d.value[i]));
+      }
+    }
+    return ret;
   }
 
   @override
@@ -390,23 +377,24 @@ class _TrafficState extends State<TrafficPage> {
                     child: DataTable(
                       headingTextStyle: TextStyle(
                         color: dark ? Colors.white : Colors.blueGrey,
-                        fontSize: 16,
+                        fontSize: 14,
                       ),
-                      headingRowHeight: 22,
-                      dataTextStyle: TextStyle(color: dark ? Colors.white : Colors.black, fontSize: 14),
-                      dataRowHeight: 20,
+                      headingRowHeight: 20,
+                      dataTextStyle: TextStyle(color: dark ? Colors.white : Colors.black, fontSize: 12),
+                      dataRowMinHeight: 10,
+                      dataRowMaxHeight: 18,
                       columns: [
                         DataColumn(
                           label: Text(loc!.time),
                         ),
                         DataColumn(
-                          label: Text('${loc!.tx}($_unit)'),
+                          label: Text('${loc!.tx}($_unit)', style: const TextStyle(color: Colors.blue)),
                         ),
                         DataColumn(
-                          label: Text('${loc!.rx}($_unit)'),
+                          label: Text('${loc!.rx}($_unit)', style: const TextStyle(color: Colors.green)),
                         ),
                         DataColumn(
-                          label: Text('${loc!.error}($_unit)'),
+                          label: Text('${loc!.error}($_unit)', style: const TextStyle(color: Colors.red)),
                         ),
                       ],
                       rows: _logs,

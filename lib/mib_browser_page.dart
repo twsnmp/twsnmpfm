@@ -13,7 +13,7 @@ import 'package:twsnmpfm/settings.dart';
 class MibBrowserPage extends StatefulWidget {
   final Node node;
   final Settings settings;
-  const MibBrowserPage({Key? key, required this.node, required this.settings}) : super(key: key);
+  const MibBrowserPage({super.key, required this.node, required this.settings});
 
   @override
   State<MibBrowserPage> createState() => _MibBrowserState();
@@ -250,11 +250,12 @@ class _MibBrowserState extends State<MibBrowserPage> {
                   child: DataTable(
                     headingTextStyle: TextStyle(
                       color: dark ? Colors.white : Colors.blueGrey,
-                      fontSize: 16,
+                      fontSize: 14,
                     ),
-                    headingRowHeight: 22,
-                    dataTextStyle: TextStyle(color: dark ? Colors.white : Colors.black, fontSize: 14),
-                    dataRowHeight: 20,
+                    headingRowHeight: 20,
+                    dataTextStyle: TextStyle(color: dark ? Colors.white : Colors.black, fontSize: 12),
+                    dataRowMinHeight: 10,
+                    dataRowMaxHeight: 18,
                     columns: _columns,
                     rows: _rows,
                   ),
