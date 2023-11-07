@@ -102,7 +102,7 @@ class _PortState extends State<PortPage> {
     try {
       _ports = [];
       var t = InternetAddress(widget.node.ip);
-      var session = await Snmp.createSession(t, timeout: Duration(seconds: _timeout), retries: _retry);
+      var session = await Snmp.createSession(t, timeout: Duration(seconds: _timeout), retries: _retry, community: widget.node.community);
       final rootOid = _mibdb!.nameToOid("tcpListenerProcess");
       var currentOid = rootOid;
       while (true) {
@@ -165,7 +165,7 @@ class _PortState extends State<PortPage> {
     try {
       _ports = [];
       var t = InternetAddress(widget.node.ip);
-      var session = await Snmp.createSession(t, timeout: Duration(seconds: _timeout), retries: _retry);
+      var session = await Snmp.createSession(t, timeout: Duration(seconds: _timeout), retries: _retry, community: widget.node.community);
       final rootOid = _mibdb!.nameToOid("udpEndpointProcess");
       var currentOid = rootOid;
       while (true) {

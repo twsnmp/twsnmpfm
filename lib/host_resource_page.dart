@@ -65,7 +65,7 @@ class _HostResourceState extends State<HostResourcePage> {
   void _getHostResource() async {
     try {
       var t = InternetAddress(widget.node.ip);
-      var session = await Snmp.createSession(t, timeout: Duration(seconds: _timeout), retries: _retry);
+      var session = await Snmp.createSession(t, timeout: Duration(seconds: _timeout), retries: _retry, community: widget.node.community);
       String n = "hrProcessorLoad";
       final List<double> cpus = [];
       final List<Storage> storages = [];

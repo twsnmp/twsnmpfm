@@ -68,7 +68,7 @@ class _ProcessesState extends State<ProcessesPage> {
       int totalCPU = 0;
       int totalMem = 0;
       var t = InternetAddress(widget.node.ip);
-      var session = await Snmp.createSession(t, timeout: Duration(seconds: _timeout), retries: _retry);
+      var session = await Snmp.createSession(t, timeout: Duration(seconds: _timeout), retries: _retry, community: widget.node.community);
       String n = "hrSWRunName";
       while (true) {
         var m = await session.getNext(Oid.fromString(_mibdb!.nameToOid(n)));

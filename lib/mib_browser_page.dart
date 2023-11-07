@@ -78,7 +78,7 @@ class _MibBrowserState extends State<MibBrowserPage> {
         ];
       });
       var t = InternetAddress(widget.node.ip);
-      var session = await Snmp.createSession(t, timeout: Duration(seconds: _timeout), retries: _retry);
+      var session = await Snmp.createSession(t, timeout: Duration(seconds: _timeout), retries: _retry, community: widget.node.community);
       final rootOid = _mibdb!.nameToOid(_mibName);
       var currentOid = rootOid;
       _progoress = true;
@@ -125,7 +125,7 @@ class _MibBrowserState extends State<MibBrowserPage> {
     final List<List<String>> rows = [[]];
     try {
       var t = InternetAddress(widget.node.ip);
-      var session = await Snmp.createSession(t, timeout: Duration(seconds: _timeout), retries: _retry);
+      var session = await Snmp.createSession(t, timeout: Duration(seconds: _timeout), retries: _retry, community: widget.node.community);
       final rootOid = _mibdb!.nameToOid(_mibName);
       var currentOid = rootOid;
       _progoress = true;
