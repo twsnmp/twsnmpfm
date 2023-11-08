@@ -12,6 +12,7 @@ class TimeLineChart extends StatelessWidget {
     double minX = DateTime.now().millisecondsSinceEpoch.toDouble();
     double maxX = 0;
     double maxY = 0;
+    double minY = 0;
     if (seriesList.isNotEmpty && seriesList[0].spots.isNotEmpty) {
       for (var spot in seriesList[0].spots) {
         if (spot.x < minX) {
@@ -25,6 +26,9 @@ class TimeLineChart extends StatelessWidget {
         for (var spot in s.spots) {
           if (spot.y > maxY) {
             maxY = spot.y;
+          }
+          if (spot.y < minY) {
+            minY = spot.y;
           }
         }
       }
@@ -51,11 +55,16 @@ class TimeLineChart extends StatelessWidget {
       for (i = 1000; i < maxY; i += 1000) {}
       maxY = i;
     }
+    if (minY < 0) {
+      minY = (minY.toInt() - 1).toDouble();
+    } else {
+      minY = 0;
+    }
     return LineChart(LineChartData(
       lineBarsData: seriesList,
       minX: minX,
       maxX: maxX,
-      minY: 0,
+      minY: minY,
       maxY: maxY,
       titlesData: FlTitlesData(
         rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
