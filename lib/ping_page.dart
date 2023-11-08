@@ -86,13 +86,13 @@ class _PingPageState extends State<PingPage> {
               final tx = event.summary?.transmitted ?? 0;
               final rx = event.summary?.received ?? 0;
               _lastResult = "ping done $rx/$tx";
+              _setStats();
+              ping?.stop();
+              ping = null;
             } else {
               _lastResult = err;
               _errMsg = err;
             }
-            _setStats();
-            ping?.stop();
-            ping = null;
           });
         }
       });
@@ -164,6 +164,7 @@ class _PingPageState extends State<PingPage> {
     return [
       LineChartBarData(
         spots: spots,
+        dotData: FlDotData(show: spots.length < 10),
       )
     ];
   }
