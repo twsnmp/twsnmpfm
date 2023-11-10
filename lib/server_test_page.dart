@@ -89,7 +89,7 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
     _ntpTargetList.add("time.cloudflare.com");
     _target = widget.node.ip;
     _startTime = DateTime.now().millisecondsSinceEpoch;
-    _tabController = TabController(vsync: this, length: Platform.isIOS ? 5 : 4);
+    _tabController = TabController(vsync: this, length: 4);
     _tabController?.addListener(() {
       _stop();
     });
@@ -905,23 +905,22 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
         title: Text("${loc!.serverTest} ${widget.node.name}"),
         bottom: TabBar(
           controller: _tabController,
-          tabs: [
-            const Tab(
+          tabs: const [
+            Tab(
               child: Text("NTP", style: TextStyle(fontSize: 12)),
             ),
-            const Tab(
+            Tab(
               child: Text(
                 "syslog",
                 style: TextStyle(fontSize: 10),
               ),
             ),
-            const Tab(
+            Tab(
               child: Text("Trap", style: TextStyle(fontSize: 12)),
             ),
-            const Tab(
+            Tab(
               child: Text("Mail", style: TextStyle(fontSize: 12)),
             ),
-            if (Platform.isIOS) const Tab(child: Text("DHCP", style: TextStyle(fontSize: 12))),
           ],
         ),
       ),
