@@ -169,7 +169,8 @@ class _TrafficState extends State<TrafficPage> {
   void _getTraffic() async {
     try {
       var t = InternetAddress(widget.node.ip);
-      var session = await Snmp.createSession(t, timeout: Duration(seconds: _timeout), retries: _retry, community: widget.node.community);
+      var c = widget.node.community.isEmpty ? "public" : widget.node.community;
+      var session = await Snmp.createSession(t, timeout: Duration(seconds: _timeout), retries: _retry, community: c);
       double tx = 0.0;
       double rx = 0.0;
       double err = 0.0;
@@ -243,7 +244,8 @@ class _TrafficState extends State<TrafficPage> {
     ];
     try {
       var t = InternetAddress(widget.node.ip);
-      var session = await Snmp.createSession(t, timeout: Duration(seconds: _timeout), retries: _retry, community: widget.node.community);
+      var c = widget.node.community.isEmpty ? "public" : widget.node.community;
+      var session = await Snmp.createSession(t, timeout: Duration(seconds: _timeout), retries: _retry, community: c);
       final rootOid = _mibdb!.nameToOid("ifType");
       var currentOid = rootOid;
       while (true) {

@@ -66,7 +66,8 @@ class _VPanelState extends State<VPanelPage> {
     try {
       _ports = [];
       var t = InternetAddress(widget.node.ip);
-      var session = await Snmp.createSession(t, timeout: Duration(seconds: _timeout), retries: _retry, community: widget.node.community);
+      var c = widget.node.community.isEmpty ? "public" : widget.node.community;
+      var session = await Snmp.createSession(t, timeout: Duration(seconds: _timeout), retries: _retry, community: c);
       final rootOid = _mibdb!.nameToOid("ifType");
       var currentOid = rootOid;
       while (true) {
