@@ -598,6 +598,7 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
               TextFormField(
                 initialValue: _mailFrom,
                 autocorrect: false,
+                keyboardType: TextInputType.emailAddress,
                 enableSuggestions: false,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -614,6 +615,7 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
               ),
               TextFormField(
                 initialValue: _mailTo,
+                keyboardType: TextInputType.emailAddress,
                 autocorrect: false,
                 enableSuggestions: false,
                 validator: (value) {
