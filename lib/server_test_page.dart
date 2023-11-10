@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
@@ -64,12 +62,6 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
   final List<String> _trapOIDs = ["coldStart", "warmStart", "linkUp", "linkDown", "authenticationFailure"];
   final List<DataRow> _trapHist = [];
   int _startTime = 0;
-
-  // for DHCP Test
-  int _dhcpPort = 67; // Server 67/Client 68
-  UDP? _dhcpUDP;
-  String _errorMsgDHCP = '';
-  final List<DataRow> _dhcpHist = [];
 
   // for Mail Test
   String _mailUser = "";
@@ -161,7 +153,6 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
   @override
   void dispose() {
     _tabController?.dispose();
-    _dhcpUDP?.close();
     _timer?.cancel();
     _save();
     super.dispose();
@@ -474,75 +465,6 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
                       ),
                     ],
                     rows: _trapHist,
-                  )),
-            ],
-          ),
-        ),
-      );
-
-  SingleChildScrollView _dhcpTestView(bool dark) => SingleChildScrollView(
-        padding: const EdgeInsets.all(10),
-        child: Form(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              Row(
-                children: [
-                  Expanded(child: Text(loc?.dhcpPort ?? "DHCP Port")),
-                  DropdownButton<int>(
-                      value: _dhcpPort,
-                      items: const [
-                        DropdownMenuItem(value: 67, child: Text("Server(67)")),
-                        DropdownMenuItem(value: 68, child: Text("Client(68)")),
-                      ],
-                      onChanged: (int? value) {
-                        if (value == null || value == _dhcpPort) {
-                          return;
-                        }
-                        setState(() {
-                          _dhcpPort = value;
-                          if (_process) {
-                            _stop();
-                            _start();
-                          }
-                        });
-                      }),
-                ],
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  _sendDhcpDiscover();
-                },
-                child: const Text("Send Discover"),
-              ),
-              Text(
-                _errorMsgDHCP,
-                style: const TextStyle(fontSize: 12, color: Colors.red),
-              ),
-              SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: DataTable(
-                    headingTextStyle: TextStyle(
-                      color: dark ? Colors.white : Colors.blueGrey,
-                      fontSize: 14,
-                    ),
-                    headingRowHeight: 20,
-                    dataTextStyle: TextStyle(color: dark ? Colors.white : Colors.black, fontSize: 12),
-                    dataRowMinHeight: 10,
-                    dataRowMaxHeight: 18,
-                    columns: [
-                      DataColumn(
-                        label: Text(loc?.time ?? "Time"),
-                      ),
-                      DataColumn(
-                        label: Text(loc?.dhcpAddress ?? "Address"),
-                      ),
-                      DataColumn(
-                        label: Text(loc?.dhcpType ?? "Type"),
-                      ),
-                    ],
-                    rows: _dhcpHist,
                   )),
             ],
           ),
@@ -896,134 +818,6 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
     }
   }
 
-  void _dhcpTest() async {
-    setState(() {
-      _errorMsgDHCP = "";
-      _process = true;
-    });
-    try {
-      _dhcpUDP = await UDP.bind(Endpoint.any(port: Port(_dhcpPort)));
-      if (_dhcpUDP == null) {
-        return;
-      }
-      _dhcpUDP!.asStream().listen((datagram) {
-        if (datagram == null) {
-          return;
-        }
-        setState(() {
-          _dhcpHist.add(
-            DataRow(cells: [
-              DataCell(Text(DateFormat("HH:mm:ss").format(DateTime.now()))),
-              DataCell(Text(datagram.address.address)),
-              DataCell(Text(_getDHCPType(datagram.data))),
-            ]),
-          );
-        });
-      });
-    } catch (e) {
-      setState(() {
-        _errorMsgDHCP = e.toString();
-        _process = false;
-      });
-      _dhcpUDP?.close();
-    }
-  }
-
-  void _sendDhcpDiscover() async {
-    if (_dhcpUDP == null) {
-      return;
-    }
-    await _dhcpUDP!.send(_makeDHCPPkt(), Endpoint.broadcast(port: const Port(67)));
-  }
-
-  List<int> _makeDHCPPkt() {
-    List<int> r = [];
-    r.add(0x01); // BOOTP Request
-    r.add(0x01); // HW Type Ethernet
-    r.add(0x06); // HW Addr len 6
-    r.add(0x00);
-    r.add(0x00); // XID
-    r.add(0x01);
-    r.add(0x02);
-    r.add(0x03);
-
-    r.add(0x00); // Sec
-    r.add(0x00);
-
-    r.add(0x80); // Flag Bcast
-    r.add(0x00);
-
-    r.add(0x00); // Client IP
-    r.add(0x00);
-    r.add(0x00);
-    r.add(0x00);
-
-    r.add(0x00); // Your IP
-    r.add(0x00);
-    r.add(0x00);
-    r.add(0x00);
-
-    r.add(0x00); // Next IP
-    r.add(0x00);
-    r.add(0x00);
-    r.add(0x00);
-
-    r.add(0x00); // Relay IP
-    r.add(0x00);
-    r.add(0x00);
-    r.add(0x00);
-
-    r.add(0x5d); //MAC Address
-    r.add(0x01);
-    r.add(0x02);
-    r.add(0x03);
-    r.add(0x04);
-    r.add(0x05);
-    // Padding
-    for (var i = 0; i < 10; i++) {
-      r.add(0x00);
-    }
-    // Server host name
-    for (var i = 0; i < 16 * 4; i++) {
-      r.add(0x00);
-    }
-    // Boot File Name
-    for (var i = 0; i < 16 * 8; i++) {
-      r.add(0x00);
-    }
-    // Magic
-    r.add(0x63);
-    r.add(0x82);
-    r.add(0x53);
-    r.add(0x63);
-    // Discover
-    r.add(0x35);
-    r.add(0x01);
-    r.add(0x01);
-    // End
-    r.add(0xff);
-    return r;
-  }
-
-  String _getDHCPType(Uint8List data) {
-    for (var i = 0; i < data.length - 7; i++) {
-      if (data[i] == 0x63 && data[i + 1] == 0x82 && data[i + 2] == 0x53 && data[i + 3] == 0x63 && data[i + 4] == 0x35 && data[i + 5] == 0x01) {
-        final mac = sprintf("%02x:%02x:%02x:%02x:%02x:%02x", [data[28], data[29], data[30], data[31], data[32], data[33]]);
-        switch (data[i + 6]) {
-          case 0x01:
-            return "Discover($mac)";
-          case 0x02:
-            return "Offer";
-          case 0x03:
-            return "Request";
-          case 0x04:
-            return "Ack";
-        }
-      }
-    }
-    return "Unknow";
-  }
-
   void _sendMail() async {
     setState(() {
       _errorMsgMail = "";
@@ -1090,18 +884,12 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
         // Mail Test
         _sendMail();
         break;
-      case 4:
-        // DHCP Test
-        _dhcpTest();
-        break;
     }
   }
 
   void _stop() {
     _timer?.cancel();
     _timer = null;
-    _dhcpUDP?.close();
-    _dhcpUDP = null;
     setState(() {
       _process = false;
     });
@@ -1144,7 +932,6 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
           _syslogTestView(dark),
           _trapTestView(dark),
           _mailTestView(dark),
-          if (Platform.isIOS) _dhcpTestView(dark),
         ],
       ),
       floatingActionButton: FloatingActionButton(
