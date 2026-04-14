@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:statistics/statistics.dart';
 import 'package:dart_ping/dart_ping.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:twsnmpfm/l10n/app_localizations.dart';
 import 'package:twsnmpfm/settings.dart';
-import 'package:flutter_beep/flutter_beep.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:twsnmpfm/time_line_chart.dart';
 
@@ -55,7 +55,7 @@ class _PingPageState extends State<PingPage> {
           i++;
           final err = event.error?.toString() ?? '';
           if (_beep) {
-            FlutterBeep.beep(err == '');
+            SystemSound.play(SystemSoundType.click);
           }
           if (err != '') {
             setState(() {

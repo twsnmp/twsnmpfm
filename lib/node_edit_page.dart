@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:regexed_validator/regexed_validator.dart';
 import 'package:twsnmpfm/node.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:twsnmpfm/l10n/app_localizations.dart';
 
 class NodeEditPage extends StatelessWidget {
   final Node node;

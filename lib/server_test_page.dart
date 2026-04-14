@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:twsnmpfm/l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:twsnmpfm/node.dart';
 import 'package:twsnmpfm/mibdb.dart';
