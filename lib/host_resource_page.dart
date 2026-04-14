@@ -139,6 +139,7 @@ class _HostResourceState extends State<HostResourcePage> {
         vals.add(s.usage());
       }
       final now = DateTime.now().millisecondsSinceEpoch.toDouble();
+      if (!mounted) return;
       setState(() {
         _chartData.add(TimeLineSeries(now, vals));
         _chartSeries = _createChartSeries(storages);
@@ -169,6 +170,7 @@ class _HostResourceState extends State<HostResourcePage> {
       session.close();
     } catch (e) {
       if (_timer != null) {
+        if (!mounted) return;
         setState(() {
           _errorMsg = e.toString();
         });

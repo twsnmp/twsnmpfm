@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:io';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:twsnmpfm/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,7 +9,9 @@ import 'package:twsnmpfm/settings.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  DartPingIOS.register();
+  if (Platform.isIOS || Platform.isMacOS) {
+    DartPingIOS.register();
+  }
   runApp(
     const ProviderScope(
       child: MyApp(),

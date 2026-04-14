@@ -102,6 +102,7 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
       return;
     }
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    if (!mounted) return;
     setState(() {
       // NTP
       _ntpTimeout = prefs.getDouble("ntpTimeout") ?? widget.settings.timeout.toDouble();
@@ -691,10 +692,12 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
 
   void _ntpTest() async {
     try {
+      if (!mounted) return;
       setState(() {
         _errorMsgNTP = "";
       });
       final int offset = await NTP.getNtpOffset(localTime: DateTime.now(), lookUpAddress: _ntpTarget, timeout: Duration(seconds: _ntpTimeout.toInt()));
+      if (!mounted) return;
       setState(() {
         _lastResultNTP = "offset $offset mSec";
         _ntpChartData.add(TimeLineSeries(DateTime.now().millisecondsSinceEpoch.toDouble(), [offset.toDouble()]));
@@ -705,6 +708,7 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
         _stop();
       }
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _errorMsgNTP = e.toString();
       });
@@ -730,6 +734,7 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
       var sender = await UDP.bind(Endpoint.any());
       final msg = _getSyslogMsg();
       final len = await sender.send(msg.codeUnits, Endpoint.unicast(InternetAddress(ip), port: Port(port)));
+      if (!mounted) return;
       setState(() {
         _syslogHist.add(
           DataRow(cells: [
@@ -740,10 +745,12 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
         );
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _errorMsgSyslog = e.toString();
       });
     } finally {
+      if (!mounted) return;
       setState(() {
         _process = false;
       });
@@ -798,6 +805,7 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
       }
       var sender = await UDP.bind(Endpoint.any());
       final len = await sender.send(m.encodedBytes, Endpoint.unicast(InternetAddress(ip), port: Port(port)));
+      if (!mounted) return;
       setState(() {
         _trapHist.add(
           DataRow(cells: [
@@ -808,10 +816,12 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
         );
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _errorMsgTrap = e.toString();
       });
     } finally {
+      if (!mounted) return;
       setState(() {
         _process = false;
       });
@@ -845,6 +855,7 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
         ..subject = _mailSubject
         ..text = _mailBody;
       final sendReport = await mailer.send(message, server);
+      if (!mounted) return;
       setState(() {
         _mailHist.add(
           DataRow(cells: [
@@ -855,10 +866,12 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
         );
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _errorMsgMail = e.toString();
       });
     } finally {
+      if (!mounted) return;
       setState(() {
         _process = false;
       });

@@ -60,6 +60,10 @@ class _CertState extends State<CertPage> {
           return true;
         },
       );
+      if (!mounted) {
+        socket.close();
+        return;
+      }
       setState(() {
         listTiles = [];
         if (socket.peerCertificate == null) {
@@ -217,6 +221,7 @@ class _CertState extends State<CertPage> {
       });
       socket.close();
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         listTiles = [];
         _errorMsg = e.toString();

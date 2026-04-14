@@ -67,6 +67,7 @@ class _MibBrowserState extends State<MibBrowserPage> {
   void _doSnmpWalk() async {
     try {
       _rows.length = 0;
+      if (!mounted) return;
       setState(() {
         _columns = [
           DataColumn(
@@ -102,6 +103,10 @@ class _MibBrowserState extends State<MibBrowserPage> {
         if (message.pdu.varbinds.first.tag == OID) {
           vbval = _mibdb!.oidToName(vbval);
         }
+        if (!mounted) {
+          _progoress = false;
+          break;
+        }
         setState(() {
           _rows.add(
             DataRow(cells: [
@@ -113,6 +118,7 @@ class _MibBrowserState extends State<MibBrowserPage> {
       }
       session.close();
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _errorMsg = e.toString();
       });
@@ -166,6 +172,7 @@ class _MibBrowserState extends State<MibBrowserPage> {
         final r = indexes.indexOf(index);
         rows[r].add(vbval);
       }
+      if (!mounted) return;
       setState(() {
         _columns = [];
         _columns.add(const DataColumn(label: Text("Index")));
@@ -184,6 +191,7 @@ class _MibBrowserState extends State<MibBrowserPage> {
       });
       session.close();
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _errorMsg = e.toString();
       });

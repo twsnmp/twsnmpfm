@@ -50,10 +50,12 @@ class TimeLineChart extends StatelessWidget {
       double i;
       for (i = 100; i < maxY; i += 100) {}
       maxY = i;
-    } else {
+    } else if (maxY.isFinite) {
       double i;
       for (i = 1000; i < maxY; i += 1000) {}
       maxY = i;
+    } else {
+      maxY = 1000.0;
     }
     if (minY < 0) {
       minY = (minY.toInt() - 1).toDouble();

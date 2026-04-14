@@ -142,6 +142,7 @@ class _PortState extends State<PortPage> {
       }
       session.close();
       _ports.sort((a, b) => a.port.compareTo(b.port));
+      if (!mounted) return;
       setState(() {
         _rows = [];
         for (var p in _ports) {
@@ -156,6 +157,7 @@ class _PortState extends State<PortPage> {
         }
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _errorMsg = e.toString();
       });
@@ -215,6 +217,7 @@ class _PortState extends State<PortPage> {
       }
       session.close();
       _ports.sort((a, b) => a.port.compareTo(b.port));
+      if (!mounted) return;
       setState(() {
         _rows = [];
         for (var p in _ports) {
@@ -229,6 +232,7 @@ class _PortState extends State<PortPage> {
         }
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _errorMsg = e.toString();
       });

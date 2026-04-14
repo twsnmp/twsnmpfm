@@ -41,69 +41,79 @@ class _PingPageState extends State<PingPage> {
 
   void _startPing() {
     int i = 0;
-    _stats.length = 0;
-    _chartData.length = 0;
+    _stats.clear();
+    _chartData.clear();
     _maxTTL = 0;
     _minTTL = 255;
-    _rtts.length = 0;
+    _rtts.clear();
     _errMsg = "";
-    ping = Ping(widget.ip, count: _count.toInt(), timeout: _timeout.toInt(), ttl: _ttl.toInt());
+    ping = Ping(widget.ip,
+        count: _count.toInt(), timeout: _timeout.toInt(), ttl: _ttl.toInt());
     ping?.stream.listen((event) {
-      final ttl = event.response?.ttl ?? '';
-      setState(() {
-        if (ttl != '') {
-          i++;
-          final err = event.error?.toString() ?? '';
-          if (_beep) {
-            SystemSound.play(SystemSoundType.click);
-          }
+      if (!mounted) return;
+      final response = event.response;
+      if (response != null && response.ttl != null) {
+        final ttl = response.ttl!;
+        i++;
+        final err = event.error?.toString() ?? '';
+        if (_beep) {
+          SystemSound.play(SystemSoundType.click);
+        }
+        if (!mounted) return;
+        setState(() {
           if (err != '') {
-            setState(() {
-              _lastResult = '$i/$_count rtt=? ttl=?';
-              _errMsg = err;
-              _setStats();
-            });
-            return;
-          }
-          final nrtt = event.response?.time?.inMicroseconds.toDouble() ?? 0.0;
-          _rtts.add(nrtt / 1000);
-          _chartData.add(TimeLineSeries(DateTime.now().millisecondsSinceEpoch.toDouble(), [nrtt / 1000]));
-          final nttl = ttl.toString().toInt();
-          if (nttl < _minTTL) {
-            _minTTL = nttl;
-          }
-          if (nttl > _maxTTL) {
-            _maxTTL = nttl;
-          }
-          setState(() {
+            _lastResult = '$i/$_count rtt=? ttl=?';
+            _errMsg = err;
+          } else {
+            final nrtt = response.time?.inMicroseconds.toDouble() ?? 0.0;
+            _rtts.add(nrtt / 1000);
+            _chartData.add(TimeLineSeries(
+                DateTime.now().millisecondsSinceEpoch.toDouble(),
+                [nrtt / 1000]));
+            if (ttl < _minTTL) {
+              _minTTL = ttl;
+            }
+            if (ttl > _maxTTL) {
+              _maxTTL = ttl;
+            }
             _lastResult = '$i/$_count rtt=${nrtt / 1000}mSec ttl=$ttl';
-            _setStats();
-          });
-        } else {
-          setState(() {
-            final err = event.error?.toString() ?? '';
-            if (err == "") {
-              final tx = event.summary?.transmitted ?? 0;
-              final rx = event.summary?.received ?? 0;
+          }
+          _setStats();
+        });
+      } else {
+        if (!mounted) return;
+        setState(() {
+          final err = event.error?.toString() ?? '';
+          if (err == "") {
+            final summary = event.summary;
+            if (summary != null) {
+              final tx = summary.transmitted;
+              final rx = summary.received;
               _lastResult = "ping done $rx/$tx";
               _setStats();
               ping?.stop();
               ping = null;
-            } else {
-              _lastResult = err;
-              _errMsg = err;
             }
-          });
-        }
-      });
+          } else {
+            _lastResult = err;
+            _errMsg = err;
+          }
+        });
+      }
     });
   }
 
-  _stopPing() {
+  void _stopPing() {
     ping?.stop();
     setState(() {
       ping = null;
     });
+  }
+
+  @override
+  void dispose() {
+    ping?.stop();
+    super.dispose();
   }
 
   void _setStats() {

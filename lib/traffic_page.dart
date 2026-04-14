@@ -210,6 +210,7 @@ class _TrafficState extends State<TrafficPage> {
         final txps = (tx - _lastData!.value[0]) / diff;
         final rxps = (rx - _lastData!.value[1]) / diff;
         final errps = (err - _lastData!.value[2]) / diff;
+        if (!mounted) return;
         setState(() {
           _chartData.add(TimeLineSeries(now.millisecondsSinceEpoch.toDouble(), <double>[txps, rxps, errps]));
           _logs.add(
@@ -224,6 +225,7 @@ class _TrafficState extends State<TrafficPage> {
       }
       _lastData = TimeLineSeries(now.millisecondsSinceEpoch.toDouble(), <double>[tx, rx, err]);
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _errorMsg = e.toString();
       });
@@ -273,6 +275,7 @@ class _TrafficState extends State<TrafficPage> {
           _targetList.add(_TrafficTarget("$name:BPS", "ifBPS:$index", "ifBPS", index));
         }
       }
+      if (!mounted) return;
       setState(() {
         _targetMenuItems = [];
         _selectedTarget = "tcp";
@@ -283,6 +286,7 @@ class _TrafficState extends State<TrafficPage> {
         }
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _errorMsg = e.toString();
       });

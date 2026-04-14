@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:regexed_validator/regexed_validator.dart';
 import 'package:twsnmpfm/node.dart';
 import 'package:twsnmpfm/l10n/app_localizations.dart';
+import 'package:basic_utils/basic_utils.dart';
 
 class NodeEditPage extends StatelessWidget {
   final Node node;
@@ -34,25 +35,43 @@ class NodeEditFormState extends State<NodeEditForm> {
   final _formKey = GlobalKey<FormState>();
   final _ipController = TextEditingController();
   String _errorMsg = '';
+
   void _getIPFromName() async {
+    if (!mounted) return;
     setState(() {
       _errorMsg = "";
     });
-    if (widget.node.name.isEmpty) {
+    final name = widget.node.name.trim().replaceAll('　', '');
+    if (name.isEmpty) {
       return;
     }
     try {
-      var ips = await InternetAddress.lookup(widget.node.name);
+      // 1. Try system DNS lookup
+      var ips = await InternetAddress.lookup(name);
       var ip = ips.first.address;
-      setState(() {
-        widget.node.ip = ip;
-        _ipController.text = ip;
-      });
+      _updateIP(ip);
     } catch (e) {
+      try {
+        // 2. Fallback to Google DNS lookup for emulator environments
+        final records = await DnsUtils.lookupRecord(name, RRecordType.A);
+        if (records != null && records.isNotEmpty) {
+          _updateIP(records.first.data);
+          return;
+        }
+      } catch (_) {}
+      if (!mounted) return;
       setState(() {
         _errorMsg = e.toString();
       });
     }
+  }
+
+  void _updateIP(String ip) {
+    if (!mounted) return;
+    setState(() {
+      widget.node.ip = ip;
+      _ipController.text = ip;
+    });
   }
 
   @override

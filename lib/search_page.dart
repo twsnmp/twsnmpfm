@@ -477,6 +477,7 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
       for (var i in await NetworkInterface.list()) {
         for (var addr in i.addresses) {
           if (!addr.isLoopback) {
+            if (!mounted) return;
             setState(() {
               _results.add(DataRow(cells: [DataCell(Text("${i.name}:${addr.type.name}")), DataCell(Text(addr.address))]));
             });
@@ -502,6 +503,10 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
           strun.asStream(timeout: const Duration(seconds: 5)).listen((datagram) {
             if (datagram != null && datagram.data.length == 32 && datagram.data[0] == 0x01 && datagram.data[1] == 0x01) {
               var ip = sprintf("%d.%d.%d.%d", [datagram.data[28], datagram.data[29], datagram.data[30], datagram.data[31]]);
+              if (!mounted) {
+                strun.close();
+                return;
+              }
               setState(() {
                 _results.add(DataRow(cells: [const DataCell(Text("STUN IP")), DataCell(Text(ip))]));
               });
@@ -512,10 +517,12 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
         }
       }
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _errorMsg = e.toString();
       });
     } finally {
+      if (!mounted) return;
       setState(() {
         _process = false;
       });
@@ -555,6 +562,7 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
       if (ip == null) {
         var ips = await InternetAddress.lookup(_dnsTarget);
         for (var ip in ips) {
+          if (!mounted) return;
           setState(() {
             _results.add(DataRow(cells: [DataCell(Text("Local DNS ${ip.type.name}")), DataCell(Text(ip.address))]));
           });
@@ -566,6 +574,7 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
             final t = _rrTypeMap[r.rType] ?? "Unknown";
             final k = "Google DNS $t";
             final v = r.data;
+            if (!mounted) return;
             setState(() {
               _results.add(DataRow(cells: [DataCell(Text(k)), DataCell(Text(v))]));
             });
@@ -573,11 +582,13 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
         }
       } else {
         final h = await ip.reverse();
+        if (!mounted) return;
         setState(() {
           _results.add(DataRow(cells: [const DataCell(Text("Local DNS Host")), DataCell(Text(h.host))]));
         });
         var rs = await DnsUtils.reverseDns(_dnsTarget);
         if (rs != null) {
+          if (!mounted) return;
           setState(() {
             for (var r in rs) {
               final t = _rrTypeMap[r.rType] ?? "Unknown";
@@ -589,10 +600,12 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
         }
       }
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _errorMsg = e.toString();
       });
     } finally {
+      if (!mounted) return;
       setState(() {
         _process = false;
       });

@@ -174,6 +174,7 @@ class _VPanelState extends State<VPanelPage> {
         _ports.add(port);
       }
       session.close();
+      if (!mounted) return;
       setState(() {
         _rows = [];
         for (var p in _ports) {
@@ -200,6 +201,7 @@ class _VPanelState extends State<VPanelPage> {
         }
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _errorMsg = e.toString();
       });

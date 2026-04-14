@@ -20,9 +20,6 @@ class Settings extends ChangeNotifier {
   }
 
   save() async {
-    if (Platform.operatingSystem == 'macos') {
-      return;
-    }
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setInt('count', count);
     await prefs.setInt('ttl', ttl);
@@ -36,9 +33,6 @@ class Settings extends ChangeNotifier {
   }
 
   _load() async {
-    if (Platform.operatingSystem == 'macos') {
-      return;
-    }
     SharedPreferences prefs = await SharedPreferences.getInstance();
     count = prefs.getInt("count") ?? 5;
     ttl = prefs.getInt("ttl") ?? 255;

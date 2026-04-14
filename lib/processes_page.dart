@@ -163,6 +163,7 @@ class _ProcessesState extends State<ProcessesPage> {
       } else {
         processes.sort((a, b) => b.mem.compareTo(a.mem));
       }
+      if (!mounted) return;
       setState(() {
         _rows = [];
         _sections = [];
@@ -213,6 +214,7 @@ class _ProcessesState extends State<ProcessesPage> {
       session.close();
     } catch (e) {
       if (_timer != null) {
+        if (!mounted) return;
         setState(() {
           _errorMsg = e.toString();
         });
