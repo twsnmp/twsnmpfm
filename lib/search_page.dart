@@ -208,7 +208,7 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
     }
   }
 
-  SingleChildScrollView _myIPView(bool dark) => SingleChildScrollView(
+  SingleChildScrollView _myIPView() => SingleChildScrollView(
         padding: const EdgeInsets.all(10),
         child: Form(
           child: Column(
@@ -238,21 +238,12 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
               SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: DataTable(
-                    headingTextStyle: TextStyle(
-                      color: dark ? Colors.white : Colors.blueGrey,
-                      fontSize: 14,
-                    ),
                     headingRowHeight: 20,
-                    dataTextStyle: TextStyle(color: dark ? Colors.white : Colors.black, fontSize: 12),
                     dataRowMinHeight: 10,
                     dataRowMaxHeight: 18,
                     columns: [
-                      DataColumn(
-                        label: Text(loc!.key),
-                      ),
-                      DataColumn(
-                        label: Text(loc!.value),
-                      ),
+                      DataColumn(label: Text(loc!.key)),
+                      DataColumn(label: Text(loc!.value)),
                     ],
                     rows: _results,
                   )),
@@ -261,7 +252,7 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
         ),
       );
 
-  SingleChildScrollView _dnsView(bool dark) => SingleChildScrollView(
+  SingleChildScrollView _dnsView() => SingleChildScrollView(
         padding: const EdgeInsets.all(10),
         child: Form(
           child: Column(
@@ -309,21 +300,12 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
               SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: DataTable(
-                    headingTextStyle: TextStyle(
-                      color: dark ? Colors.white : Colors.blueGrey,
-                      fontSize: 14,
-                    ),
                     headingRowHeight: 20,
-                    dataTextStyle: TextStyle(color: dark ? Colors.white : Colors.black, fontSize: 12),
                     dataRowMinHeight: 10,
                     dataRowMaxHeight: 18,
                     columns: [
-                      DataColumn(
-                        label: Text(loc!.key),
-                      ),
-                      DataColumn(
-                        label: Text(loc!.value),
-                      ),
+                      DataColumn(label: Text(loc!.key)),
+                      DataColumn(label: Text(loc!.value)),
                     ],
                     rows: _results,
                   )),
@@ -332,7 +314,7 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
         ),
       );
 
-  SingleChildScrollView _macToVendorView(bool dark) => SingleChildScrollView(
+  SingleChildScrollView _macToVendorView() => SingleChildScrollView(
         padding: const EdgeInsets.all(10),
         child: Form(
           child: Column(
@@ -360,21 +342,12 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
               SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: DataTable(
-                    headingTextStyle: TextStyle(
-                      color: dark ? Colors.white : Colors.blueGrey,
-                      fontSize: 14,
-                    ),
                     headingRowHeight: 20,
-                    dataTextStyle: TextStyle(color: dark ? Colors.white : Colors.black, fontSize: 12),
                     dataRowMinHeight: 10,
                     dataRowMaxHeight: 18,
                     columns: [
-                      DataColumn(
-                        label: Text(loc!.vendorCode),
-                      ),
-                      DataColumn(
-                        label: Text(loc!.vendorName),
-                      ),
+                      DataColumn(label: Text(loc!.vendorCode)),
+                      DataColumn(label: Text(loc!.vendorName)),
                     ],
                     rows: _results,
                   )),
@@ -383,7 +356,7 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
         ),
       );
 
-  SingleChildScrollView _portView(bool dark) => SingleChildScrollView(
+  SingleChildScrollView _portView() => SingleChildScrollView(
         padding: const EdgeInsets.all(10),
         child: Form(
           child: Column(
@@ -434,21 +407,12 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
               SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: DataTable(
-                    headingTextStyle: TextStyle(
-                      color: dark ? Colors.white : Colors.blueGrey,
-                      fontSize: 14,
-                    ),
                     headingRowHeight: 20,
-                    dataTextStyle: TextStyle(color: dark ? Colors.white : Colors.black, fontSize: 12),
                     dataRowMinHeight: 10,
                     dataRowMaxHeight: 18,
                     columns: [
-                      DataColumn(
-                        label: Text(loc!.key),
-                      ),
-                      DataColumn(
-                        label: Text(loc!.value),
-                      ),
+                      DataColumn(label: Text(loc!.key)),
+                      DataColumn(label: Text(loc!.value)),
                     ],
                     rows: _results,
                   )),
@@ -669,7 +633,6 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
 
   @override
   Widget build(BuildContext context) {
-    bool dark = Theme.of(context).brightness == Brightness.dark;
     loc = AppLocalizations.of(context)!;
     return SafeArea(
         child: Scaffold(
@@ -697,10 +660,10 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
       body: TabBarView(
         controller: _tabController,
         children: [
-          _myIPView(dark),
-          _dnsView(dark),
-          _macToVendorView(dark),
-          _portView(dark),
+          _myIPView(),
+          _dnsView(),
+          _macToVendorView(),
+          _portView(),
           _mibTreeView(),
         ],
       ),

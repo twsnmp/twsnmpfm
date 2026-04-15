@@ -182,7 +182,7 @@ class _PingPageState extends State<PingPage> {
   @override
   Widget build(BuildContext context) {
     loc = AppLocalizations.of(context)!;
-    bool dark = Theme.of(context).brightness == Brightness.dark;
+    final colorScheme = Theme.of(context).colorScheme;
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
@@ -258,32 +258,23 @@ class _PingPageState extends State<PingPage> {
                 ),
                 Text(
                   _lastResult,
-                  style: TextStyle(fontSize: 16, color: dark ? Colors.white : Colors.black87),
+                  style: TextStyle(fontSize: 16, color: colorScheme.onSurface),
                 ),
                 Text(
                   _errMsg,
-                  style: const TextStyle(fontSize: 12, color: Colors.red),
+                  style: TextStyle(fontSize: 12, color: colorScheme.error),
                 ),
                 SizedBox(
                   height: 160,
                   child: TimeLineChart(_createChartData()),
                 ),
                 DataTable(
-                  headingTextStyle: TextStyle(
-                    color: dark ? Colors.white : Colors.blueGrey,
-                    fontSize: 14,
-                  ),
                   headingRowHeight: 20,
-                  dataTextStyle: TextStyle(color: dark ? Colors.white : Colors.black, fontSize: 12),
                   dataRowMinHeight: 10,
                   dataRowMaxHeight: 18,
                   columns: const [
-                    DataColumn(
-                      label: Text('項目'),
-                    ),
-                    DataColumn(
-                      label: Text('値'),
-                    ),
+                    DataColumn(label: Text('項目')),
+                    DataColumn(label: Text('値')),
                   ],
                   rows: _stats,
                 ),

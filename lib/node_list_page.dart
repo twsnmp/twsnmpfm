@@ -56,125 +56,123 @@ class NodeListState extends ConsumerState<NodeListPage> {
           restorationId: 'node_list_view',
           padding: const EdgeInsets.symmetric(vertical: 8),
           itemCount: nodes.nodes.length,
-          itemBuilder: (context, i) => ListTile(
-              leading: nodes.nodes[i].getIcon(),
-              title: Text(nodes.nodes[i].name),
-              subtitle: Text(nodes.nodes[i].ip),
-              trailing: PopupMenuButton<String>(
-                padding: EdgeInsets.zero,
-                onSelected: (value) => {nodeMenuAction(value, i, context, ref)},
-                itemBuilder: (context) => <PopupMenuItem<String>>[
-                  const PopupMenuItem<String>(
-                      height: h,
-                      value: "ping",
-                      child: Row(children: [
-                        Icon(Icons.network_ping),
-                        Text(
-                          "Ping",
-                          style: TextStyle(fontSize: 14),
-                        ),
-                      ])),
-                  PopupMenuItem<String>(
-                      height: h,
-                      value: "snmp",
-                      child: Row(children: [
-                        const Icon(Icons.storage),
-                        Text(
-                          loc.mibBrowser,
-                          style: const TextStyle(fontSize: 14),
-                        ),
-                      ])),
-                  PopupMenuItem<String>(
-                    height: h,
-                    value: "panel",
-                    child: Row(children: [
-                      const Icon(Icons.lan),
-                      Text(loc.panel),
-                    ]),
+          itemBuilder: (context, i) {
+            final node = nodes.nodes[i];
+            return Card(
+              child: ListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                leading: node.getIcon(),
+                title: Text(
+                  node.name,
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                ),
+                subtitle: Text(
+                  node.ip,
+                  style: TextStyle(
+                    fontFamily: 'monospace',
+                    fontSize: 12,
+                    color: Theme.of(context).colorScheme.primary,
                   ),
-                  PopupMenuItem<String>(
+                ),
+                trailing: PopupMenuButton<String>(
+                  padding: EdgeInsets.zero,
+                  onSelected: (value) => {nodeMenuAction(value, i, context, ref)},
+                  itemBuilder: (context) => <PopupMenuItem<String>>[
+                    const PopupMenuItem<String>(
+                        height: h,
+                        value: "ping",
+                        child: Row(children: [
+                          Icon(Icons.network_ping),
+                          SizedBox(width: 8),
+                          Text("Ping", style: TextStyle(fontSize: 14)),
+                        ])),
+                    PopupMenuItem<String>(
+                        height: h,
+                        value: "snmp",
+                        child: Row(children: [
+                          const Icon(Icons.storage),
+                          const SizedBox(width: 8),
+                          Text(loc.mibBrowser, style: const TextStyle(fontSize: 14)),
+                        ])),
+                    PopupMenuItem<String>(
                       height: h,
-                      value: "traffic",
+                      value: "panel",
                       child: Row(children: [
-                        const Icon(Icons.show_chart),
-                        Text(
-                          loc.traffic,
-                          style: const TextStyle(fontSize: 14),
-                        ),
-                      ])),
-                  PopupMenuItem<String>(
+                        const Icon(Icons.lan),
+                        const SizedBox(width: 8),
+                        Text(loc.panel, style: const TextStyle(fontSize: 14)),
+                      ]),
+                    ),
+                    PopupMenuItem<String>(
+                        height: h,
+                        value: "traffic",
+                        child: Row(children: [
+                          const Icon(Icons.show_chart),
+                          const SizedBox(width: 8),
+                          Text(loc.traffic, style: const TextStyle(fontSize: 14)),
+                        ])),
+                    PopupMenuItem<String>(
+                        height: h,
+                        value: "hrmib",
+                        child: Row(children: [
+                          const Icon(Icons.data_usage),
+                          const SizedBox(width: 8),
+                          Text(loc.hostResource, style: const TextStyle(fontSize: 14)),
+                        ])),
+                    PopupMenuItem<String>(
+                        height: h,
+                        value: "process",
+                        child: Row(children: [
+                          const Icon(Icons.memory),
+                          const SizedBox(width: 8),
+                          Text(loc.processes, style: const TextStyle(fontSize: 14)),
+                        ])),
+                    PopupMenuItem<String>(
+                        height: h,
+                        value: "port",
+                        child: Row(children: [
+                          const Icon(Icons.drag_indicator),
+                          const SizedBox(width: 8),
+                          Text(loc.port, style: const TextStyle(fontSize: 14)),
+                        ])),
+                    PopupMenuItem<String>(
+                        height: h,
+                        value: "cert",
+                        child: Row(children: [
+                          const Icon(Icons.security),
+                          const SizedBox(width: 8),
+                          Text(loc.cert, style: const TextStyle(fontSize: 14)),
+                        ])),
+                    PopupMenuItem<String>(
+                        height: h,
+                        value: "server",
+                        child: Row(children: [
+                          const Icon(Icons.rule),
+                          const SizedBox(width: 8),
+                          Text(loc.serverTest, style: const TextStyle(fontSize: 14)),
+                        ])),
+                    PopupMenuItem<String>(
+                        height: h,
+                        value: "edit",
+                        child: Row(children: [
+                          const Icon(Icons.edit),
+                          const SizedBox(width: 8),
+                          Text(loc.edit, style: const TextStyle(fontSize: 14)),
+                        ])),
+                    PopupMenuItem<String>(
                       height: h,
-                      value: "hrmib",
+                      value: "delete",
                       child: Row(children: [
-                        const Icon(Icons.data_usage),
-                        Text(
-                          loc.hostResource,
-                          style: const TextStyle(fontSize: 14),
-                        ),
-                      ])),
-                  PopupMenuItem<String>(
-                      height: h,
-                      value: "process",
-                      child: Row(children: [
-                        const Icon(Icons.memory),
-                        Text(
-                          loc.processes,
-                          style: const TextStyle(fontSize: 14),
-                        ),
-                      ])),
-                  PopupMenuItem<String>(
-                      height: h,
-                      value: "port",
-                      child: Row(children: [
-                        const Icon(Icons.drag_indicator),
-                        Text(
-                          loc.port,
-                          style: const TextStyle(fontSize: 14),
-                        ),
-                      ])),
-                  PopupMenuItem<String>(
-                      height: h,
-                      value: "cert",
-                      child: Row(children: [
-                        const Icon(Icons.security),
-                        Text(
-                          loc.cert,
-                          style: const TextStyle(fontSize: 14),
-                        ),
-                      ])),
-                  PopupMenuItem<String>(
-                      height: h,
-                      value: "server",
-                      child: Row(children: [
-                        const Icon(Icons.rule),
-                        Text(
-                          loc.serverTest,
-                          style: const TextStyle(fontSize: 14),
-                        ),
-                      ])),
-                  PopupMenuItem<String>(
-                      height: h,
-                      value: "edit",
-                      child: Row(children: [
-                        const Icon(Icons.edit),
-                        Text(
-                          loc.edit,
-                          style: const TextStyle(fontSize: 14),
-                        ),
-                      ])),
-                  PopupMenuItem<String>(
-                    height: h,
-                    value: "delete",
-                    child: Row(children: [
-                      const Icon(Icons.delete, color: Colors.red),
-                      Text(
-                        loc.delete,
-                        style: const TextStyle(fontSize: 14),
-                      ),
-                    ]),
-                  ),
-                ],
-              )),
+                        Icon(Icons.delete, color: Theme.of(context).colorScheme.error),
+                        const SizedBox(width: 8),
+                        Text(loc.delete, style: const TextStyle(fontSize: 14)),
+                      ]),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
         ),
       ),
       floatingActionButton: FloatingActionButton(
@@ -183,6 +181,7 @@ class NodeListState extends ConsumerState<NodeListPage> {
       ),
     );
   }
+
 
   void nodeMenuAction(String action, int i, BuildContext context, WidgetRef ref) {
     final nodes = ref.read(nodesProvider);

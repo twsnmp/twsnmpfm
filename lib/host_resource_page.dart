@@ -220,7 +220,7 @@ class _HostResourceState extends State<HostResourcePage> {
 
   @override
   Widget build(BuildContext context) {
-    bool dark = Theme.of(context).brightness == Brightness.dark;
+    final colorScheme = Theme.of(context).colorScheme;
     final loc = AppLocalizations.of(context)!;
     return SafeArea(
       child: Scaffold(
@@ -251,7 +251,7 @@ class _HostResourceState extends State<HostResourcePage> {
                             }),
                   ],
                 ),
-                Text(_errorMsg, style: const TextStyle(color: Colors.red)),
+                Text(_errorMsg, style: TextStyle(color: colorScheme.error)),
                 SizedBox(
                   height: 160,
                   child: TimeLineChart(_chartSeries),
@@ -260,12 +260,7 @@ class _HostResourceState extends State<HostResourcePage> {
                 SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: DataTable(
-                      headingTextStyle: TextStyle(
-                        color: dark ? Colors.white : Colors.blueGrey,
-                        fontSize: 14,
-                      ),
                       headingRowHeight: 20,
-                      dataTextStyle: TextStyle(color: dark ? Colors.white : Colors.black, fontSize: 12),
                       dataRowMinHeight: 10,
                       dataRowMaxHeight: 18,
                       columns: [

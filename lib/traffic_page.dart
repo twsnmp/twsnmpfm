@@ -331,8 +331,8 @@ class _TrafficState extends State<TrafficPage> {
 
   @override
   Widget build(BuildContext context) {
-    bool dark = Theme.of(context).brightness == Brightness.dark;
     loc = AppLocalizations.of(context);
+    final colorScheme = Theme.of(context).colorScheme;
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
@@ -373,7 +373,7 @@ class _TrafficState extends State<TrafficPage> {
                             }),
                   ],
                 ),
-                Text(_errorMsg, style: const TextStyle(color: Colors.red)),
+                Text(_errorMsg, style: TextStyle(color: colorScheme.error)),
                 SizedBox(
                   height: 200,
                   child: TimeLineChart(_createChartData()),
@@ -381,27 +381,14 @@ class _TrafficState extends State<TrafficPage> {
                 SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: DataTable(
-                      headingTextStyle: TextStyle(
-                        color: dark ? Colors.white : Colors.blueGrey,
-                        fontSize: 14,
-                      ),
                       headingRowHeight: 20,
-                      dataTextStyle: TextStyle(color: dark ? Colors.white : Colors.black, fontSize: 12),
                       dataRowMinHeight: 10,
                       dataRowMaxHeight: 18,
                       columns: [
-                        DataColumn(
-                          label: Text(loc!.time),
-                        ),
-                        DataColumn(
-                          label: Text('${loc!.tx}($_unit)', style: const TextStyle(color: Colors.blue)),
-                        ),
-                        DataColumn(
-                          label: Text('${loc!.rx}($_unit)', style: const TextStyle(color: Colors.green)),
-                        ),
-                        DataColumn(
-                          label: Text('${loc!.error}($_unit)', style: const TextStyle(color: Colors.red)),
-                        ),
+                        DataColumn(label: Text(loc!.time)),
+                        DataColumn(label: Text('${loc!.tx}($_unit)', style: TextStyle(color: colorScheme.primary))),
+                        DataColumn(label: Text('${loc!.rx}($_unit)', style: const TextStyle(color: Colors.green))),
+                        DataColumn(label: Text('${loc!.error}($_unit)', style: TextStyle(color: colorScheme.error))),
                       ],
                       rows: _logs,
                     )),

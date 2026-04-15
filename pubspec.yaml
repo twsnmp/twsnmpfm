@@ -34,6 +34,7 @@ dependencies:
   mailer: ^6.0.1
   flutter_simple_treeview: ^3.0.1
   fl_chart: ^0.64.0
+  google_fonts: ^6.2.1
 
 dev_dependencies:
   flutter_test:
