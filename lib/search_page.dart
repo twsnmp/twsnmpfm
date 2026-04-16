@@ -6,9 +6,18 @@ import 'package:twsnmpfm/mibdb.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:twsnmpfm/settings.dart';
 import 'package:basic_utils/basic_utils.dart';
-import 'package:flutter_simple_treeview/flutter_simple_treeview.dart';
 import 'package:udp/udp.dart';
 import 'package:sprintf/sprintf.dart';
+
+class MibNode {
+  final String name;
+  final String oid;
+  final int depth;
+  bool isExpanded;
+  final List<MibNode> children = [];
+
+  MibNode({required this.name, required this.oid, this.depth = 0, this.isExpanded = false});
+}
 
 class SearchPage extends StatefulWidget {
   final Settings settings;
@@ -76,8 +85,9 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
 
   MIBDB? _mibdb;
   List<String> _mibNames = [];
-  TreeNode? _mibTreeRoot;
-  final Map<String, TreeNode> _mibTreeMap = {};
+  MibNode? _mibTreeRoot;
+  final Map<String, MibNode> _mibTreeMap = {};
+  List<MibNode> _visibleMibNodes = [];
 
   final List<DataRow> _results = [];
 
@@ -91,6 +101,9 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
   void initState() {
     super.initState();
     _tabController = TabController(vsync: this, length: 5);
+    _tabController!.addListener(() {
+      setState(() {});
+    });
     _rrTypeMap.forEach((key, value) {
       _rrTypeList.add(DropdownMenuItem(value: key, child: Text(value)));
     });
@@ -135,7 +148,7 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
       }
       return aa.length.compareTo(ba.length);
     });
-    _addToMibTree("iso.org.dod.internet", "1.3.6.1", "");
+    _addToMibTree("iso.org.dod.internet", "1.3.6.1", "", 0);
     for (var oid in oids) {
       var n = _mibdb!.oidToName(oid);
       if (n == "") {
@@ -146,12 +159,16 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
         continue;
       }
       oida.removeLast();
-      _addToMibTree(n, oid, oida.join("."));
+      final poid = oida.join(".");
+      final depth = poid.split(".").length - 3; // base 1.3.6.1 depth 0
+      _addToMibTree(n, oid, poid, depth > 0 ? depth : 1);
     }
+    _updateVisibleNodes();
   }
 
-  void _addToMibTree(String name, String oid, String poid) {
-    final n = TreeNode(content: Text("$name($oid)"), children: []);
+  void _addToMibTree(String name, String oid, String poid, int depth) {
+    if (_mibTreeMap.containsKey(oid)) return;
+    final n = MibNode(name: name, oid: oid, depth: depth);
     if (poid == "") {
       _mibTreeRoot = n;
     } else {
@@ -159,9 +176,25 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
       if (p == null) {
         return;
       }
-      p.children?.add(n);
+      p.children.add(n);
     }
     _mibTreeMap[oid] = n;
+  }
+
+  void _updateVisibleNodes() {
+    _visibleMibNodes = [];
+    if (_mibTreeRoot != null) {
+      void traverse(MibNode node) {
+        _visibleMibNodes.add(node);
+        if (node.isExpanded) {
+          for (var child in node.children) {
+            traverse(child);
+          }
+        }
+      }
+      traverse(_mibTreeRoot!);
+    }
+    if (mounted) setState(() {});
   }
 
   void _loadPortNameMap() async {
@@ -421,14 +454,47 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
         ),
       );
 
-  SingleChildScrollView _mibTreeView() {
-    var tv = _mibTreeRoot != null
-        ? TreeView(
-            nodes: [_mibTreeRoot!],
-            indent: 15,
-          )
-        : TreeView(nodes: const []);
-    return SingleChildScrollView(padding: const EdgeInsets.all(10), child: SingleChildScrollView(scrollDirection: Axis.horizontal, child: tv));
+  Widget _mibTreeView() {
+    if (_mibTreeRoot == null) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    return ListView.builder(
+      itemCount: _visibleMibNodes.length,
+      itemBuilder: (context, index) {
+        final node = _visibleMibNodes[index];
+        final hasChildren = node.children.isNotEmpty;
+        return Padding(
+          padding: EdgeInsets.only(left: node.depth * 15.0),
+          child: InkWell(
+            onTap: hasChildren ? () {
+              setState(() {
+                node.isExpanded = !node.isExpanded;
+                _updateVisibleNodes();
+              });
+            } : null,
+            child: Row(
+              children: [
+                if (hasChildren)
+                  Icon(
+                    node.isExpanded ? Icons.keyboard_arrow_down : Icons.keyboard_arrow_right,
+                    size: 20,
+                  )
+                else
+                  const SizedBox(width: 20),
+                const SizedBox(width: 4),
+                Expanded(
+                  child: Text(
+                    "${node.name}(${node.oid})",
+                    style: const TextStyle(fontSize: 14),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   void _myIP() async {
@@ -667,12 +733,14 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
           _mibTreeView(),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          _search();
-        },
-        child: _process ? const Icon(Icons.stop, color: Colors.red) : const Icon(Icons.play_circle),
-      ),
+      floatingActionButton: _tabController?.index == 4
+          ? null
+          : FloatingActionButton(
+              onPressed: () {
+                _search();
+              },
+              child: _process ? const Icon(Icons.stop, color: Colors.red) : const Icon(Icons.play_circle),
+            ),
     ));
   }
 }
