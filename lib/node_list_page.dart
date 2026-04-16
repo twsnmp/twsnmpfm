@@ -15,6 +15,9 @@ import 'package:twsnmpfm/server_test_page.dart';
 import 'package:twsnmpfm/settings.dart';
 import 'package:twsnmpfm/settings_page.dart';
 import 'package:twsnmpfm/search_page.dart';
+import 'dart:io';
+import 'dart:async';
+import 'package:dart_ping/dart_ping.dart';
 
 class NodeListPage extends ConsumerStatefulWidget {
   const NodeListPage({super.key});
@@ -22,6 +25,43 @@ class NodeListPage extends ConsumerStatefulWidget {
   NodeListState createState() => NodeListState();
 }
 class NodeListState extends ConsumerState<NodeListPage> {
+  bool _isRunning = false;
+  Timer? _timer;
+  int _checkTotal = 0;
+  int _checkCompleted = 0;
+  int _checkErrors = 0;
+  String _checkCurrentNodeName = "";
+  bool _isCheckFinished = false;
+  bool _isCheckCancelled = false;
+  String _checkTitle = "";
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _startTimer();
+    });
+  }
+
+  void _startTimer() {
+    final settings = ref.read(settingsProvider);
+    _timer?.cancel();
+    _timer = Timer.periodic(Duration(minutes: settings.interval > 0 ? settings.interval : 5), (timer) async {
+      if (!_isRunning) {
+        await _runPingChecks(context, ref);
+      }
+      if (mounted && !_isRunning) {
+        await _runCertChecks(context, ref);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final nodes = ref.watch(nodesProvider);
@@ -40,6 +80,42 @@ class NodeListState extends ConsumerState<NodeListPage> {
               search(context, ref);
             },
           ),
+          PopupMenuButton<String>(
+            tooltip: loc.start,
+            icon: const Icon(Icons.play_circle),
+            onSelected: (value) {
+              if (_isRunning) return;
+              if (value == 'ping') {
+                _runPingChecks(context, ref);
+              } else if (value == 'cert') {
+                _runCertChecks(context, ref);
+              }
+            },
+            itemBuilder: (context) => <PopupMenuEntry<String>>[
+              PopupMenuItem<String>(
+                value: "ping",
+                enabled: !_isRunning,
+                child: Row(
+                  children: [
+                    const Icon(Icons.network_ping),
+                    const SizedBox(width: 8),
+                    Text(loc.runPing, style: const TextStyle(fontSize: 14)),
+                  ],
+                ),
+              ),
+              PopupMenuItem<String>(
+                value: "cert",
+                enabled: !_isRunning,
+                child: Row(
+                  children: [
+                    const Icon(Icons.security),
+                    const SizedBox(width: 8),
+                    Text(loc.runCert, style: const TextStyle(fontSize: 14)),
+                  ],
+                ),
+              ),
+            ],
+          ),
           IconButton(
             tooltip: loc.settings,
             icon: const Icon(
@@ -51,30 +127,61 @@ class NodeListState extends ConsumerState<NodeListPage> {
           ),
         ],
       ),
-      body: Scrollbar(
-        child: ListView.builder(
-          restorationId: 'node_list_view',
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          itemCount: nodes.nodes.length,
-          itemBuilder: (context, i) {
-            final node = nodes.nodes[i];
-            return Card(
-              child: ListTile(
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                leading: node.getIcon(),
-                title: Text(
-                  node.name,
-                  style: const TextStyle(fontWeight: FontWeight.w600),
-                ),
-                subtitle: Text(
-                  node.ip,
-                  style: TextStyle(
-                    fontFamily: 'monospace',
-                    fontSize: 12,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                ),
-                trailing: PopupMenuButton<String>(
+      body: Stack(
+        children: [
+          AbsorbPointer(
+            absorbing: _isRunning,
+            child: Column(
+              children: [
+                Expanded(
+                  child: Scrollbar(
+                child: ListView.builder(
+                  restorationId: 'node_list_view',
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  itemCount: nodes.nodes.length,
+                  itemBuilder: (context, i) {
+                    final node = nodes.nodes[i];
+                    return Card(
+                      child: ListTile(
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                        leading: node.getIcon(),
+                        title: Text(
+                          node.name,
+                          style: const TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                        subtitle: Row(
+                          children: [
+                            Text(
+                              node.ip,
+                              style: TextStyle(
+                                fontFamily: 'monospace',
+                                fontSize: 12,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            if (node.pingState != -1)
+                              Icon(
+                                node.pingState == 0 ? Icons.check_circle : Icons.error,
+                                size: 16,
+                                color: node.pingState == 0 ? Colors.green : Colors.red,
+                              ),
+                            if (node.certState != -1)
+                              Padding(
+                                padding: const EdgeInsets.only(left: 4.0),
+                                child: Icon(
+                                  node.certState == 0 ? Icons.verified : 
+                                  node.certState == 1 ? Icons.error : 
+                                  node.certState == 2 ? Icons.dangerous : Icons.warning,
+                                  size: 16,
+                                  color: node.certState == 0 ? Colors.green : 
+                                         node.certState == 1 ? Colors.red : 
+                                         node.certState == 2 ? Colors.red : Colors.amber,
+                                ),
+                              ),
+                          ],
+                        ),
+                        trailing: PopupMenuButton<String>(
                   padding: EdgeInsets.zero,
                   onSelected: (value) => {nodeMenuAction(value, i, context, ref)},
                   itemBuilder: (context) => <PopupMenuItem<String>>[
@@ -175,6 +282,59 @@ class NodeListState extends ConsumerState<NodeListPage> {
           },
         ),
       ),
+      )
+     ]
+    )
+   ),
+   if (_isRunning)
+     Container(
+       color: Colors.black45,
+       padding: const EdgeInsets.all(32),
+       alignment: Alignment.center,
+       child: Card(
+         elevation: 8,
+         child: Padding(
+           padding: const EdgeInsets.all(24),
+           child: Column(
+             mainAxisSize: MainAxisSize.min,
+             crossAxisAlignment: CrossAxisAlignment.stretch,
+             children: [
+               Text(_checkTitle, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+               const Divider(),
+               const SizedBox(height: 16),
+               Text("${loc.checkCompletedCount}: $_checkCompleted / $_checkTotal"),
+               const SizedBox(height: 8),
+               Text("${loc.checkProblemCount}: $_checkErrors", style: TextStyle(color: _checkErrors > 0 ? Theme.of(context).colorScheme.error : null)),
+               const SizedBox(height: 8),
+               Text("${loc.checkingNode}: $_checkCurrentNodeName", maxLines: 1, overflow: TextOverflow.ellipsis),
+               const SizedBox(height: 24),
+               Center(
+                 child: _isCheckFinished
+                     ? const Icon(Icons.check_circle, color: Colors.green, size: 48)
+                     : const CircularProgressIndicator(),
+               ),
+               if (!_isCheckFinished) ...[
+                 const SizedBox(height: 24),
+                 OutlinedButton.icon(
+                   onPressed: () {
+                     setState(() {
+                       _isCheckCancelled = true;
+                     });
+                   },
+                   icon: const Icon(Icons.stop),
+                   label: Text(loc.stop),
+                   style: OutlinedButton.styleFrom(
+                     foregroundColor: Theme.of(context).colorScheme.error,
+                   ),
+                 ),
+               ],
+             ],
+           ),
+         ),
+       ),
+     ),
+   ],
+  ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => {editNode(context, ref, -1)},
         child: const Icon(Icons.add),
@@ -182,6 +342,160 @@ class NodeListState extends ConsumerState<NodeListPage> {
     );
   }
 
+  Future<void> _runPingChecks(BuildContext context, WidgetRef ref) async {
+    final nodes = ref.read(nodesProvider);
+    int total = nodes.nodes.where((n) => n.checkPing).length;
+    if (total == 0) return;
+
+    setState(() {
+      _isRunning = true;
+      _isCheckFinished = false;
+      _isCheckCancelled = false;
+      _checkTotal = total;
+      _checkCompleted = 0;
+      _checkErrors = 0;
+      _checkCurrentNodeName = "";
+      _checkTitle = AppLocalizations.of(context)!.runPing;
+    });
+
+    final settings = ref.read(settingsProvider);
+
+    for (int i = 0; i < nodes.nodes.length; i++) {
+        if (_isCheckCancelled) break;
+        final node = nodes.nodes[i];
+        if (node.checkPing) {
+            setState(() {
+              _checkCurrentNodeName = node.name;
+            });
+            bool success = false;
+            for (int r = 0; r <= settings.retry; r++) {
+                try {
+                    final ping = Ping(node.ip, count: 1, timeout: settings.timeout);
+                    final result = await ping.stream.firstWhere((event) => event.response != null || event.error != null);
+                    if (result.response != null && result.error == null) {
+                        success = true;
+                        break;
+                    }
+                } catch (e) {
+                   // ignore
+                }
+            }
+            node.pingState = success ? 0 : 1;
+            nodes.update(i, node); // This notifies listeners
+            
+            setState(() {
+              _checkCompleted++;
+              if (!success) _checkErrors++;
+            });
+        }
+    }
+
+    if (mounted) {
+      if (_isCheckCancelled) {
+        setState(() {
+          _isRunning = false;
+        });
+        return;
+      }
+      setState(() {
+        _isCheckFinished = true;
+        _checkCurrentNodeName = AppLocalizations.of(context)!.checkFinished;
+      });
+      await Future.delayed(const Duration(seconds: 3));
+      if (mounted) {
+        setState(() {
+          _isRunning = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _runCertChecks(BuildContext context, WidgetRef ref) async {
+    final nodes = ref.read(nodesProvider);
+    int total = nodes.nodes.where((n) => n.checkCert).length;
+    if (total == 0) return;
+
+    setState(() {
+      _isRunning = true;
+      _isCheckFinished = false;
+      _isCheckCancelled = false;
+      _checkTotal = total;
+      _checkCompleted = 0;
+      _checkErrors = 0;
+      _checkCurrentNodeName = "";
+      _checkTitle = AppLocalizations.of(context)!.runCert;
+    });
+
+    final settings = ref.read(settingsProvider);
+
+    for (int i = 0; i < nodes.nodes.length; i++) {
+        if (_isCheckCancelled) break;
+        final node = nodes.nodes[i];
+        if (node.checkCert) {
+            setState(() {
+                _checkCurrentNodeName = node.name;
+            });
+            int state = 1; // Default error/failed
+            for (int r = 0; r <= settings.retry; r++) {
+                try {
+                    bool bad = false;
+                    final socket = await SecureSocket.connect(
+                        node.ip,
+                        443,
+                        timeout: Duration(seconds: settings.timeout),
+                        onBadCertificate: (cert) {
+                            bad = true;
+                            return true; // Still accept to check validity limits
+                        },
+                    );
+                    if (socket.peerCertificate != null) {
+                        var endValidity = socket.peerCertificate!.endValidity;
+                        var now = DateTime.now();
+                        if (endValidity.isBefore(now)) {
+                            state = 2; // Expired
+                        } else if (bad) {
+                            state = 1; // Verification Failed
+                        } else if (endValidity.difference(now).inDays <= 7) {
+                            state = 3; // Expiring within 1 week
+                        } else {
+                            state = 0; // Normal
+                        }
+                    }
+                    socket.close();
+                    break; 
+                } catch (e) {
+                   // Retry on connect error
+                }
+            }
+            node.certState = state;
+            nodes.update(i, node);
+            
+            setState(() {
+                _checkCompleted++;
+                if (state != 0) _checkErrors++; 
+            });
+        }
+    }
+
+    if (mounted) {
+      if (_isCheckCancelled) {
+        setState(() {
+          _isRunning = false;
+        });
+        return;
+      }
+      setState(() {
+        _isCheckFinished = true;
+        _checkCurrentNodeName = AppLocalizations.of(context)!.checkFinished;
+      });
+      await Future.delayed(const Duration(seconds: 3));
+      if (mounted) {
+        setState(() {
+          _isRunning = false;
+        });
+      }
+    }
+  }
 
   void nodeMenuAction(String action, int i, BuildContext context, WidgetRef ref) {
     final nodes = ref.read(nodesProvider);

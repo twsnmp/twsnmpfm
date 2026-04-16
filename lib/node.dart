@@ -11,6 +11,10 @@ class Node {
   String user;
   String password;
   String icon;
+  bool checkPing;
+  bool checkCert;
+  int pingState;
+  int certState;
 
   Node({
     this.name = '',
@@ -20,6 +24,10 @@ class Node {
     this.user = '',
     this.password = '',
     this.icon = '',
+    this.checkPing = false,
+    this.checkCert = false,
+    this.pingState = -1,
+    this.certState = -1,
   });
 
   Map toMap() => {
@@ -30,6 +38,10 @@ class Node {
         'user': user,
         'password': password,
         'icon': icon,
+        'checkPing': checkPing,
+        'checkCert': checkCert,
+        'pingState': pingState,
+        'certState': certState,
       };
 
   Node.fromMap(Map map)
@@ -38,8 +50,12 @@ class Node {
         snmpMode = map['snmpMode'],
         community = map['community'],
         user = map['user'],
-        password = map['password'],
-        icon = map['icon'];
+        password = map['password'] ?? '',
+        icon = map['icon'] ?? '',
+        checkPing = map['checkPing'] ?? false,
+        checkCert = map['checkCert'] ?? false,
+        pingState = map['pingState'] ?? -1,
+        certState = map['certState'] ?? -1;
 
   Icon getIcon() {
     switch (icon) {

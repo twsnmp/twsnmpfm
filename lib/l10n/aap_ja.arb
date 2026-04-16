@@ -105,5 +105,14 @@
     "themeModeSystem": "システム設定",
     "themeModeLight": "ライト",
     "themeModeDark": "ダーク",
-    "save":"保存"
+    "save":"保存",
+    "checkPing": "PINGチェック",
+    "checkCertConfig": "サーバー証明書チェック",
+    "runPing": "PING実行",
+    "runCert": "証明書チェック実行",
+    "checking": "確認中...",
+    "checkCompletedCount": "チェック完了のノード数",
+    "checkProblemCount": "問題のあるノード数",
+    "checkingNode": "チェック中のノード名",
+    "checkFinished": "完了"
 }

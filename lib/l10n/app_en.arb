@@ -105,5 +105,14 @@
     "themeModeSystem": "System",
     "themeModeLight": "Light",
     "themeModeDark": "Dark",
-    "save":"Save"
+    "save":"Save",
+    "checkPing": "Check PING",
+    "checkCertConfig": "Check Server Certificate",
+    "runPing": "Run PING Checks",
+    "runCert": "Run Cert Checks",
+    "checking": "Checking...",
+    "checkCompletedCount": "Completed Nodes",
+    "checkProblemCount": "Problem Nodes",
+    "checkingNode": "Checking",
+    "checkFinished": "Check Finished"
 }

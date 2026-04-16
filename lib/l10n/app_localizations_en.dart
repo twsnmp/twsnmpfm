@@ -328,4 +328,31 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get save => 'Save';
+
+  @override
+  String get checkPing => 'Check PING';
+
+  @override
+  String get checkCertConfig => 'Check Server Certificate';
+
+  @override
+  String get runPing => 'Run PING Checks';
+
+  @override
+  String get runCert => 'Run Cert Checks';
+
+  @override
+  String get checking => 'Checking...';
+
+  @override
+  String get checkCompletedCount => 'Completed Nodes';
+
+  @override
+  String get checkProblemCount => 'Problem Nodes';
+
+  @override
+  String get checkingNode => 'Checking';
+
+  @override
+  String get checkFinished => 'Check Finished';
 }

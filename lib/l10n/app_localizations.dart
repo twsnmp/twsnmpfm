@@ -739,6 +739,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Save'**
   String get save;
+
+  /// No description provided for @checkPing.
+  ///
+  /// In en, this message translates to:
+  /// **'Check PING'**
+  String get checkPing;
+
+  /// No description provided for @checkCertConfig.
+  ///
+  /// In en, this message translates to:
+  /// **'Check Server Certificate'**
+  String get checkCertConfig;
+
+  /// No description provided for @runPing.
+  ///
+  /// In en, this message translates to:
+  /// **'Run PING Checks'**
+  String get runPing;
+
+  /// No description provided for @runCert.
+  ///
+  /// In en, this message translates to:
+  /// **'Run Cert Checks'**
+  String get runCert;
+
+  /// No description provided for @checking.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking...'**
+  String get checking;
+
+  /// No description provided for @checkCompletedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed Nodes'**
+  String get checkCompletedCount;
+
+  /// No description provided for @checkProblemCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Problem Nodes'**
+  String get checkProblemCount;
+
+  /// No description provided for @checkingNode.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking'**
+  String get checkingNode;
+
+  /// No description provided for @checkFinished.
+  ///
+  /// In en, this message translates to:
+  /// **'Check Finished'**
+  String get checkFinished;
 }
 
 class _AppLocalizationsDelegate

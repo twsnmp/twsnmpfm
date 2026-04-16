@@ -328,4 +328,31 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get save => '保存';
+
+  @override
+  String get checkPing => 'PINGチェック';
+
+  @override
+  String get checkCertConfig => 'サーバー証明書チェック';
+
+  @override
+  String get runPing => 'PING実行';
+
+  @override
+  String get runCert => '証明書チェック実行';
+
+  @override
+  String get checking => '確認中...';
+
+  @override
+  String get checkCompletedCount => 'チェック完了のノード数';
+
+  @override
+  String get checkProblemCount => '問題のあるノード数';
+
+  @override
+  String get checkingNode => 'チェック中のノード名';
+
+  @override
+  String get checkFinished => '完了';
 }

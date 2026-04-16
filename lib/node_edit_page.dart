@@ -183,6 +183,26 @@ class NodeEditFormState extends State<NodeEditForm> {
           },
           decoration: InputDecoration(icon: const Icon(Icons.security), labelText: loc.community, hintText: loc.communityHint),
         ),
+        SwitchListTile(
+          title: Text(loc.checkPing),
+          value: widget.node.checkPing,
+          onChanged: (bool value) {
+            setState(() {
+              widget.node.checkPing = value;
+            });
+          },
+          secondary: const Icon(Icons.network_ping),
+        ),
+        SwitchListTile(
+          title: Text(loc.checkCertConfig),
+          value: widget.node.checkCert,
+          onChanged: (bool value) {
+            setState(() {
+              widget.node.checkCert = value;
+            });
+          },
+          secondary: const Icon(Icons.security_update_good),
+        ),
         Padding(
           padding: const EdgeInsets.all(16.0),
           child: ElevatedButton.icon(
