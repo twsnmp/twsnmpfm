@@ -750,10 +750,11 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
         _errorMsgSyslog = e.toString();
       });
     } finally {
-      if (!mounted) return;
-      setState(() {
-        _process = false;
-      });
+      if (mounted) {
+        setState(() {
+          _process = false;
+        });
+      }
     }
   }
 
@@ -821,10 +822,11 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
         _errorMsgTrap = e.toString();
       });
     } finally {
-      if (!mounted) return;
-      setState(() {
-        _process = false;
-      });
+      if (mounted) {
+        setState(() {
+          _process = false;
+        });
+      }
     }
   }
 
@@ -871,10 +873,11 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
         _errorMsgMail = e.toString();
       });
     } finally {
-      if (!mounted) return;
-      setState(() {
-        _process = false;
-      });
+      if (mounted) {
+        setState(() {
+          _process = false;
+        });
+      }
     }
   }
 

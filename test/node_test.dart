@@ -119,7 +119,7 @@ void main() {
       // But _load calls notifyListeners().
       
       // Let's manually trigger _load to be sure or just wait.
-      await Future.delayed(Duration(milliseconds: 100));
+      await Future.delayed(const Duration(milliseconds: 100));
       
       // Nodes constructor calls _load which is async.
       // We might need to expose _load for testing or use a better pattern.

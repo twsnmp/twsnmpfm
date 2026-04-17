@@ -552,10 +552,11 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
         _errorMsg = e.toString();
       });
     } finally {
-      if (!mounted) return;
-      setState(() {
-        _process = false;
-      });
+      if (mounted) {
+        setState(() {
+          _process = false;
+        });
+      }
     }
   }
 
@@ -635,10 +636,11 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
         _errorMsg = e.toString();
       });
     } finally {
-      if (!mounted) return;
-      setState(() {
-        _process = false;
-      });
+      if (mounted) {
+        setState(() {
+          _process = false;
+        });
+      }
     }
   }
 
