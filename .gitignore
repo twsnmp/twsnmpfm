@@ -26,3 +26,5 @@ doc/api/
 .flutter-plugins-dependencies
 macos/Flutter/GeneratedPluginRegistrant.swift
 lib/ad_helper.dart
+
+.gemini/
