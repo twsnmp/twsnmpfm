@@ -1,0 +1,12 @@
+appId: jp.co.twise.twsnmpfm
+---
+- launchApp
+- tapOn:
+    id: "add_node_fab"
+- assertVisible:
+    id: "node_ip_field"
+- tapOn:
+    id: "back_button"
+- waitForAnimationToEnd
+- assertVisible:
+    id: "main_app_bar_title"

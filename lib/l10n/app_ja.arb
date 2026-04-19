@@ -114,5 +114,6 @@
     "checkCompletedCount": "チェック完了のノード数",
     "checkProblemCount": "問題のあるノード数",
     "checkingNode": "チェック中のノード名",
-    "checkFinished": "完了"
+    "checkFinished": "完了",
+    "addNode": "ノードの追加"
 }

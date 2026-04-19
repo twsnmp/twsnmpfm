@@ -16,6 +16,10 @@ class NodeEditPage extends StatelessWidget {
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
           title: Text(loc.editNode),
+          leading: Semantics(
+            identifier: 'back_button',
+            child: const BackButton(),
+          ),
         ),
         body: NodeEditForm(node: node));
   }
@@ -113,24 +117,27 @@ class NodeEditFormState extends State<NodeEditForm> {
                     }),
           ],
         ),
-        TextFormField(
-          initialValue: widget.node.name,
-          autocorrect: false,
-          enableSuggestions: false,
-          keyboardType: TextInputType.text,
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return loc.nameError;
-            }
-            return null;
-          },
-          onChanged: (value) {
-            setState(() {
-              _errorMsg = '';
-              widget.node.name = value;
-            });
-          },
-          decoration: InputDecoration(icon: const Icon(Icons.edit), labelText: loc.nodeName, hintText: loc.nameHint),
+        Semantics(
+          identifier: 'node_name_field',
+          child: TextFormField(
+            initialValue: widget.node.name,
+            autocorrect: false,
+            enableSuggestions: false,
+            keyboardType: TextInputType.text,
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return loc.nameError;
+              }
+              return null;
+            },
+            onChanged: (value) {
+              setState(() {
+                _errorMsg = '';
+                widget.node.name = value;
+              });
+            },
+            decoration: InputDecoration(icon: const Icon(Icons.edit), labelText: loc.nodeName, hintText: loc.nameHint),
+          ),
         ),
         ElevatedButton.icon(
           icon: const Icon(
@@ -146,23 +153,26 @@ class NodeEditFormState extends State<NodeEditForm> {
             backgroundColor: Colors.green,
           ),
         ),
-        TextFormField(
-          autocorrect: false,
-          enableSuggestions: false,
-          keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          controller: _ipController,
-          validator: (value) {
-            if (value == null || value.isEmpty || !validator.ip(value)) {
-              return loc.ipError;
-            }
-            return null;
-          },
-          onChanged: (value) {
-            setState(() {
-              widget.node.ip = value;
-            });
-          },
-          decoration: InputDecoration(icon: const Icon(Icons.lan), labelText: loc.ip, hintText: loc.ipHint),
+        Semantics(
+          identifier: 'node_ip_field',
+          child: TextFormField(
+            autocorrect: false,
+            enableSuggestions: false,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            controller: _ipController,
+            validator: (value) {
+              if (value == null || value.isEmpty || !validator.ip(value)) {
+                return loc.ipError;
+              }
+              return null;
+            },
+            onChanged: (value) {
+              setState(() {
+                widget.node.ip = value;
+              });
+            },
+            decoration: InputDecoration(icon: const Icon(Icons.lan), labelText: loc.ip, hintText: loc.ipHint),
+          ),
         ),
         TextFormField(
           autocorrect: false,

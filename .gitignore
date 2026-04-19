@@ -28,3 +28,4 @@ macos/Flutter/GeneratedPluginRegistrant.swift
 lib/ad_helper.dart
 
 .gemini/
+lib/l10n/app_localizations*.dart

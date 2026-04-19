@@ -114,5 +114,6 @@
     "checkCompletedCount": "Completed Nodes",
     "checkProblemCount": "Problem Nodes",
     "checkingNode": "Checking",
-    "checkFinished": "Check Finished"
+    "checkFinished": "Check Finished",
+    "addNode": "Add Node"
 }

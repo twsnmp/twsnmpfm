@@ -69,18 +69,24 @@ class NodeListState extends ConsumerState<NodeListPage> {
     const h = 35.0;
     return Scaffold(
       appBar: AppBar(
-        title: Text(MediaQuery.of(context).size.width > 400
-            ? 'TWSNMP For Mobile'
-            : 'TWSNMP'),
+        title: Semantics(
+          identifier: 'main_app_bar_title',
+          child: Text(MediaQuery.of(context).size.width > 400
+              ? 'TWSNMP For Mobile'
+              : 'TWSNMP'),
+        ),
         actions: [
-          IconButton(
-            tooltip: loc.search,
-            icon: const Icon(
-              Icons.search,
+          Semantics(
+            identifier: 'search_button',
+            child: IconButton(
+              tooltip: loc.search,
+              icon: const Icon(
+                Icons.search,
+              ),
+              onPressed: () {
+                search(context, ref);
+              },
             ),
-            onPressed: () {
-              search(context, ref);
-            },
           ),
           PopupMenuButton<String>(
             tooltip: loc.start,
@@ -337,9 +343,13 @@ class NodeListState extends ConsumerState<NodeListPage> {
      ),
    ],
   ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => {editNode(context, ref, -1)},
-        child: const Icon(Icons.add),
+      floatingActionButton: Semantics(
+        identifier: 'add_node_fab',
+        child: FloatingActionButton(
+          onPressed: () => {editNode(context, ref, -1)},
+          tooltip: loc.addNode,
+          child: const Icon(Icons.add),
+        ),
       ),
     );
   }
