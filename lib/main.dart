@@ -67,7 +67,7 @@ ThemeData _buildLightTheme() {
       centerTitle: false,
       titleTextStyle: GoogleFonts.inter(
         color: Colors.white,
-        fontSize: 20,
+        fontSize: 18,
         fontWeight: FontWeight.w600,
         letterSpacing: -0.02,
       ),
@@ -232,7 +232,7 @@ ThemeData _buildDarkTheme() {
       centerTitle: false,
       titleTextStyle: GoogleFonts.inter(
         color: const Color(0xFFE6EDF3),
-        fontSize: 20,
+        fontSize: 18,
         fontWeight: FontWeight.w600,
         letterSpacing: -0.02,
       ),

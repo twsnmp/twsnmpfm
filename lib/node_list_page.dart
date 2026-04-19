@@ -69,7 +69,9 @@ class NodeListState extends ConsumerState<NodeListPage> {
     const h = 35.0;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('TWSNMP For Mobile'),
+        title: Text(MediaQuery.of(context).size.width > 400
+            ? 'TWSNMP For Mobile'
+            : 'TWSNMP'),
         actions: [
           IconButton(
             tooltip: loc.search,
