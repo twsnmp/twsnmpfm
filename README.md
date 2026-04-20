@@ -60,6 +60,25 @@ To build the application from source, ensure you have the [Flutter SDK](https://
    - **iOS**: `flutter build ios`
    - **macOS**: `flutter build macos`
 
+### Building with mise
+
+This project uses [mise](https://mise.jdx.dev/) for managing development tools and build tasks.
+
+1. **Install tools**:
+   ```bash
+   mise install
+   ```
+2. **Build APK**:
+   ```bash
+   mise run build:apk
+   ```
+
+## CI/CD
+
+This repository uses GitHub Actions to automatically build the Android APK.
+- **Trigger**: Pushing a tag starting with `v` (e.g., `v1.0.0`).
+- **Artifact**: The generated APK is automatically uploaded to the GitHub Release.
+
 ## How to Use
 
 1. **Adding Nodes**: Tap the **+** button on the main screen to add a new device. Enter the Name, IP address, and SNMP Community string.

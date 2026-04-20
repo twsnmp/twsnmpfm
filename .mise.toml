@@ -1,0 +1,20 @@
+[tools]
+flutter = "3.41.6"
+java = "openjdk-17"
+
+[tasks."build:apk"]
+description = "Build Android release APK"
+run = """
+flutter clean
+flutter pub get
+flutter build apk --release
+"""
+
+[tasks."build:ios"]
+description = "Build iOS release IPA"
+run = """
+flutter clean
+flutter pub get
+(cd ios && pod install)
+flutter build ipa --release --export-method=app-store
+"""
