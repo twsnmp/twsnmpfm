@@ -28,16 +28,27 @@
 ### Prerequisites
 - Flutter SDK installed (3.41.6 or compatible).
 - iOS/Android/macOS development environment set up.
+- [mise](https://mise.jdx.dev/) for toolchain management.
+
+### Setup Environment
+Before the first build, run the setup task to install Android SDK components and CocoaPods:
+```bash
+mise run setup
+```
+*Note: This task requires `sdkmanager` and `gem` (provided by mise tools).*
 
 ### Key Commands
 - **Install dependencies:** `flutter pub get`
 - **Run the app:** `flutter run`
-- **Build APK (Android):** `flutter build apk`
-- **Build iOS (macOS only):** `flutter build ios`
+- **Build APK (Android):** `mise run build:apk`
+- **Build iOS (macOS only):** `mise run build:ios`
 - **Build Web:** `flutter build web`
 - **Build macOS:** `flutter build macos`
-- **Run tests:** `flutter test`
-- **Update Localization:** `flutter gen-l10n` (if `l10n.yaml` is present and `generate: true` is set in `pubspec.yaml`).
+
+### Build Notes
+- **Android SDK:** The Android SDK is managed via `mise` and installed to `~/Library/Android/sdk` by default. If `flutter doctor` fails to find it, run `flutter config --android-sdk ~/Library/Android/sdk`.
+- **Xcode Components:** If the iOS build fails with "iOS SDK not installed," open Xcode > Settings > Components and download the latest iOS platform.
+- **Info.plist:** `ios/Runner/Info.plist` is essential for the iOS build. Do not delete it.
 
 ## Development Conventions
 - **State Management:** Use Riverpod for providing state to widgets. `ChangeNotifierProvider` is currently the primary provider type for global state.

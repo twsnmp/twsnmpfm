@@ -1,6 +1,20 @@
 [tools]
 flutter = "3.41.6"
 java = "openjdk-17"
+ruby = "3.2.11"
+android-sdk = "latest"
+
+[env]
+ANDROID_HOME = "{{env.HOME}}/Library/Android/sdk"
+
+[tasks.setup]
+description = "Setup development environment"
+run = """
+# Install Android SDK components
+yes | sdkmanager --sdk_root=$ANDROID_HOME "platform-tools" "platforms;android-34" "build-tools;34.0.0" "cmdline-tools;latest"
+# Install CocoaPods
+gem install cocoapods
+"""
 
 [tasks."build:apk"]
 description = "Build Android release APK"
