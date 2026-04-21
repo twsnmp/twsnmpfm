@@ -2,6 +2,8 @@ PODS:
   - Flutter (1.0.0)
   - flutter_icmp_ping (0.0.1):
     - Flutter
+  - flutter_native_splash (2.4.3):
+    - Flutter
   - shared_preferences_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
@@ -9,6 +11,7 @@ PODS:
 DEPENDENCIES:
   - Flutter (from `Flutter`)
   - flutter_icmp_ping (from `.symlinks/plugins/flutter_icmp_ping/ios`)
+  - flutter_native_splash (from `.symlinks/plugins/flutter_native_splash/ios`)
   - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
 
 EXTERNAL SOURCES:
@@ -16,12 +19,15 @@ EXTERNAL SOURCES:
     :path: Flutter
   flutter_icmp_ping:
     :path: ".symlinks/plugins/flutter_icmp_ping/ios"
+  flutter_native_splash:
+    :path: ".symlinks/plugins/flutter_native_splash/ios"
   shared_preferences_foundation:
     :path: ".symlinks/plugins/shared_preferences_foundation/darwin"
 
 SPEC CHECKSUMS:
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
   flutter_icmp_ping: 2b159955eee0c487c766ad83fec224ae35e7c935
+  flutter_native_splash: df59bb2e1421aa0282cb2e95618af4dcb0c56c29
   shared_preferences_foundation: 5086985c1d43c5ba4d5e69a4e8083a389e2909e6
 
 PODFILE CHECKSUM: 0dbd5a87e0ace00c9610d2037ac22083a01f861d
