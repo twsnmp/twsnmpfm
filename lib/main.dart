@@ -367,11 +367,23 @@ class MyApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(settingsProvider);
+    Locale? locale;
+    switch (settings.language) {
+      case 'en':
+        locale = const Locale('en', '');
+        break;
+      case 'ja':
+        locale = const Locale('ja', '');
+        break;
+      default:
+        locale = null;
+    }
     return MaterialApp(
       title: 'TWSNMP FM',
       theme: _buildLightTheme(),
       darkTheme: _buildDarkTheme(),
       themeMode: settings.themeMode,
+      locale: locale,
       debugShowCheckedModeBanner: false,
       localizationsDelegates: const [
         AppLocalizations.delegate,

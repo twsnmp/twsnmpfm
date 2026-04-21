@@ -56,6 +56,6 @@ mise run setup
 - **Asynchronous Safety:** Always use `if (mounted)` or equivalent checks before calling `setState` or accessing `BuildContext` after an `await` within a `StatefulWidget`.
 - **UI Styling:** Prefer using `Theme.of(context).colorScheme` for consistent color management across light and dark modes.
 - **Tree Management:** Use custom `MibNode` implementations for tree structures (as seen in `search_page.dart`) instead of external treeview libraries where possible for better control.
-- **Localization:** Always use `AppLocalizations.of(context)!` for user-facing strings.
+- **Localization:** Always use `AppLocalizations.of(context)!` for user-facing strings. The application supports manual language switching (System, English, Japanese) via the settings page.
 - **Testing:** Add unit tests for logic changes in `test/` and widget tests for new UI components. Ensure `SharedPreferences` is mocked for tests that involve persistence.
 - **Linter:** Follow the rules defined in `analysis_options.yaml` (uses `flutter_lints`).

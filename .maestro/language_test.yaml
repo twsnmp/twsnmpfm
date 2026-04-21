@@ -1,0 +1,25 @@
+appId: jp.co.twise.twsnmpfm
+---
+# Switch to English
+- tapOn: "Settings"
+- tapOn:
+    point: "951, 1350" # Language dropdown
+- tapOn: "English"
+- tapOn: "Save"
+- assertVisible: "TWSNMP For Mobile"
+
+# Switch to Japanese
+- tapOn: "Settings"
+- tapOn:
+    point: "951, 1350" # Language dropdown
+- tapOn: "Japanese"
+- tapOn: "Save"
+- assertVisible: "TWSNMP For Mobile"
+
+# Revert to English for final verification
+- tapOn: "設定" # Japanese for Settings
+- tapOn:
+    point: "951, 1350" # Language dropdown
+- tapOn: "英語" # Japanese for English in the dropdown (it might be "English" if already English, but in Japanese locale it is "英語")
+- tapOn: "保存" # Japanese for Save
+- assertVisible: "TWSNMP For Mobile"

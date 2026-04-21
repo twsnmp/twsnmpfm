@@ -86,7 +86,7 @@ This repository uses GitHub Actions to automatically build the Android APK.
 3. **Accessing Tools**: Tap the **three-dot menu** on a node card to access specific tools like the MIB Browser, Traffic Monitor, or Virtual Panel.
 4. **Mass Checks**: Use the **Play icon** in the top bar to run PING or Certificate checks for all configured nodes manually.
 5. **Search**: Tap the **Search icon** in the top bar for DNS lookup or MAC address vendor search.
-6. **Settings**: Use the **Gear icon** in the top bar to adjust check intervals, timeouts, and theme preferences.
+6. **Settings**: Use the **Gear icon** in the top bar to adjust check intervals, timeouts, theme, and language settings.
 
 ## Copyright
 

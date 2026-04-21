@@ -11,6 +11,7 @@ class Settings extends ChangeNotifier {
   int retry = 1;
   int interval = 5;
   String mibName = "system";
+  String language = "system";
   bool showAllPort = false;
   ThemeMode themeMode = ThemeMode.system;
 
@@ -27,6 +28,7 @@ class Settings extends ChangeNotifier {
     await prefs.setInt('interval', interval);
     await prefs.setInt('themeMode', themeMode.index);
     await prefs.setString('mibName', mibName);
+    await prefs.setString('language', language);
     await prefs.setBool('showAllPort', showAllPort);
     notifyListeners();
   }
@@ -39,6 +41,7 @@ class Settings extends ChangeNotifier {
     retry = prefs.getInt("retry") ?? 1;
     interval = prefs.getInt("interval") ?? 5;
     mibName = prefs.getString("mibName") ?? "system";
+    language = prefs.getString("language") ?? "system";
     showAllPort = prefs.getBool("showAllPort") ?? false;
     final tm = prefs.getInt("themeMode") ?? 0;
     switch (tm) {
