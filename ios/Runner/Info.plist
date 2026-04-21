@@ -75,5 +75,12 @@
 		<false/>
 		<key>UIStatusBarHidden</key>
 		<true/>
-	</dict>
-</plist>
+		<key>NSLocalNetworkUsageDescription</key>
+		<string>Used to monitor node status via SNMP/PING on the local network. / ローカルネットワーク内のノード状態をSNMP/PINGで監視するために使用します。</string>
+		<key>NSBonjourServices</key>
+		<array>
+			<string>_http._tcp</string>
+			<string>_snmp._udp</string>
+		</array>
+		</dict>
+		</plist>
