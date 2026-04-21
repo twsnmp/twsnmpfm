@@ -1,6 +1,6 @@
 appId: jp.co.twise.twsnmpfm
 ---
-- launchApp
+# - launchApp # Maestro has issues launching this app in some environments. Assume it's already running.
 - tapOn:
     id: "add_node_fab"
 - assertVisible:
