@@ -257,13 +257,17 @@ class _ProcessesState extends State<ProcessesPage> {
                 Row(
                   children: [
                     Expanded(child: Text("${loc.showProcessMode}:${_sortCPU ? 'CPU' : 'Mem'}")),
-                    Switch(
-                      value: _sortCPU,
-                      onChanged: (bool value) {
-                        setState(() {
-                          _sortCPU = value;
-                        });
-                      },
+                    Semantics(
+                      container: true,
+                      identifier: 'process_sort_switch',
+                      child: Switch(
+                        value: _sortCPU,
+                        onChanged: (bool value) {
+                          setState(() {
+                            _sortCPU = value;
+                          });
+                        },
+                      ),
                     ),
                   ],
                 ),
@@ -315,15 +319,19 @@ class _ProcessesState extends State<ProcessesPage> {
             ),
           ),
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            if (_timer != null) {
-              _stop();
-            } else {
-              _start();
-            }
-          },
-          child: _timer != null ? const Icon(Icons.stop, color: Colors.red) : const Icon(Icons.play_circle),
+        floatingActionButton: Semantics(
+          container: true,
+          identifier: 'processes_fab',
+          child: FloatingActionButton(
+            onPressed: () {
+              if (_timer != null) {
+                _stop();
+              } else {
+                _start();
+              }
+            },
+            child: _timer != null ? const Icon(Icons.stop, color: Colors.red) : const Icon(Icons.play_circle),
+          ),
         ),
       ),
     );

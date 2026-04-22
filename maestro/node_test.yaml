@@ -1,0 +1,60 @@
+appId: jp.co.twise.twsnmpfm
+---
+- launchApp:
+    clearState: true
+# (1) Create a node (miniPC)
+- tapOn:
+    id: "add_node_fab"
+- extendedWaitUntil:
+    visible:
+      id: "node_name_field"
+    timeout: 10000
+- tapOn:
+    id: "node_name_field"
+- inputText: "miniPC"
+- hideKeyboard
+- tapOn:
+    id: "node_ip_field"
+- inputText: "192.168.1.210"
+- hideKeyboard
+- tapOn:
+    id: "community_field"
+- inputText: "public"
+- hideKeyboard
+- tapOn:
+    id: "save_node_button"
+
+# (2) Verify list display
+- extendedWaitUntil:
+    visible:
+      id: "node_menu_button_0"
+    timeout: 10000
+
+# (3) Edit the node, toggle PING ON
+- tapOn:
+    id: "node_menu_button_0"
+- waitForAnimationToEnd
+- tapOn:
+    id: "node_menu_item_edit"
+- extendedWaitUntil:
+    visible:
+      id: "ping_switch"
+    timeout: 10000
+- tapOn:
+    id: "ping_switch"
+- waitForAnimationToEnd
+- tapOn:
+    id: "save_node_button"
+
+# (4) Delete the node
+- extendedWaitUntil:
+    visible:
+      id: "node_menu_button_0"
+    timeout: 10000
+- tapOn:
+    id: "node_menu_button_0"
+- waitForAnimationToEnd
+- tapOn:
+    id: "node_menu_item_delete"
+- assertNotVisible:
+    id: "node_menu_button_0"

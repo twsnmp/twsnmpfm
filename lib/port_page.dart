@@ -301,20 +301,24 @@ class _PortState extends State<PortPage> {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                DropdownButton<String>(
-                    value: _selectedProtocol,
-                    items: const [
-                      DropdownMenuItem(value: "tcp", child: Text("TCP")),
-                      DropdownMenuItem(value: "udp", child: Text("UDP")),
-                    ],
-                    onChanged: (String? value) {
-                      setState(() {
-                        _selectedProtocol = value ?? "tcp";
-                      });
-                      if (_timer != null) {
-                        _getPortList();
-                      }
-                    }),
+                Semantics(
+                  container: true,
+                  identifier: 'port_protocol_dropdown',
+                  child: DropdownButton<String>(
+                      value: _selectedProtocol,
+                      items: const [
+                        DropdownMenuItem(value: "tcp", child: Text("TCP")),
+                        DropdownMenuItem(value: "udp", child: Text("UDP")),
+                      ],
+                      onChanged: (String? value) {
+                        setState(() {
+                          _selectedProtocol = value ?? "tcp";
+                        });
+                        if (_timer != null) {
+                          _getPortList();
+                        }
+                      }),
+                ),
                 Row(
                   children: [
                     Expanded(child: Text("${loc.interval}(${_interval.toInt()}${loc.sec})")),
@@ -356,15 +360,19 @@ class _PortState extends State<PortPage> {
             ),
           ),
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            if (_timer != null) {
-              _stop();
-            } else {
-              _start();
-            }
-          },
-          child: _timer != null ? const Icon(Icons.stop, color: Colors.red) : const Icon(Icons.play_circle),
+        floatingActionButton: Semantics(
+          container: true,
+          identifier: 'port_fab',
+          child: FloatingActionButton(
+            onPressed: () {
+              if (_timer != null) {
+                _stop();
+              } else {
+                _start();
+              }
+            },
+            child: _timer != null ? const Icon(Icons.stop, color: Colors.red) : const Icon(Icons.play_circle),
+          ),
         ),
       ),
     );

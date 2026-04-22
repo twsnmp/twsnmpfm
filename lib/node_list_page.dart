@@ -124,14 +124,17 @@ class NodeListState extends ConsumerState<NodeListPage> {
               ),
             ],
           ),
-          IconButton(
-            tooltip: loc.settings,
-            icon: const Icon(
-              Icons.settings,
+          Semantics(
+            identifier: 'settings_button',
+            child: IconButton(
+              tooltip: loc.settings,
+              icon: const Icon(
+                Icons.settings,
+              ),
+              onPressed: () {
+                settings(context, ref);
+              },
             ),
-            onPressed: () {
-              settings(context, ref);
-            },
           ),
         ],
       ),
@@ -149,145 +152,188 @@ class NodeListState extends ConsumerState<NodeListPage> {
                   itemCount: nodes.nodes.length,
                   itemBuilder: (context, i) {
                     final node = nodes.nodes[i];
-                    return Card(
-                      child: ListTile(
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                        leading: node.getIcon(),
-                        title: Text(
-                          node.name,
-                          style: const TextStyle(fontWeight: FontWeight.w600),
-                        ),
-                        subtitle: Row(
-                          children: [
-                            Text(
-                              node.ip,
-                              style: TextStyle(
-                                fontFamily: 'monospace',
-                                fontSize: 12,
-                                color: Theme.of(context).colorScheme.primary,
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            if (node.pingState != -1)
-                              Icon(
-                                node.pingState == 0 ? Icons.check_circle : Icons.error,
-                                size: 16,
-                                color: node.pingState == 0 ? Colors.green : Colors.red,
-                              ),
-                            if (node.certState != -1)
-                              Padding(
-                                padding: const EdgeInsets.only(left: 4.0),
-                                child: Icon(
-                                  node.certState == 0 ? Icons.verified : 
-                                  node.certState == 1 ? Icons.error : 
-                                  node.certState == 2 ? Icons.dangerous : Icons.warning,
-                                  size: 16,
-                                  color: node.certState == 0 ? Colors.green : 
-                                         node.certState == 1 ? Colors.red : 
-                                         node.certState == 2 ? Colors.red : Colors.amber,
+                    return Semantics(
+                      identifier: 'node_list_item_$i',
+                      child: Card(
+                        child: ListTile(
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                          leading: node.getIcon(),
+                          title: Text(
+                            node.name,
+                            style: const TextStyle(fontWeight: FontWeight.w600),
+                          ),
+                          subtitle: Row(
+                            children: [
+                              Text(
+                                node.ip,
+                                style: TextStyle(
+                                  fontFamily: 'monospace',
+                                  fontSize: 12,
+                                  color: Theme.of(context).colorScheme.primary,
                                 ),
                               ),
-                          ],
+                              const SizedBox(width: 8),
+                              if (node.pingState != -1)
+                                Icon(
+                                  node.pingState == 0 ? Icons.check_circle : Icons.error,
+                                  size: 16,
+                                  color: node.pingState == 0 ? Colors.green : Colors.red,
+                                ),
+                              if (node.certState != -1)
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 4.0),
+                                  child: Icon(
+                                    node.certState == 0 ? Icons.verified : 
+                                    node.certState == 1 ? Icons.error : 
+                                    node.certState == 2 ? Icons.dangerous : Icons.warning,
+                                    size: 16,
+                                    color: node.certState == 0 ? Colors.green : 
+                                           node.certState == 1 ? Colors.red : 
+                                           node.certState == 2 ? Colors.red : Colors.amber,
+                                  ),
+                                ),
+                            ],
+                          ),
+                          trailing: Semantics(
+                            container: true,
+                            identifier: 'node_menu_button_$i',
+                            child: PopupMenuButton<String>(
+                              tooltip: 'node_menu_button_$i',
+                              padding: EdgeInsets.zero,
+                              onSelected: (value) => {nodeMenuAction(value, i, context, ref)},
+                              itemBuilder: (context) => <PopupMenuItem<String>>[
+                                PopupMenuItem<String>(
+                                    height: h,
+                                    value: "ping",
+                                    child: Semantics(
+                                      identifier: 'node_menu_item_ping',
+                                      child: const Row(children: [
+                                        Icon(Icons.network_ping),
+                                        SizedBox(width: 8),
+                                        Text("Ping", style: TextStyle(fontSize: 14)),
+                                      ]),
+                                    )),
+                                PopupMenuItem<String>(
+                                    height: h,
+                                    value: "snmp",
+                                    child: Semantics(
+                                      identifier: 'node_menu_item_snmp',
+                                      child: Row(children: [
+                                        const Icon(Icons.storage),
+                                        const SizedBox(width: 8),
+                                        Text(loc.mibBrowser, style: const TextStyle(fontSize: 14)),
+                                      ]),
+                                    )),
+                                PopupMenuItem<String>(
+                                  height: h,
+                                  value: "panel",
+                                  child: Semantics(
+                                    identifier: 'node_menu_item_panel',
+                                    child: Row(children: [
+                                      const Icon(Icons.lan),
+                                      const SizedBox(width: 8),
+                                      Text(loc.panel, style: const TextStyle(fontSize: 14)),
+                                    ]),
+                                  ),
+                                ),
+                                PopupMenuItem<String>(
+                                    height: h,
+                                    value: "traffic",
+                                    child: Semantics(
+                                      identifier: 'node_menu_item_traffic',
+                                      child: Row(children: [
+                                        const Icon(Icons.show_chart),
+                                        const SizedBox(width: 8),
+                                        Text(loc.traffic, style: const TextStyle(fontSize: 14)),
+                                      ]),
+                                    )),
+                                PopupMenuItem<String>(
+                                    height: h,
+                                    value: "hrmib",
+                                    child: Semantics(
+                                      identifier: 'node_menu_item_hrmib',
+                                      child: Row(children: [
+                                        const Icon(Icons.data_usage),
+                                        const SizedBox(width: 8),
+                                        Text(loc.hostResource, style: const TextStyle(fontSize: 14)),
+                                      ]),
+                                    )),
+                                PopupMenuItem<String>(
+                                    height: h,
+                                    value: "process",
+                                    child: Semantics(
+                                      identifier: 'node_menu_item_process',
+                                      child: Row(children: [
+                                        const Icon(Icons.memory),
+                                        const SizedBox(width: 8),
+                                        Text(loc.processes, style: const TextStyle(fontSize: 14)),
+                                      ]),
+                                    )),
+                                PopupMenuItem<String>(
+                                    height: h,
+                                    value: "port",
+                                    child: Semantics(
+                                      identifier: 'node_menu_item_port',
+                                      child: Row(children: [
+                                        const Icon(Icons.drag_indicator),
+                                        const SizedBox(width: 8),
+                                        Text(loc.port, style: const TextStyle(fontSize: 14)),
+                                      ]),
+                                    )),
+                                PopupMenuItem<String>(
+                                    height: h,
+                                    value: "cert",
+                                    child: Semantics(
+                                      identifier: 'node_menu_item_cert',
+                                      child: Row(children: [
+                                        const Icon(Icons.security),
+                                        const SizedBox(width: 8),
+                                        Text(loc.cert, style: const TextStyle(fontSize: 14)),
+                                      ]),
+                                    )),
+                                PopupMenuItem<String>(
+                                    height: h,
+                                    value: "server",
+                                    child: Semantics(
+                                      identifier: 'node_menu_item_server',
+                                      child: Row(children: [
+                                        const Icon(Icons.rule),
+                                        const SizedBox(width: 8),
+                                        Text(loc.serverTest, style: const TextStyle(fontSize: 14)),
+                                      ]),
+                                    )),
+                                PopupMenuItem<String>(
+                                    height: h,
+                                    value: "edit",
+                                    child: Semantics(
+                                      container: true,
+                                      identifier: 'node_menu_item_edit',
+                                      child: Row(children: [
+                                        const Icon(Icons.edit),
+                                        const SizedBox(width: 8),
+                                        Text(loc.edit, style: const TextStyle(fontSize: 14)),
+                                      ]),
+                                    )),
+                                PopupMenuItem<String>(
+                                  height: h,
+                                  value: "delete",
+                                  child: Semantics(
+                                    container: true,
+                                    identifier: 'node_menu_item_delete',
+                                    child: Row(children: [
+                                      Icon(Icons.delete, color: Theme.of(context).colorScheme.error),
+                                      const SizedBox(width: 8),
+                                      Text(loc.delete, style: const TextStyle(fontSize: 14)),
+                                    ]),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
-                        trailing: PopupMenuButton<String>(
-                  padding: EdgeInsets.zero,
-                  onSelected: (value) => {nodeMenuAction(value, i, context, ref)},
-                  itemBuilder: (context) => <PopupMenuItem<String>>[
-                    const PopupMenuItem<String>(
-                        height: h,
-                        value: "ping",
-                        child: Row(children: [
-                          Icon(Icons.network_ping),
-                          SizedBox(width: 8),
-                          Text("Ping", style: TextStyle(fontSize: 14)),
-                        ])),
-                    PopupMenuItem<String>(
-                        height: h,
-                        value: "snmp",
-                        child: Row(children: [
-                          const Icon(Icons.storage),
-                          const SizedBox(width: 8),
-                          Text(loc.mibBrowser, style: const TextStyle(fontSize: 14)),
-                        ])),
-                    PopupMenuItem<String>(
-                      height: h,
-                      value: "panel",
-                      child: Row(children: [
-                        const Icon(Icons.lan),
-                        const SizedBox(width: 8),
-                        Text(loc.panel, style: const TextStyle(fontSize: 14)),
-                      ]),
-                    ),
-                    PopupMenuItem<String>(
-                        height: h,
-                        value: "traffic",
-                        child: Row(children: [
-                          const Icon(Icons.show_chart),
-                          const SizedBox(width: 8),
-                          Text(loc.traffic, style: const TextStyle(fontSize: 14)),
-                        ])),
-                    PopupMenuItem<String>(
-                        height: h,
-                        value: "hrmib",
-                        child: Row(children: [
-                          const Icon(Icons.data_usage),
-                          const SizedBox(width: 8),
-                          Text(loc.hostResource, style: const TextStyle(fontSize: 14)),
-                        ])),
-                    PopupMenuItem<String>(
-                        height: h,
-                        value: "process",
-                        child: Row(children: [
-                          const Icon(Icons.memory),
-                          const SizedBox(width: 8),
-                          Text(loc.processes, style: const TextStyle(fontSize: 14)),
-                        ])),
-                    PopupMenuItem<String>(
-                        height: h,
-                        value: "port",
-                        child: Row(children: [
-                          const Icon(Icons.drag_indicator),
-                          const SizedBox(width: 8),
-                          Text(loc.port, style: const TextStyle(fontSize: 14)),
-                        ])),
-                    PopupMenuItem<String>(
-                        height: h,
-                        value: "cert",
-                        child: Row(children: [
-                          const Icon(Icons.security),
-                          const SizedBox(width: 8),
-                          Text(loc.cert, style: const TextStyle(fontSize: 14)),
-                        ])),
-                    PopupMenuItem<String>(
-                        height: h,
-                        value: "server",
-                        child: Row(children: [
-                          const Icon(Icons.rule),
-                          const SizedBox(width: 8),
-                          Text(loc.serverTest, style: const TextStyle(fontSize: 14)),
-                        ])),
-                    PopupMenuItem<String>(
-                        height: h,
-                        value: "edit",
-                        child: Row(children: [
-                          const Icon(Icons.edit),
-                          const SizedBox(width: 8),
-                          Text(loc.edit, style: const TextStyle(fontSize: 14)),
-                        ])),
-                    PopupMenuItem<String>(
-                      height: h,
-                      value: "delete",
-                      child: Row(children: [
-                        Icon(Icons.delete, color: Theme.of(context).colorScheme.error),
-                        const SizedBox(width: 8),
-                        Text(loc.delete, style: const TextStyle(fontSize: 14)),
-                      ]),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
+                      ),
+                    );
+                  },
         ),
       ),
       )

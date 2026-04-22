@@ -1,0 +1,25 @@
+appId: jp.co.twise.twsnmpfm
+---
+- launchApp:
+    clearState: true
+- runFlow:
+    file: setup_minipc.yaml
+- tapOn:
+    id: "node_menu_button_0"
+- waitForAnimationToEnd
+- tapOn:
+    id: "node_menu_item_panel"
+- extendedWaitUntil:
+    visible:
+      id: "vpanel_fab"
+    timeout: 10000
+- tapOn:
+    id: "vpanel_fab"
+- tapOn:
+    id: "show_all_port_switch"
+- extendedWaitUntil:
+    visible:
+      id: "vpanel_table"
+    timeout: 30000
+- tapOn:
+    id: "vpanel_fab" # Stop

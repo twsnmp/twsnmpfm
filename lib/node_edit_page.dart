@@ -118,6 +118,7 @@ class NodeEditFormState extends State<NodeEditForm> {
           ],
         ),
         Semantics(
+          container: true,
           identifier: 'node_name_field',
           child: TextFormField(
             initialValue: widget.node.name,
@@ -139,21 +140,26 @@ class NodeEditFormState extends State<NodeEditForm> {
             decoration: InputDecoration(icon: const Icon(Icons.edit), labelText: loc.nodeName, hintText: loc.nameHint),
           ),
         ),
-        ElevatedButton.icon(
-          icon: const Icon(
-            Icons.search,
-            color: Colors.white,
-          ),
-          onPressed: () {
-            _getIPFromName();
-          },
-          label: Text(loc.getIPFromName),
-          style: ElevatedButton.styleFrom(
-            foregroundColor: Colors.white,
-            backgroundColor: Colors.green,
+        Semantics(
+          container: true,
+          identifier: 'get_ip_from_name_button',
+          child: ElevatedButton.icon(
+            icon: const Icon(
+              Icons.search,
+              color: Colors.white,
+            ),
+            onPressed: () {
+              _getIPFromName();
+            },
+            label: Text(loc.getIPFromName),
+            style: ElevatedButton.styleFrom(
+              foregroundColor: Colors.white,
+              backgroundColor: Colors.green,
+            ),
           ),
         ),
         Semantics(
+          container: true,
           identifier: 'node_ip_field',
           child: TextFormField(
             autocorrect: false,
@@ -174,55 +180,71 @@ class NodeEditFormState extends State<NodeEditForm> {
             decoration: InputDecoration(icon: const Icon(Icons.lan), labelText: loc.ip, hintText: loc.ipHint),
           ),
         ),
-        TextFormField(
-          autocorrect: false,
-          enableSuggestions: false,
-          keyboardType: TextInputType.text,
-          initialValue: widget.node.community,
-          validator: (value) {
-            if (value == null) {
-              return loc.communityError;
-            }
-            return null;
-          },
-          onChanged: (value) {
-            setState(() {
-              _errorMsg = '';
-              widget.node.community = value;
-            });
-          },
-          decoration: InputDecoration(icon: const Icon(Icons.security), labelText: loc.community, hintText: loc.communityHint),
+        Semantics(
+          container: true,
+          identifier: 'community_field',
+          child: TextFormField(
+            autocorrect: false,
+            enableSuggestions: false,
+            keyboardType: TextInputType.text,
+            initialValue: widget.node.community,
+            validator: (value) {
+              if (value == null) {
+                return loc.communityError;
+              }
+              return null;
+            },
+            onChanged: (value) {
+              setState(() {
+                _errorMsg = '';
+                widget.node.community = value;
+              });
+            },
+            decoration: InputDecoration(icon: const Icon(Icons.security), labelText: loc.community, hintText: loc.communityHint),
+          ),
         ),
-        SwitchListTile(
-          title: Text(loc.checkPing),
-          value: widget.node.checkPing,
-          onChanged: (bool value) {
-            setState(() {
-              widget.node.checkPing = value;
-            });
-          },
-          secondary: const Icon(Icons.network_ping),
+        Semantics(
+          container: true,
+          identifier: 'ping_switch',
+          child: SwitchListTile(
+            title: Text(loc.checkPing),
+            value: widget.node.checkPing,
+            onChanged: (bool value) {
+              setState(() {
+                widget.node.checkPing = value;
+              });
+            },
+            secondary: const Icon(Icons.network_ping),
+          ),
         ),
-        SwitchListTile(
-          title: Text(loc.checkCertConfig),
-          value: widget.node.checkCert,
-          onChanged: (bool value) {
-            setState(() {
-              widget.node.checkCert = value;
-            });
-          },
-          secondary: const Icon(Icons.security_update_good),
+        Semantics(
+          container: true,
+          identifier: 'cert_switch',
+          child: SwitchListTile(
+            title: Text(loc.checkCertConfig),
+            value: widget.node.checkCert,
+            onChanged: (bool value) {
+              setState(() {
+                widget.node.checkCert = value;
+              });
+            },
+            secondary: const Icon(Icons.security_update_good),
+          ),
         ),
         Padding(
           padding: const EdgeInsets.all(16.0),
-          child: ElevatedButton.icon(
-            icon: const Icon(Icons.save),
-            onPressed: () {
-              if (_formKey.currentState!.validate()) {
-                Navigator.pop(context, widget.node);
-              }
-            },
-            label: Text(loc.save),
+          child: Semantics(
+            container: true,
+            identifier: 'save_node_button',
+            child: ElevatedButton.icon(
+              icon: const Icon(Icons.save),
+              onPressed: () {
+                if (_formKey.currentState!.validate()) {
+                  Navigator.pop(context, widget.node);
+                }
+              },
+              label: Text(loc.save),
+            ),
           ),
         )
       ]),

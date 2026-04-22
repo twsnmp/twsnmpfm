@@ -348,14 +348,18 @@ class _TrafficState extends State<TrafficPage> {
               children: <Widget>[
                 Row(children: [
                   Expanded(child: Text(loc!.target)),
-                  DropdownButton<String>(
-                      value: _selectedTarget,
-                      items: _targetMenuItems,
-                      onChanged: (value) => {
-                            setState(() {
-                              _selectedTarget = value!;
-                            })
-                          }),
+                  Semantics(
+                    container: true,
+                    identifier: 'traffic_target_dropdown',
+                    child: DropdownButton<String>(
+                        value: _selectedTarget,
+                        items: _targetMenuItems,
+                        onChanged: (value) => {
+                              setState(() {
+                                _selectedTarget = value!;
+                              })
+                            }),
+                  ),
                 ]),
                 Row(
                   children: [
@@ -396,15 +400,19 @@ class _TrafficState extends State<TrafficPage> {
             ),
           ),
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            if (_timer != null) {
-              _stop();
-            } else {
-              _start();
-            }
-          },
-          child: _timer != null ? const Icon(Icons.stop, color: Colors.red) : const Icon(Icons.play_circle),
+        floatingActionButton: Semantics(
+          container: true,
+          identifier: 'traffic_fab',
+          child: FloatingActionButton(
+            onPressed: () {
+              if (_timer != null) {
+                _stop();
+              } else {
+                _start();
+              }
+            },
+            child: _timer != null ? const Icon(Icons.stop, color: Colors.red) : const Icon(Icons.play_circle),
+          ),
         ),
       ),
     );

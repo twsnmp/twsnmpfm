@@ -126,6 +126,11 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
     });
   }
 
+  void _loadMIBDB() async {
+    final mibfile = await rootBundle.loadString('assets/conf/mib.txt');
+    _mibdb = MIBDB(mibfile);
+  }
+
   void _save() async {
     if (Platform.operatingSystem == 'macos') {
       return;
@@ -151,19 +156,6 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
     await prefs.setString('mailBody', _mailBody);
   }
 
-  @override
-  void dispose() {
-    _tabController?.dispose();
-    _timer?.cancel();
-    _save();
-    super.dispose();
-  }
-
-  void _loadMIBDB() async {
-    final mibfile = await rootBundle.loadString('assets/conf/mib.txt');
-    _mibdb = MIBDB(mibfile);
-  }
-
   SingleChildScrollView _ntpTestView(bool dark) => SingleChildScrollView(
         padding: const EdgeInsets.all(10),
         child: Form(
@@ -172,20 +164,24 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               Text(loc!.server, style: const TextStyle(color: Colors.blue)),
-              Autocomplete<String>(
-                initialValue: TextEditingValue(text: _ntpTarget),
-                optionsBuilder: (value) {
-                  if (value.text.isEmpty) {
-                    return [];
-                  }
-                  _ntpTarget = value.text;
-                  return _ntpTargetList.where((n) => n.toLowerCase().contains(value.text.toLowerCase()));
-                },
-                onSelected: (value) {
-                  setState(() {
-                    _ntpTarget = value;
-                  });
-                },
+              Semantics(
+                container: true,
+                identifier: 'ntp_target_autocomplete',
+                child: Autocomplete<String>(
+                  initialValue: TextEditingValue(text: _ntpTarget),
+                  optionsBuilder: (value) {
+                    if (value.text.isEmpty) {
+                      return [];
+                    }
+                    _ntpTarget = value.text;
+                    return _ntpTargetList.where((n) => n.toLowerCase().contains(value.text.toLowerCase()));
+                  },
+                  onSelected: (value) {
+                    setState(() {
+                      _ntpTarget = value;
+                    });
+                  },
+                ),
               ),
               Row(
                 children: [
@@ -912,6 +908,14 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
   }
 
   @override
+  void dispose() {
+    _tabController?.dispose();
+    _timer?.cancel();
+    _save();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     bool dark = Theme.of(context).brightness == Brightness.dark;
     loc = AppLocalizations.of(context)!;
@@ -949,15 +953,19 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
           _mailTestView(dark),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          if (_process) {
-            _stop();
-          } else {
-            _start();
-          }
-        },
-        child: _process ? const Icon(Icons.stop, color: Colors.red) : const Icon(Icons.play_circle),
+      floatingActionButton: Semantics(
+        container: true,
+        identifier: 'server_test_fab',
+        child: FloatingActionButton(
+          onPressed: () {
+            if (_process) {
+              _stop();
+            } else {
+              _start();
+            }
+          },
+          child: _process ? const Icon(Icons.stop, color: Colors.red) : const Icon(Icons.play_circle),
+        ),
       ),
     ));
   }

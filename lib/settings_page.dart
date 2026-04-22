@@ -190,38 +190,60 @@ class SettingsFormState extends State<SettingsForm> {
           Row(
             children: [
               Expanded(child: Text(loc.language)),
-              DropdownButton<String>(
-                  value: _language,
-                  items: [
-                    DropdownMenuItem(value: "system", child: Text(loc.languageSystem)),
-                    DropdownMenuItem(value: "en", child: Text(loc.languageEnglish)),
-                    DropdownMenuItem(value: "ja", child: Text(loc.languageJapanese)),
-                  ],
-                  onChanged: (value) => {
-                        setState(() {
-                          _language = value!;
-                        })
-                      }),
+              Semantics(
+                container: true,
+                identifier: 'language_dropdown',
+                child: DropdownButton<String>(
+                    value: _language,
+                    items: [
+                      DropdownMenuItem(
+                          value: "system",
+                          child: Semantics(
+                              container: true,
+                              identifier: 'language_item_system',
+                              child: Text(loc.languageSystem))),
+                      DropdownMenuItem(
+                          value: "en",
+                          child: Semantics(
+                              container: true,
+                              identifier: 'language_item_en',
+                              child: Text(loc.languageEnglish))),
+                      DropdownMenuItem(
+                          value: "ja",
+                          child: Semantics(
+                              container: true,
+                              identifier: 'language_item_ja',
+                              child: Text(loc.languageJapanese))),
+                    ],
+                    onChanged: (value) => {
+                          setState(() {
+                            _language = value!;
+                          })
+                        }),
+              ),
             ],
           ),
           Padding(
             padding: const EdgeInsets.all(16.0),
-            child: ElevatedButton(
-              onPressed: () {
-                if (_formKey.currentState!.validate()) {
-                  widget.settings.count = _count.toInt();
-                  widget.settings.timeout = _timeout.toInt();
-                  widget.settings.retry = _retry.toInt();
-                  widget.settings.interval = _interval.toInt();
-                  widget.settings.ttl = _ttl.toInt();
-                  widget.settings.mibName = _mibName;
-                  widget.settings.language = _language;
-                  widget.settings.showAllPort = _showAllPort;
-                  widget.settings.themeMode = _themeMode;
-                  Navigator.pop(context, widget.settings);
-                }
-              },
-              child: Text(loc.save),
+            child: Semantics(
+              identifier: 'save_settings_button',
+              child: ElevatedButton(
+                onPressed: () {
+                  if (_formKey.currentState!.validate()) {
+                    widget.settings.count = _count.toInt();
+                    widget.settings.timeout = _timeout.toInt();
+                    widget.settings.retry = _retry.toInt();
+                    widget.settings.interval = _interval.toInt();
+                    widget.settings.ttl = _ttl.toInt();
+                    widget.settings.mibName = _mibName;
+                    widget.settings.language = _language;
+                    widget.settings.showAllPort = _showAllPort;
+                    widget.settings.themeMode = _themeMode;
+                    Navigator.pop(context, widget.settings);
+                  }
+                },
+                child: Text(loc.save),
+              ),
             ),
           ),
         ],

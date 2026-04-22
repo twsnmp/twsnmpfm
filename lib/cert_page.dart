@@ -233,20 +233,24 @@ class _CertState extends State<CertPage> {
   List<Widget> _getView(AppLocalizations loc) {
     List<Widget> r = [
       Text(loc.ipOrHostPort, style: const TextStyle(color: Colors.blue)),
-      Autocomplete<String>(
-        initialValue: TextEditingValue(text: _target),
-        optionsBuilder: (value) {
-          if (value.text.isEmpty) {
-            return [];
-          }
-          _target = value.text;
-          return _targetList.where((n) => n.toLowerCase().contains(value.text.toLowerCase()));
-        },
-        onSelected: (value) {
-          setState(() {
-            _target = value;
-          });
-        },
+      Semantics(
+        container: true,
+        identifier: 'cert_target_autocomplete',
+        child: Autocomplete<String>(
+          initialValue: TextEditingValue(text: _target),
+          optionsBuilder: (value) {
+            if (value.text.isEmpty) {
+              return [];
+            }
+            _target = value.text;
+            return _targetList.where((n) => n.toLowerCase().contains(value.text.toLowerCase()));
+          },
+          onSelected: (value) {
+            setState(() {
+              _target = value;
+            });
+          },
+        ),
       ),
       Text(_errorMsg, style: const TextStyle(color: Colors.red))
     ];
@@ -275,11 +279,15 @@ class _CertState extends State<CertPage> {
             ),
           ),
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            _getCert(loc);
-          },
-          child: _process ? const Icon(Icons.stop, color: Colors.red) : const Icon(Icons.play_circle),
+        floatingActionButton: Semantics(
+          container: true,
+          identifier: 'cert_fab',
+          child: FloatingActionButton(
+            onPressed: () {
+              _getCert(loc);
+            },
+            child: _process ? const Icon(Icons.stop, color: Colors.red) : const Icon(Icons.play_circle),
+          ),
         ),
       ),
     );

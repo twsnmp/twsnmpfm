@@ -1,25 +1,33 @@
 appId: jp.co.twise.twsnmpfm
 ---
+- launchApp:
+    clearState: true
 # Switch to English
-- tapOn: "Settings"
 - tapOn:
-    point: "951, 1350" # Language dropdown
-- tapOn: "English"
-- tapOn: "Save"
+    id: "settings_button"
+- extendedWaitUntil:
+    visible:
+      id: "language_dropdown"
+    timeout: 10000
+- tapOn:
+    id: "language_dropdown"
+- tapOn:
+    id: "language_item_en"
+- tapOn:
+    id: "save_settings_button"
+- waitForAnimationToEnd
 - assertVisible: "TWSNMP For Mobile"
 
-# Switch to Japanese
-- tapOn: "Settings"
+# Switch back to Japanese
 - tapOn:
-    point: "951, 1350" # Language dropdown
-- tapOn: "Japanese"
-- tapOn: "Save"
-- assertVisible: "TWSNMP For Mobile"
-
-# Revert to English for final verification
-- tapOn: "設定" # Japanese for Settings
+    id: "settings_button"
+- extendedWaitUntil:
+    visible:
+      id: "language_dropdown"
+    timeout: 10000
 - tapOn:
-    point: "951, 1350" # Language dropdown
-- tapOn: "英語" # Japanese for English in the dropdown (it might be "English" if already English, but in Japanese locale it is "英語")
-- tapOn: "保存" # Japanese for Save
-- assertVisible: "TWSNMP For Mobile"
+    id: "language_dropdown"
+- tapOn:
+    id: "language_item_ja"
+- tapOn:
+    id: "save_settings_button"

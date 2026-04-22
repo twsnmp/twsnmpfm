@@ -1,0 +1,29 @@
+appId: jp.co.twise.twsnmpfm
+---
+- launchApp:
+    clearState: true
+- runFlow:
+    file: setup_minipc.yaml
+- tapOn:
+    id: "node_menu_button_0"
+- waitForAnimationToEnd
+- tapOn:
+    id: "node_menu_item_snmp"
+- extendedWaitUntil:
+    visible:
+      id: "mib_name_autocomplete"
+    timeout: 10000
+- tapOn:
+    id: "mib_name_autocomplete"
+- eraseText
+- inputText: "system"
+- tapOn: "system" # Select from autocomplete suggestion
+- hideKeyboard
+- tapOn:
+    id: "mib_browser_fab"
+- extendedWaitUntil:
+    visible:
+      id: "mib_browser_table"
+    timeout: 30000
+- tapOn:
+    id: "mib_browser_fab" # Stop SNMP

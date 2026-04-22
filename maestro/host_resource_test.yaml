@@ -1,0 +1,20 @@
+appId: jp.co.twise.twsnmpfm
+---
+- launchApp:
+    clearState: true
+- runFlow:
+    file: setup_minipc.yaml
+- tapOn:
+    id: "node_menu_button_0"
+- waitForAnimationToEnd
+- tapOn:
+    id: "node_menu_item_hrmib"
+- extendedWaitUntil:
+    visible:
+      id: "hrmib_fab"
+    timeout: 10000
+- tapOn:
+    id: "hrmib_fab"
+- waitForAnimationToEnd
+- tapOn:
+    id: "hrmib_fab" # Stop

@@ -28,3 +28,4 @@ macos/Flutter/GeneratedPluginRegistrant.swift
 
 .gemini/
 lib/l10n/app_localizations*.dart
+maestro/.maestro

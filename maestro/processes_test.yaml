@@ -1,0 +1,22 @@
+appId: jp.co.twise.twsnmpfm
+---
+- launchApp:
+    clearState: true
+- runFlow:
+    file: setup_minipc.yaml
+- tapOn:
+    id: "node_menu_button_0"
+- waitForAnimationToEnd
+- tapOn:
+    id: "node_menu_item_process"
+- extendedWaitUntil:
+    visible:
+      id: "processes_fab"
+    timeout: 10000
+- tapOn:
+    id: "process_sort_switch"
+- tapOn:
+    id: "processes_fab"
+- waitForAnimationToEnd
+- tapOn:
+    id: "processes_fab" # Stop

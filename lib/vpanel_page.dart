@@ -262,16 +262,20 @@ class _VPanelState extends State<VPanelPage> {
                 Row(
                   children: [
                     Expanded(child: Text(loc.showAllPort)),
-                    Switch(
-                      value: _showAllPort,
-                      onChanged: (bool value) {
-                        setState(() {
-                          _showAllPort = value;
-                          if (_timer != null) {
-                            _getVPanel();
-                          }
-                        });
-                      },
+                    Semantics(
+                      container: true,
+                      identifier: 'show_all_port_switch',
+                      child: Switch(
+                        value: _showAllPort,
+                        onChanged: (bool value) {
+                          setState(() {
+                            _showAllPort = value;
+                            if (_timer != null) {
+                              _getVPanel();
+                            }
+                          });
+                        },
+                      ),
                     ),
                   ],
                 ),
@@ -302,46 +306,54 @@ class _VPanelState extends State<VPanelPage> {
                 const SizedBox(height: 10),
                 SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
-                    child: DataTable(
-                      headingTextStyle: TextStyle(
-                        color: dark ? Colors.white : Colors.blueGrey,
-                        fontSize: 14,
+                    child: Semantics(
+                      container: true,
+                      identifier: 'vpanel_table',
+                      child: DataTable(
+                        headingTextStyle: TextStyle(
+                          color: dark ? Colors.white : Colors.blueGrey,
+                          fontSize: 14,
+                        ),
+                        headingRowHeight: 20,
+                        dataTextStyle: TextStyle(color: dark ? Colors.white : Colors.black, fontSize: 12),
+                        dataRowMinHeight: 10,
+                        dataRowMaxHeight: 18,
+                        columns: const [
+                          DataColumn(label: Text("Index")),
+                          DataColumn(label: Text("Name")),
+                          DataColumn(label: Text("State")),
+                          DataColumn(label: Text("Speed")),
+                          DataColumn(label: Text("Type")),
+                          DataColumn(label: Text("MAC")),
+                          DataColumn(label: Text("admin")),
+                          DataColumn(label: Text("oper")),
+                          DataColumn(label: Text("Rx Bytes")),
+                          DataColumn(label: Text("Rx Packtes")),
+                          DataColumn(label: Text("Rx Errors")),
+                          DataColumn(label: Text("Tx Bytes")),
+                          DataColumn(label: Text("Tx Packtes")),
+                          DataColumn(label: Text("Tx Errors")),
+                        ],
+                        rows: _rows,
                       ),
-                      headingRowHeight: 20,
-                      dataTextStyle: TextStyle(color: dark ? Colors.white : Colors.black, fontSize: 12),
-                      dataRowMinHeight: 10,
-                      dataRowMaxHeight: 18,
-                      columns: const [
-                        DataColumn(label: Text("Index")),
-                        DataColumn(label: Text("Name")),
-                        DataColumn(label: Text("State")),
-                        DataColumn(label: Text("Speed")),
-                        DataColumn(label: Text("Type")),
-                        DataColumn(label: Text("MAC")),
-                        DataColumn(label: Text("admin")),
-                        DataColumn(label: Text("oper")),
-                        DataColumn(label: Text("Rx Bytes")),
-                        DataColumn(label: Text("Rx Packtes")),
-                        DataColumn(label: Text("Rx Errors")),
-                        DataColumn(label: Text("Tx Bytes")),
-                        DataColumn(label: Text("Tx Packtes")),
-                        DataColumn(label: Text("Tx Errors")),
-                      ],
-                      rows: _rows,
                     ))
               ],
             ),
           ),
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            if (_timer != null) {
-              _stop();
-            } else {
-              _start();
-            }
-          },
-          child: _timer != null ? const Icon(Icons.stop, color: Colors.red) : const Icon(Icons.play_circle),
+        floatingActionButton: Semantics(
+          container: true,
+          identifier: 'vpanel_fab',
+          child: FloatingActionButton(
+            onPressed: () {
+              if (_timer != null) {
+                _stop();
+              } else {
+                _start();
+              }
+            },
+            child: _timer != null ? const Icon(Icons.stop, color: Colors.red) : const Icon(Icons.play_circle),
+          ),
         ),
       ),
     );

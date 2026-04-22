@@ -1,0 +1,24 @@
+appId: jp.co.twise.twsnmpfm
+---
+- launchApp:
+    clearState: true
+- runFlow:
+    file: setup_minipc.yaml
+- tapOn:
+    id: "node_menu_button_0"
+- waitForAnimationToEnd
+- tapOn:
+    id: "node_menu_item_cert"
+- extendedWaitUntil:
+    visible:
+      id: "cert_fab"
+    timeout: 10000
+- tapOn:
+    id: "cert_target_autocomplete"
+- eraseText
+- inputText: "google.com"
+- tapOn: "google.com"
+- hideKeyboard
+- tapOn:
+    id: "cert_fab"
+- waitForAnimationToEnd

@@ -273,15 +273,19 @@ class _HostResourceState extends State<HostResourcePage> {
             ),
           ),
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            if (_timer != null) {
-              _stop();
-            } else {
-              _start();
-            }
-          },
-          child: _timer != null ? const Icon(Icons.stop, color: Colors.red) : const Icon(Icons.play_circle),
+        floatingActionButton: Semantics(
+          container: true,
+          identifier: 'hrmib_fab',
+          child: FloatingActionButton(
+            onPressed: () {
+              if (_timer != null) {
+                _stop();
+              } else {
+                _start();
+              }
+            },
+            child: _timer != null ? const Icon(Icons.stop, color: Colors.red) : const Icon(Icons.play_circle),
+          ),
         ),
       ),
     );

@@ -240,44 +240,56 @@ class _MibBrowserState extends State<MibBrowserPage> {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
-                Autocomplete<String>(
-                  initialValue: TextEditingValue(text: _mibName),
-                  optionsBuilder: (value) {
-                    if (value.text.isEmpty) {
-                      return [];
-                    }
-                    return _mibNames.where((n) => n.toLowerCase().contains(value.text.toLowerCase()));
-                  },
-                  onSelected: (value) {
-                    setState(() {
-                      _mibName = value;
-                    });
-                  },
+                Semantics(
+                  container: true,
+                  identifier: 'mib_name_autocomplete',
+                  child: Autocomplete<String>(
+                    initialValue: TextEditingValue(text: _mibName),
+                    optionsBuilder: (value) {
+                      if (value.text.isEmpty) {
+                        return [];
+                      }
+                      return _mibNames.where((n) => n.toLowerCase().contains(value.text.toLowerCase()));
+                    },
+                    onSelected: (value) {
+                      setState(() {
+                        _mibName = value;
+                      });
+                    },
+                  ),
                 ),
                 Text(_errorMsg, style: TextStyle(color: colorScheme.error)),
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
-                  child: DataTable(
-                    headingRowHeight: 20,
-                    dataRowMinHeight: 10,
-                    dataRowMaxHeight: 18,
-                    columns: _columns,
-                    rows: _rows,
+                  child: Semantics(
+                    container: true,
+                    identifier: 'mib_browser_table',
+                    child: DataTable(
+                      headingRowHeight: 20,
+                      dataRowMinHeight: 10,
+                      dataRowMaxHeight: 18,
+                      columns: _columns,
+                      rows: _rows,
+                    ),
                   ),
                 ),
               ],
             ),
           ),
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            if (_progoress) {
-              _stopSnmp();
-            } else {
-              _startSnmp();
-            }
-          },
-          child: _progoress ? const Icon(Icons.stop, color: Colors.red) : const Icon(Icons.play_circle),
+        floatingActionButton: Semantics(
+          container: true,
+          identifier: 'mib_browser_fab',
+          child: FloatingActionButton(
+            onPressed: () {
+              if (_progoress) {
+                _stopSnmp();
+              } else {
+                _startSnmp();
+              }
+            },
+            child: _progoress ? const Icon(Icons.stop, color: Colors.red) : const Icon(Icons.play_circle),
+          ),
         ),
       ),
     );
