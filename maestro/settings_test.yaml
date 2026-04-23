@@ -1,0 +1,46 @@
+appId: jp.co.twise.twsnmpfm
+---
+- launchApp:
+    clearState: true
+- tapOn:
+    id: "settings_button"
+- extendedWaitUntil:
+    visible:
+      id: "save_settings_button"
+    timeout: 10000
+
+# SNMP Settings
+- tapOn:
+    id: "settings_count_slider"
+- tapOn:
+    id: "settings_timeout_slider"
+- tapOn:
+    id: "settings_retry_slider"
+
+# MIB Name
+- tapOn:
+    id: "settings_mib_name_input"
+- eraseText
+- inputText: "system"
+- hideKeyboard
+
+# UI Settings
+- tapOn:
+    id: "settings_show_all_port_switch"
+- tapOn:
+    id: "settings_theme_mode_dropdown"
+- tapOn:
+    id: "theme_mode_item_dark"
+
+# Language (Testing dropdown)
+- tapOn:
+    id: "language_dropdown"
+- tapOn:
+    id: "language_item_en"
+
+# Save
+- tapOn:
+    id: "save_settings_button"
+- waitForAnimationToEnd
+- assertVisible:
+    id: "settings_button"

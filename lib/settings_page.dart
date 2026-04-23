@@ -11,7 +11,8 @@ class SettingsPage extends StatelessWidget {
     final loc = AppLocalizations.of(context)!;
     return Scaffold(
         appBar: AppBar(
-          title: Text(loc.settings),
+          title: Semantics(
+              identifier: 'settings_app_bar_title', child: Text(loc.settings)),
         ),
         body: SettingsForm(settings: settings));
   }
@@ -65,126 +66,168 @@ class SettingsFormState extends State<SettingsForm> {
           Row(
             children: [
               Expanded(child: Text("${loc.count}(${_count.toInt()})")),
-              Slider(
-                  label: "${_count.toInt()}",
-                  value: _count,
-                  min: 1,
-                  max: 100,
-                  divisions: (100 - 1),
-                  onChanged: (value) => {
-                        setState(() {
-                          _count = value;
-                        })
-                      }),
+              Semantics(
+                identifier: 'settings_count_slider',
+                child: Slider(
+                    label: "${_count.toInt()}",
+                    value: _count,
+                    min: 1,
+                    max: 100,
+                    divisions: (100 - 1),
+                    onChanged: (value) => {
+                          setState(() {
+                            _count = value;
+                          })
+                        }),
+              ),
             ],
           ),
           Row(
             children: [
-              Expanded(child: Text("${loc.timeout}(${_timeout.toInt()}${loc.sec})")),
-              Slider(
-                  label: "${_timeout.toInt()}",
-                  value: _timeout,
-                  min: 1,
-                  max: 10,
-                  divisions: (10 - 1),
-                  onChanged: (value) => {
-                        setState(() {
-                          _timeout = value;
-                        })
-                      }),
+              Expanded(
+                  child: Text("${loc.timeout}(${_timeout.toInt()}${loc.sec})")),
+              Semantics(
+                identifier: 'settings_timeout_slider',
+                child: Slider(
+                    label: "${_timeout.toInt()}",
+                    value: _timeout,
+                    min: 1,
+                    max: 10,
+                    divisions: (10 - 1),
+                    onChanged: (value) => {
+                          setState(() {
+                            _timeout = value;
+                          })
+                        }),
+              ),
             ],
           ),
           Row(
             children: [
               Expanded(child: Text("${loc.retry}(${_retry.toInt()})")),
-              Slider(
-                  label: "${_retry.toInt()}",
-                  value: _retry,
-                  min: 0,
-                  max: 5,
-                  divisions: 5,
-                  onChanged: (value) => {
-                        setState(() {
-                          _retry = value;
-                        })
-                      }),
+              Semantics(
+                identifier: 'settings_retry_slider',
+                child: Slider(
+                    label: "${_retry.toInt()}",
+                    value: _retry,
+                    min: 0,
+                    max: 5,
+                    divisions: 5,
+                    onChanged: (value) => {
+                          setState(() {
+                            _retry = value;
+                          })
+                        }),
+              ),
             ],
           ),
           Row(
             children: [
               Expanded(child: Text("TTL(${_ttl.toInt()})")),
-              Slider(
-                  label: "${_ttl.toInt()}",
-                  value: _ttl,
-                  min: 1,
-                  max: 255,
-                  divisions: (255 - 1),
-                  onChanged: (value) => {
-                        setState(() {
-                          _ttl = value;
-                        })
-                      }),
+              Semantics(
+                identifier: 'settings_ttl_slider',
+                child: Slider(
+                    label: "${_ttl.toInt()}",
+                    value: _ttl,
+                    min: 1,
+                    max: 255,
+                    divisions: (255 - 1),
+                    onChanged: (value) => {
+                          setState(() {
+                            _ttl = value;
+                          })
+                        }),
+              ),
             ],
           ),
           Row(
             children: [
-              Expanded(child: Text("${loc.interval}(${_interval.toInt()}${loc.sec})")),
-              Slider(
-                  label: "${_interval.toInt()}",
-                  value: _interval,
-                  min: 5,
-                  max: 60,
-                  divisions: (60 - 5) ~/ 5,
-                  onChanged: (value) => {
-                        setState(() {
-                          _interval = value;
-                        })
-                      }),
+              Expanded(
+                  child: Text("${loc.interval}(${_interval.toInt()}${loc.sec})")),
+              Semantics(
+                identifier: 'settings_interval_slider',
+                child: Slider(
+                    label: "${_interval.toInt()}",
+                    value: _interval,
+                    min: 5,
+                    max: 60,
+                    divisions: (60 - 5) ~/ 5,
+                    onChanged: (value) => {
+                          setState(() {
+                            _interval = value;
+                          })
+                        }),
+              ),
             ],
           ),
-          TextFormField(
-            initialValue: widget.settings.mibName,
-            validator: (value) {
-              if (value == null) {
-                return "Null";
-              }
-              return null;
-            },
-            onChanged: (value) {
-              setState(() {
-                _mibName = value;
-              });
-            },
-            decoration: InputDecoration(labelText: loc.mibName, hintText: loc.mibName),
+          Semantics(
+            identifier: 'settings_mib_name_input',
+            child: TextFormField(
+              initialValue: widget.settings.mibName,
+              validator: (value) {
+                if (value == null) {
+                  return "Null";
+                }
+                return null;
+              },
+              onChanged: (value) {
+                setState(() {
+                  _mibName = value;
+                });
+              },
+              decoration:
+                  InputDecoration(labelText: loc.mibName, hintText: loc.mibName),
+            ),
           ),
           Row(
             children: [
               Expanded(child: Text(loc.showAllPort)),
-              Switch(
-                value: _showAllPort,
-                onChanged: (bool value) {
-                  setState(() {
-                    _showAllPort = value;
-                  });
-                },
+              Semantics(
+                identifier: 'settings_show_all_port_switch',
+                child: Switch(
+                  value: _showAllPort,
+                  onChanged: (bool value) {
+                    setState(() {
+                      _showAllPort = value;
+                    });
+                  },
+                ),
               ),
             ],
           ),
           Row(
             children: [
               Expanded(child: Text(loc.themeMode)),
-              DropdownButton<ThemeMode>(
-                  value: _themeMode,
-                  items: [
-                    DropdownMenuItem(value: ThemeMode.system, child: Text(loc.themeModeSystem)),
-                    DropdownMenuItem(value: ThemeMode.light, child: Text(loc.themeModeLight)),
-                    DropdownMenuItem(value: ThemeMode.dark, child: Text(loc.themeModeDark)),
-                  ],
-                  onChanged: (value) => {
-                        setState(() {
-                          _themeMode = value!;
-                        })
-                      }),
+              Semantics(
+                identifier: 'settings_theme_mode_dropdown',
+                child: DropdownButton<ThemeMode>(
+                    value: _themeMode,
+                    items: [
+                      DropdownMenuItem(
+                          value: ThemeMode.system,
+                          child: Semantics(
+                              container: true,
+                              identifier: 'theme_mode_item_system',
+                              child: Text(loc.themeModeSystem))),
+                      DropdownMenuItem(
+                          value: ThemeMode.light,
+                          child: Semantics(
+                              container: true,
+                              identifier: 'theme_mode_item_light',
+                              child: Text(loc.themeModeLight))),
+                      DropdownMenuItem(
+                          value: ThemeMode.dark,
+                          child: Semantics(
+                              container: true,
+                              identifier: 'theme_mode_item_dark',
+                              child: Text(loc.themeModeDark))),
+                    ],
+                    onChanged: (value) => {
+                          setState(() {
+                            _themeMode = value!;
+                          })
+                        }),
+              ),
             ],
           ),
           Row(
