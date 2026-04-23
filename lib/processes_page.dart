@@ -293,28 +293,32 @@ class _ProcessesState extends State<ProcessesPage> {
                   child: PieChart(PieChartData(sections: _sections)),
                 ),
                 const SizedBox(height: 10),
-                SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: DataTable(
-                      headingTextStyle: TextStyle(
-                        color: dark ? Colors.white : Colors.blueGrey,
-                        fontSize: 14,
-                      ),
-                      headingRowHeight: 20,
-                      dataTextStyle: TextStyle(color: dark ? Colors.white : Colors.black, fontSize: 12),
-                      dataRowMinHeight: 10,
-                      dataRowMaxHeight: 18,
-                      columns: [
-                        DataColumn(label: Text(loc.processName)),
-                        DataColumn(label: Text(loc.path)),
-                        DataColumn(label: Text(loc.status)),
-                        DataColumn(label: Text(loc.type)),
-                        const DataColumn(label: Text("CPU%")),
-                        const DataColumn(label: Text("Mem%")),
-                        const DataColumn(label: Text("Mem(Bytes)"))
-                      ],
-                      rows: _rows,
-                    ))
+                ExcludeSemantics(
+                  child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: DataTable(
+                        headingTextStyle: TextStyle(
+                          color: dark ? Colors.white : Colors.blueGrey,
+                          fontSize: 14,
+                        ),
+                        headingRowHeight: 20,
+                        dataTextStyle: TextStyle(
+                            color: dark ? Colors.white : Colors.black,
+                            fontSize: 12),
+                        dataRowMinHeight: 10,
+                        dataRowMaxHeight: 18,
+                        columns: [
+                          DataColumn(label: Text(loc.processName)),
+                          DataColumn(label: Text(loc.path)),
+                          DataColumn(label: Text(loc.status)),
+                          DataColumn(label: Text(loc.type)),
+                          const DataColumn(label: Text("CPU%")),
+                          const DataColumn(label: Text("Mem%")),
+                          const DataColumn(label: Text("Mem(Bytes)"))
+                        ],
+                        rows: _rows,
+                      )),
+                )
               ],
             ),
           ),

@@ -18,7 +18,11 @@ appId: jp.co.twise.twsnmpfm
 - eraseText
 - inputText: "system"
 - tapOn: "system" # Select from autocomplete suggestion
-- hideKeyboard
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - hideKeyboard
 - tapOn:
     id: "mib_browser_fab"
 - extendedWaitUntil:

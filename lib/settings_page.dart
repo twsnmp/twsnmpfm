@@ -57,12 +57,14 @@ class SettingsFormState extends State<SettingsForm> {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
-    return Form(
-      key: _formKey,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(10),
+      child: Form(
+        key: _formKey,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
           Row(
             children: [
               Expanded(child: Text("${loc.count}(${_count.toInt()})")),
@@ -291,6 +293,7 @@ class SettingsFormState extends State<SettingsForm> {
           ),
         ],
       ),
-    );
+    ),
+   );
   }
 }

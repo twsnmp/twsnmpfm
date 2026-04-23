@@ -18,7 +18,11 @@ appId: jp.co.twise.twsnmpfm
 - eraseText
 - inputText: "pool.ntp.org"
 - tapOn: "pool.ntp.org"
-- hideKeyboard
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - hideKeyboard
 - tapOn:
     id: "server_test_fab"
 - waitForAnimationToEnd

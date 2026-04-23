@@ -15,6 +15,3 @@ appId: jp.co.twise.twsnmpfm
     timeout: 10000
 - tapOn:
     id: "hrmib_fab"
-- waitForAnimationToEnd
-- tapOn:
-    id: "hrmib_fab" # Stop

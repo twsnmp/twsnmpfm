@@ -22,7 +22,11 @@ appId: jp.co.twise.twsnmpfm
     id: "settings_mib_name_input"
 - eraseText
 - inputText: "system"
-- hideKeyboard
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - hideKeyboard
 
 # UI Settings
 - tapOn:

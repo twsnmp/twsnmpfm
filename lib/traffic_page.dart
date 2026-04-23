@@ -378,24 +378,28 @@ class _TrafficState extends State<TrafficPage> {
                   ],
                 ),
                 Text(_errorMsg, style: TextStyle(color: colorScheme.error)),
-                SizedBox(
-                  height: 200,
-                  child: TimeLineChart(_createChartData()),
+                ExcludeSemantics(
+                  child: SizedBox(
+                    height: 200,
+                    child: TimeLineChart(_createChartData()),
+                  ),
                 ),
-                SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: DataTable(
-                      headingRowHeight: 20,
-                      dataRowMinHeight: 10,
-                      dataRowMaxHeight: 18,
-                      columns: [
-                        DataColumn(label: Text(loc!.time)),
-                        DataColumn(label: Text('${loc!.tx}($_unit)', style: TextStyle(color: colorScheme.primary))),
-                        DataColumn(label: Text('${loc!.rx}($_unit)', style: const TextStyle(color: Colors.green))),
-                        DataColumn(label: Text('${loc!.error}($_unit)', style: TextStyle(color: colorScheme.error))),
-                      ],
-                      rows: _logs,
-                    )),
+                ExcludeSemantics(
+                  child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: DataTable(
+                        headingRowHeight: 20,
+                        dataRowMinHeight: 10,
+                        dataRowMaxHeight: 18,
+                        columns: [
+                          DataColumn(label: Text(loc!.time)),
+                          DataColumn(label: Text('${loc!.tx}($_unit)', style: TextStyle(color: colorScheme.primary))),
+                          DataColumn(label: Text('${loc!.rx}($_unit)', style: const TextStyle(color: Colors.green))),
+                          DataColumn(label: Text('${loc!.error}($_unit)', style: TextStyle(color: colorScheme.error))),
+                        ],
+                        rows: _logs,
+                      )),
+                ),
               ],
             ),
           ),

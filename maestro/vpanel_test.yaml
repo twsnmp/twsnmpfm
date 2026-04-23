@@ -19,7 +19,7 @@ appId: jp.co.twise.twsnmpfm
     id: "show_all_port_switch"
 - extendedWaitUntil:
     visible:
-      id: "vpanel_table"
+      id: "vpanel_fab"
     timeout: 30000
 - tapOn:
     id: "vpanel_fab" # Stop

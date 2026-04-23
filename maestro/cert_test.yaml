@@ -18,7 +18,11 @@ appId: jp.co.twise.twsnmpfm
 - eraseText
 - inputText: "google.com"
 - tapOn: "google.com"
-- hideKeyboard
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - hideKeyboard
 - tapOn:
     id: "cert_fab"
 - waitForAnimationToEnd

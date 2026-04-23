@@ -276,21 +276,25 @@ class _PingPageState extends State<PingPage> {
                   _errMsg,
                   style: TextStyle(fontSize: 12, color: colorScheme.error),
                 ),
-                SizedBox(
-                  height: 160,
-                  child: TimeLineChart(_createChartData()),
+                ExcludeSemantics(
+                  child: SizedBox(
+                    height: 160,
+                    child: TimeLineChart(_createChartData()),
+                  ),
                 ),
-                Semantics(
-                  identifier: "ping_stats_table",
-                  child: DataTable(
-                    headingRowHeight: 20,
-                    dataRowMinHeight: 10,
-                    dataRowMaxHeight: 18,
-                    columns: const [
-                      DataColumn(label: Text('項目')),
-                      DataColumn(label: Text('値')),
-                    ],
-                    rows: _stats,
+                ExcludeSemantics(
+                  child: Semantics(
+                    identifier: "ping_stats_table",
+                    child: DataTable(
+                      headingRowHeight: 20,
+                      dataRowMinHeight: 10,
+                      dataRowMaxHeight: 18,
+                      columns: const [
+                        DataColumn(label: Text('項目')),
+                        DataColumn(label: Text('値')),
+                      ],
+                      rows: _stats,
+                    ),
                   ),
                 ),
               ],
@@ -298,6 +302,7 @@ class _PingPageState extends State<PingPage> {
           ),
         ),
         floatingActionButton: Semantics(
+          container: true,
           identifier: "ping_fab",
           child: FloatingActionButton(
             onPressed: () {

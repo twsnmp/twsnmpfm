@@ -296,47 +296,51 @@ class _VPanelState extends State<VPanelPage> {
                   ],
                 ),
                 Text(_errorMsg, style: const TextStyle(color: Colors.red)),
-                Center(
-                  child: SizedBox(
-                    height: ((_rows.length ~/ 8) * 25) + 45,
-                    width: 8 * 25 + 40,
-                    child: PWidget(sketch),
+                ExcludeSemantics(
+                  child: Center(
+                    child: SizedBox(
+                      height: ((_rows.length ~/ 8) * 25) + 45,
+                      width: 8 * 25 + 40,
+                      child: PWidget(sketch),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 10),
-                SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Semantics(
-                      container: true,
-                      identifier: 'vpanel_table',
-                      child: DataTable(
-                        headingTextStyle: TextStyle(
-                          color: dark ? Colors.white : Colors.blueGrey,
-                          fontSize: 14,
+                ExcludeSemantics(
+                  child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Semantics(
+                        container: true,
+                        identifier: 'vpanel_table',
+                        child: DataTable(
+                          headingTextStyle: TextStyle(
+                            color: dark ? Colors.white : Colors.blueGrey,
+                            fontSize: 14,
+                          ),
+                          headingRowHeight: 20,
+                          dataTextStyle: TextStyle(color: dark ? Colors.white : Colors.black, fontSize: 12),
+                          dataRowMinHeight: 10,
+                          dataRowMaxHeight: 18,
+                          columns: const [
+                            DataColumn(label: Text("Index")),
+                            DataColumn(label: Text("Name")),
+                            DataColumn(label: Text("State")),
+                            DataColumn(label: Text("Speed")),
+                            DataColumn(label: Text("Type")),
+                            DataColumn(label: Text("MAC")),
+                            DataColumn(label: Text("admin")),
+                            DataColumn(label: Text("oper")),
+                            DataColumn(label: Text("Rx Bytes")),
+                            DataColumn(label: Text("Rx Packtes")),
+                            DataColumn(label: Text("Rx Errors")),
+                            DataColumn(label: Text("Tx Bytes")),
+                            DataColumn(label: Text("Tx Packtes")),
+                            DataColumn(label: Text("Tx Errors")),
+                          ],
+                          rows: _rows,
                         ),
-                        headingRowHeight: 20,
-                        dataTextStyle: TextStyle(color: dark ? Colors.white : Colors.black, fontSize: 12),
-                        dataRowMinHeight: 10,
-                        dataRowMaxHeight: 18,
-                        columns: const [
-                          DataColumn(label: Text("Index")),
-                          DataColumn(label: Text("Name")),
-                          DataColumn(label: Text("State")),
-                          DataColumn(label: Text("Speed")),
-                          DataColumn(label: Text("Type")),
-                          DataColumn(label: Text("MAC")),
-                          DataColumn(label: Text("admin")),
-                          DataColumn(label: Text("oper")),
-                          DataColumn(label: Text("Rx Bytes")),
-                          DataColumn(label: Text("Rx Packtes")),
-                          DataColumn(label: Text("Rx Errors")),
-                          DataColumn(label: Text("Tx Bytes")),
-                          DataColumn(label: Text("Tx Packtes")),
-                          DataColumn(label: Text("Tx Errors")),
-                        ],
-                        rows: _rows,
-                      ),
-                    ))
+                      )),
+                )
               ],
             ),
           ),

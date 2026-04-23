@@ -12,15 +12,27 @@ appId: jp.co.twise.twsnmpfm
 - tapOn:
     id: "node_name_field"
 - inputText: "miniPC"
-- hideKeyboard
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - hideKeyboard
 - tapOn:
     id: "node_ip_field"
 - inputText: "192.168.1.210"
-- hideKeyboard
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - hideKeyboard
 - tapOn:
     id: "community_field"
 - inputText: "public"
-- hideKeyboard
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - hideKeyboard
 - tapOn:
     id: "save_node_button"
 

@@ -337,25 +337,29 @@ class _PortState extends State<PortPage> {
                 ),
                 Text(_errorMsg, style: const TextStyle(color: Colors.red)),
                 const SizedBox(height: 10),
-                SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: DataTable(
-                      headingTextStyle: TextStyle(
-                        color: dark ? Colors.white : Colors.blueGrey,
-                        fontSize: 14,
-                      ),
-                      headingRowHeight: 20,
-                      dataTextStyle: TextStyle(color: dark ? Colors.white : Colors.black, fontSize: 12),
-                      dataRowMinHeight: 10,
-                      dataRowMaxHeight: 18,
-                      columns: const [
-                        DataColumn(label: Text("Port")),
-                        DataColumn(label: Text("Address")),
-                        DataColumn(label: Text("Process")),
-                        DataColumn(label: Text("Info")),
-                      ],
-                      rows: _rows,
-                    ))
+                ExcludeSemantics(
+                  child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: DataTable(
+                        headingTextStyle: TextStyle(
+                          color: dark ? Colors.white : Colors.blueGrey,
+                          fontSize: 14,
+                        ),
+                        headingRowHeight: 20,
+                        dataTextStyle: TextStyle(
+                            color: dark ? Colors.white : Colors.black,
+                            fontSize: 12),
+                        dataRowMinHeight: 10,
+                        dataRowMaxHeight: 18,
+                        columns: const [
+                          DataColumn(label: Text("Port")),
+                          DataColumn(label: Text("Address")),
+                          DataColumn(label: Text("Process")),
+                          DataColumn(label: Text("Info")),
+                        ],
+                        rows: _rows,
+                      )),
+                )
               ],
             ),
           ),

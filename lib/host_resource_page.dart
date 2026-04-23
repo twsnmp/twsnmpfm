@@ -252,23 +252,27 @@ class _HostResourceState extends State<HostResourcePage> {
                   ],
                 ),
                 Text(_errorMsg, style: TextStyle(color: colorScheme.error)),
-                SizedBox(
-                  height: 160,
-                  child: TimeLineChart(_chartSeries),
+                ExcludeSemantics(
+                  child: SizedBox(
+                    height: 160,
+                    child: TimeLineChart(_chartSeries),
+                  ),
                 ),
                 const SizedBox(height: 10),
-                SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: DataTable(
-                      headingRowHeight: 20,
-                      dataRowMinHeight: 10,
-                      dataRowMaxHeight: 18,
-                      columns: [
-                        DataColumn(label: Text(loc.key)),
-                        DataColumn(label: Text(loc.value)),
-                      ],
-                      rows: _rows,
-                    ))
+                ExcludeSemantics(
+                  child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: DataTable(
+                        headingRowHeight: 20,
+                        dataRowMinHeight: 10,
+                        dataRowMaxHeight: 18,
+                        columns: [
+                          DataColumn(label: Text(loc.key)),
+                          DataColumn(label: Text(loc.value)),
+                        ],
+                        rows: _rows,
+                      )),
+                )
               ],
             ),
           ),
