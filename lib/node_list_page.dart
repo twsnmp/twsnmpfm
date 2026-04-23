@@ -26,7 +26,6 @@ class NodeListPage extends ConsumerStatefulWidget {
 }
 class NodeListState extends ConsumerState<NodeListPage> {
   bool _isRunning = false;
-  Timer? _timer;
   int _checkTotal = 0;
   int _checkCompleted = 0;
   int _checkErrors = 0;
@@ -38,27 +37,10 @@ class NodeListState extends ConsumerState<NodeListPage> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _startTimer();
-    });
-  }
-
-  void _startTimer() {
-    final settings = ref.read(settingsProvider);
-    _timer?.cancel();
-    _timer = Timer.periodic(Duration(minutes: settings.interval > 0 ? settings.interval : 5), (timer) async {
-      if (!_isRunning) {
-        await _runPingChecks(context, ref);
-      }
-      if (mounted && !_isRunning) {
-        await _runCertChecks(context, ref);
-      }
-    });
   }
 
   @override
   void dispose() {
-    _timer?.cancel();
     super.dispose();
   }
 
@@ -178,6 +160,18 @@ class NodeListState extends ConsumerState<NodeListPage> {
                                   node.pingState == 0 ? Icons.check_circle : Icons.error,
                                   size: 16,
                                   color: node.pingState == 0 ? Colors.green : Colors.red,
+                                )
+                              else if (!node.checkPing)
+                                const Icon(
+                                  Icons.not_interested,
+                                  size: 16,
+                                  color: Colors.grey,
+                                )
+                              else
+                                const Icon(
+                                  Icons.pending,
+                                  size: 16,
+                                  color: Colors.grey,
                                 ),
                               if (node.certState != -1)
                                 Padding(
@@ -190,6 +184,24 @@ class NodeListState extends ConsumerState<NodeListPage> {
                                     color: node.certState == 0 ? Colors.green : 
                                            node.certState == 1 ? Colors.red : 
                                            node.certState == 2 ? Colors.red : Colors.amber,
+                                  ),
+                                )
+                              else if (!node.checkCert)
+                                const Padding(
+                                  padding: EdgeInsets.only(left: 4.0),
+                                  child: Icon(
+                                    Icons.not_interested,
+                                    size: 16,
+                                    color: Colors.grey,
+                                  ),
+                                )
+                              else
+                                const Padding(
+                                  padding: EdgeInsets.only(left: 4.0),
+                                  child: Icon(
+                                    Icons.pending,
+                                    size: 16,
+                                    color: Colors.grey,
                                   ),
                                 ),
                             ],

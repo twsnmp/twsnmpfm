@@ -131,6 +131,11 @@ class Nodes extends ChangeNotifier {
     var result = prefs.getStringList('nodes');
     if (result != null) {
       nodes = result.map((f) => Node.fromMap(json.decode(f))).toList();
+      // Clear status on startup
+      for (var node in nodes) {
+        node.pingState = -1;
+        node.certState = -1;
+      }
     }
     notifyListeners();
   }
