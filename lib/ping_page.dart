@@ -198,61 +198,73 @@ class _PingPageState extends State<PingPage> {
                 Row(
                   children: [
                     Expanded(child: Text("${loc!.count}(${_count.toInt()})")),
-                    Slider(
-                        label: "${_count.toInt()}",
-                        value: _count,
-                        min: 1,
-                        max: 100,
-                        divisions: (100 - 1),
-                        onChanged: (value) => {
-                              setState(() {
-                                _count = value;
-                              })
-                            }),
+                    Semantics(
+                      identifier: "ping_count_slider",
+                      child: Slider(
+                          label: "${_count.toInt()}",
+                          value: _count,
+                          min: 1,
+                          max: 100,
+                          divisions: (100 - 1),
+                          onChanged: (value) => {
+                                setState(() {
+                                  _count = value;
+                                })
+                              }),
+                    ),
                   ],
                 ),
                 Row(
                   children: [
                     Expanded(child: Text("${loc!.timeout}(${_timeout.toInt()}${loc!.sec})")),
-                    Slider(
-                        label: "${_timeout.toInt()}",
-                        value: _timeout,
-                        min: 1,
-                        max: 10,
-                        divisions: (10 - 1),
-                        onChanged: (value) => {
-                              setState(() {
-                                _timeout = value;
-                              })
-                            }),
+                    Semantics(
+                      identifier: "ping_timeout_slider",
+                      child: Slider(
+                          label: "${_timeout.toInt()}",
+                          value: _timeout,
+                          min: 1,
+                          max: 10,
+                          divisions: (10 - 1),
+                          onChanged: (value) => {
+                                setState(() {
+                                  _timeout = value;
+                                })
+                              }),
+                    ),
                   ],
                 ),
                 Row(
                   children: [
                     Expanded(child: Text("TTL(${_ttl.toInt()})")),
-                    Slider(
-                        label: "${_ttl.toInt()}",
-                        value: _ttl,
-                        min: 1,
-                        max: 255,
-                        divisions: (255 - 1),
-                        onChanged: (value) => {
-                              setState(() {
-                                _ttl = value;
-                              })
-                            }),
+                    Semantics(
+                      identifier: "ping_ttl_slider",
+                      child: Slider(
+                          label: "${_ttl.toInt()}",
+                          value: _ttl,
+                          min: 1,
+                          max: 255,
+                          divisions: (255 - 1),
+                          onChanged: (value) => {
+                                setState(() {
+                                  _ttl = value;
+                                })
+                              }),
+                    ),
                   ],
                 ),
                 Row(
                   children: [
                     const Expanded(child: Text("BEEP")),
-                    Switch(
-                      value: _beep,
-                      onChanged: (bool value) {
-                        setState(() {
-                          _beep = value;
-                        });
-                      },
+                    Semantics(
+                      identifier: "ping_beep_switch",
+                      child: Switch(
+                        value: _beep,
+                        onChanged: (bool value) {
+                          setState(() {
+                            _beep = value;
+                          });
+                        },
+                      ),
                     ),
                   ],
                 ),
@@ -268,29 +280,35 @@ class _PingPageState extends State<PingPage> {
                   height: 160,
                   child: TimeLineChart(_createChartData()),
                 ),
-                DataTable(
-                  headingRowHeight: 20,
-                  dataRowMinHeight: 10,
-                  dataRowMaxHeight: 18,
-                  columns: const [
-                    DataColumn(label: Text('項目')),
-                    DataColumn(label: Text('値')),
-                  ],
-                  rows: _stats,
+                Semantics(
+                  identifier: "ping_stats_table",
+                  child: DataTable(
+                    headingRowHeight: 20,
+                    dataRowMinHeight: 10,
+                    dataRowMaxHeight: 18,
+                    columns: const [
+                      DataColumn(label: Text('項目')),
+                      DataColumn(label: Text('値')),
+                    ],
+                    rows: _stats,
+                  ),
                 ),
               ],
             ),
           ),
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            if (ping != null) {
-              _stopPing();
-            } else {
-              _startPing();
-            }
-          },
-          child: ping != null ? const Icon(Icons.stop, color: Colors.red) : const Icon(Icons.play_circle),
+        floatingActionButton: Semantics(
+          identifier: "ping_fab",
+          child: FloatingActionButton(
+            onPressed: () {
+              if (ping != null) {
+                _stopPing();
+              } else {
+                _startPing();
+              }
+            },
+            child: ping != null ? const Icon(Icons.stop, color: Colors.red) : const Icon(Icons.play_circle),
+          ),
         ),
       ),
     );
