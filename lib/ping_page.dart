@@ -6,6 +6,7 @@ import 'package:twsnmpfm/l10n/app_localizations.dart';
 import 'package:twsnmpfm/settings.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:twsnmpfm/time_line_chart.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 class PingPage extends StatefulWidget {
   final String ip;
@@ -30,6 +31,7 @@ class _PingPageState extends State<PingPage> {
   Ping? ping;
   AppLocalizations? loc;
   bool _beep = false;
+  final _player = AudioPlayer();
 
   @override
   void initState() {
@@ -37,6 +39,15 @@ class _PingPageState extends State<PingPage> {
     _timeout = widget.settings.timeout.toDouble();
     _ttl = widget.settings.ttl.toDouble();
     super.initState();
+  }
+
+  void _playBeep(bool success) {
+    if (!_beep) return;
+    if (success) {
+      _player.play(AssetSource('sounds/ok.mp3'));
+    } else {
+      _player.play(AssetSource('sounds/ng.mp3'));
+    }
   }
 
   void _startPing() {
@@ -52,18 +63,16 @@ class _PingPageState extends State<PingPage> {
     ping?.stream.listen((event) {
       if (!mounted) return;
       final response = event.response;
-      if (response != null && response.ttl != null) {
-        final ttl = response.ttl!;
+      if (response != null) {
         i++;
+        final ttl = response.ttl;
         final err = event.error?.toString() ?? '';
-        if (_beep) {
-          SystemSound.play(SystemSoundType.click);
-        }
+        _playBeep(err == '' && ttl != null);
         if (!mounted) return;
         setState(() {
-          if (err != '') {
+          if (err != '' || ttl == null) {
             _lastResult = '$i/$_count rtt=? ttl=?';
-            _errMsg = err;
+            _errMsg = err != '' ? err : 'Request timeout';
           } else {
             final nrtt = response.time?.inMicroseconds.toDouble() ?? 0.0;
             _rtts.add(nrtt / 1000);
@@ -77,6 +86,7 @@ class _PingPageState extends State<PingPage> {
               _maxTTL = ttl;
             }
             _lastResult = '$i/$_count rtt=${nrtt / 1000}mSec ttl=$ttl';
+            _errMsg = '';
           }
           _setStats();
         });
@@ -95,6 +105,7 @@ class _PingPageState extends State<PingPage> {
               ping = null;
             }
           } else {
+            _playBeep(false);
             _lastResult = err;
             _errMsg = err;
           }
@@ -113,6 +124,7 @@ class _PingPageState extends State<PingPage> {
   @override
   void dispose() {
     ping?.stop();
+    _player.dispose();
     super.dispose();
   }
 
@@ -254,7 +266,7 @@ class _PingPageState extends State<PingPage> {
                 ),
                 Row(
                   children: [
-                    const Expanded(child: Text("BEEP")),
+                    Expanded(child: Text(loc!.beep)),
                     Semantics(
                       identifier: "ping_beep_switch",
                       child: Switch(

@@ -119,5 +119,6 @@
     "checkProblemCount": "問題のあるノード数",
     "checkingNode": "チェック中のノード名",
     "checkFinished": "完了",
-    "addNode": "ノードの追加"
+    "addNode": "ノードの追加",
+    "beep": "ビープ音"
 }

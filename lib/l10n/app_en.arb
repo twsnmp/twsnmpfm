@@ -119,5 +119,6 @@
     "checkProblemCount": "Problem Nodes",
     "checkingNode": "Checking",
     "checkFinished": "Check Finished",
-    "addNode": "Add Node"
+    "addNode": "Add Node",
+    "beep": "BEEP"
 }
