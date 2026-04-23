@@ -1,0 +1,61 @@
+appId: jp.co.twise.twsnmpfm
+---
+- launchApp:
+    clearState: true
+- runFlow:
+    file: setup_minipc.yaml
+- tapOn:
+    id: "search_button"
+- extendedWaitUntil:
+    visible:
+      id: "search_fab"
+    timeout: 10000
+# My IP
+- tapOn:
+    id: "search_fab"
+- waitForAnimationToEnd
+- assertVisible:
+    id: "search_results_table"
+
+# DNS
+- tapOn:
+    id: "search_tab_dns"
+- inputText:
+    id: "search_dns_target_input"
+    text: "google.com"
+- tapOn:
+    id: "search_fab"
+- waitForAnimationToEnd
+- assertVisible:
+    id: "search_results_table"
+
+# MAC
+- tapOn:
+    id: "search_tab_mac"
+- inputText:
+    id: "search_mac_address_input"
+    text: "00:00:5E"
+- tapOn:
+    id: "search_fab"
+- waitForAnimationToEnd
+- assertVisible:
+    id: "search_results_table"
+
+# Port
+- tapOn:
+    id: "search_tab_port"
+- inputText:
+    id: "search_port_number_input"
+    text: "80"
+- tapOn:
+    id: "search_fab"
+- waitForAnimationToEnd
+- assertVisible:
+    id: "search_results_table"
+
+# MIB
+- tapOn:
+    id: "search_tab_mib"
+- extendedWaitUntil:
+    visible: "iso.org.dod.internet(1.3.6.1)"
+    timeout: 10000

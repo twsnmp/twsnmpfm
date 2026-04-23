@@ -251,17 +251,20 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
               Row(
                 children: [
                   const Expanded(child: Text("STUN Server")),
-                  DropdownButton<String>(
-                      value: _stunServer,
-                      items: _stunServerList,
-                      onChanged: (String? value) {
-                        if (value == null) {
-                          return;
-                        }
-                        setState(() {
-                          _stunServer = value;
-                        });
-                      }),
+                  Semantics(
+                    identifier: "search_stun_server_dropdown",
+                    child: DropdownButton<String>(
+                        value: _stunServer,
+                        items: _stunServerList,
+                        onChanged: (String? value) {
+                          if (value == null) {
+                            return;
+                          }
+                          setState(() {
+                            _stunServer = value;
+                          });
+                        }),
+                  ),
                 ],
               ),
               Text(
@@ -270,15 +273,18 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
               ),
               SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
-                  child: DataTable(
-                    headingRowHeight: 20,
-                    dataRowMinHeight: 10,
-                    dataRowMaxHeight: 18,
-                    columns: [
-                      DataColumn(label: Text(loc!.key)),
-                      DataColumn(label: Text(loc!.value)),
-                    ],
-                    rows: _results,
+                  child: Semantics(
+                    identifier: "search_results_table",
+                    child: DataTable(
+                      headingRowHeight: 20,
+                      dataRowMinHeight: 10,
+                      dataRowMaxHeight: 18,
+                      columns: [
+                        DataColumn(label: Text(loc!.key)),
+                        DataColumn(label: Text(loc!.value)),
+                      ],
+                      rows: _results,
+                    ),
                   )),
             ],
           ),
@@ -292,38 +298,45 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              TextFormField(
-                initialValue: _dnsTarget,
-                autocorrect: false,
-                enableSuggestions: false,
-                keyboardType: TextInputType.text,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return loc!.requiredError;
-                  }
-                  return null;
-                },
-                onChanged: (value) {
-                  setState(() {
-                    _dnsTarget = value;
-                  });
-                },
-                decoration: InputDecoration(icon: const Icon(Icons.search), labelText: loc?.ipOrHost ?? "IP or Host", hintText: loc?.ipOrHost ?? ""),
+              Semantics(
+                identifier: "search_dns_target_input",
+                child: TextFormField(
+                  initialValue: _dnsTarget,
+                  autocorrect: false,
+                  enableSuggestions: false,
+                  keyboardType: TextInputType.text,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return loc!.requiredError;
+                    }
+                    return null;
+                  },
+                  onChanged: (value) {
+                    setState(() {
+                      _dnsTarget = value;
+                    });
+                  },
+                  decoration: InputDecoration(
+                      icon: const Icon(Icons.search), labelText: loc?.ipOrHost ?? "IP or Host", hintText: loc?.ipOrHost ?? ""),
+                ),
               ),
               Row(
                 children: [
                   Expanded(child: Text(loc?.rrType ?? "DNS Record Type")),
-                  DropdownButton<int>(
-                      value: _rrType,
-                      items: _rrTypeList,
-                      onChanged: (int? value) {
-                        if (value == null) {
-                          return;
-                        }
-                        setState(() {
-                          _rrType = value;
-                        });
-                      }),
+                  Semantics(
+                    identifier: "search_dns_record_type_dropdown",
+                    child: DropdownButton<int>(
+                        value: _rrType,
+                        items: _rrTypeList,
+                        onChanged: (int? value) {
+                          if (value == null) {
+                            return;
+                          }
+                          setState(() {
+                            _rrType = value;
+                          });
+                        }),
+                  ),
                 ],
               ),
               Text(
@@ -332,15 +345,18 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
               ),
               SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
-                  child: DataTable(
-                    headingRowHeight: 20,
-                    dataRowMinHeight: 10,
-                    dataRowMaxHeight: 18,
-                    columns: [
-                      DataColumn(label: Text(loc!.key)),
-                      DataColumn(label: Text(loc!.value)),
-                    ],
-                    rows: _results,
+                  child: Semantics(
+                    identifier: "search_results_table",
+                    child: DataTable(
+                      headingRowHeight: 20,
+                      dataRowMinHeight: 10,
+                      dataRowMaxHeight: 18,
+                      columns: [
+                        DataColumn(label: Text(loc!.key)),
+                        DataColumn(label: Text(loc!.value)),
+                      ],
+                      rows: _results,
+                    ),
                   )),
             ],
           ),
@@ -354,35 +370,42 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              TextFormField(
-                initialValue: _macAddress,
-                autocorrect: false,
-                enableSuggestions: false,
-                keyboardType: TextInputType.text,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return loc!.requiredError;
-                  }
-                  return null;
-                },
-                onChanged: (value) {
-                  setState(() {
-                    _macAddress = value;
-                  });
-                },
-                decoration: InputDecoration(icon: const Icon(Icons.search), labelText: loc?.macAddress ?? "MAC Address", hintText: loc?.macAddress ?? ""),
+              Semantics(
+                identifier: "search_mac_address_input",
+                child: TextFormField(
+                  initialValue: _macAddress,
+                  autocorrect: false,
+                  enableSuggestions: false,
+                  keyboardType: TextInputType.text,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return loc!.requiredError;
+                    }
+                    return null;
+                  },
+                  onChanged: (value) {
+                    setState(() {
+                      _macAddress = value;
+                    });
+                  },
+                  decoration: InputDecoration(
+                      icon: const Icon(Icons.search), labelText: loc?.macAddress ?? "MAC Address", hintText: loc?.macAddress ?? ""),
+                ),
               ),
               SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
-                  child: DataTable(
-                    headingRowHeight: 20,
-                    dataRowMinHeight: 10,
-                    dataRowMaxHeight: 18,
-                    columns: [
-                      DataColumn(label: Text(loc!.vendorCode)),
-                      DataColumn(label: Text(loc!.vendorName)),
-                    ],
-                    rows: _results,
+                  child: Semantics(
+                    identifier: "search_results_table",
+                    child: DataTable(
+                      headingRowHeight: 20,
+                      dataRowMinHeight: 10,
+                      dataRowMaxHeight: 18,
+                      columns: [
+                        DataColumn(label: Text(loc!.vendorCode)),
+                        DataColumn(label: Text(loc!.vendorName)),
+                      ],
+                      rows: _results,
+                    ),
                   )),
             ],
           ),
@@ -396,41 +419,47 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              TextFormField(
-                initialValue: _portNumber,
-                autocorrect: false,
-                enableSuggestions: false,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return loc!.requiredError;
-                  }
-                  return null;
-                },
-                onChanged: (value) {
-                  setState(() {
-                    _portNumber = value;
-                  });
-                },
-                decoration: InputDecoration(icon: const Icon(Icons.numbers), labelText: loc?.port ?? "Port", hintText: loc?.port ?? ""),
+              Semantics(
+                identifier: "search_port_number_input",
+                child: TextFormField(
+                  initialValue: _portNumber,
+                  autocorrect: false,
+                  enableSuggestions: false,
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return loc!.requiredError;
+                    }
+                    return null;
+                  },
+                  onChanged: (value) {
+                    setState(() {
+                      _portNumber = value;
+                    });
+                  },
+                  decoration: InputDecoration(icon: const Icon(Icons.numbers), labelText: loc?.port ?? "Port", hintText: loc?.port ?? ""),
+                ),
               ),
               Row(
                 children: [
                   const Expanded(child: Text("TCP/UDP")),
-                  DropdownButton<String>(
-                      value: _portProt,
-                      items: const [
-                        DropdownMenuItem(value: "tcp", child: Text("TCP")),
-                        DropdownMenuItem(value: "udp", child: Text("UDP")),
-                      ],
-                      onChanged: (String? value) {
-                        if (value == null) {
-                          return;
-                        }
-                        setState(() {
-                          _portProt = value;
-                        });
-                      }),
+                  Semantics(
+                    identifier: "search_port_protocol_dropdown",
+                    child: DropdownButton<String>(
+                        value: _portProt,
+                        items: const [
+                          DropdownMenuItem(value: "tcp", child: Text("TCP")),
+                          DropdownMenuItem(value: "udp", child: Text("UDP")),
+                        ],
+                        onChanged: (String? value) {
+                          if (value == null) {
+                            return;
+                          }
+                          setState(() {
+                            _portProt = value;
+                          });
+                        }),
+                  ),
                 ],
               ),
               Text(
@@ -439,15 +468,18 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
               ),
               SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
-                  child: DataTable(
-                    headingRowHeight: 20,
-                    dataRowMinHeight: 10,
-                    dataRowMaxHeight: 18,
-                    columns: [
-                      DataColumn(label: Text(loc!.key)),
-                      DataColumn(label: Text(loc!.value)),
-                    ],
-                    rows: _results,
+                  child: Semantics(
+                    identifier: "search_results_table",
+                    child: DataTable(
+                      headingRowHeight: 20,
+                      dataRowMinHeight: 10,
+                      dataRowMaxHeight: 18,
+                      columns: [
+                        DataColumn(label: Text(loc!.key)),
+                        DataColumn(label: Text(loc!.value)),
+                      ],
+                      rows: _results,
+                    ),
                   )),
             ],
           ),
@@ -466,12 +498,14 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
         return Padding(
           padding: EdgeInsets.only(left: node.depth * 15.0),
           child: InkWell(
-            onTap: hasChildren ? () {
-              setState(() {
-                node.isExpanded = !node.isExpanded;
-                _updateVisibleNodes();
-              });
-            } : null,
+            onTap: hasChildren
+                ? () {
+                    setState(() {
+                      node.isExpanded = !node.isExpanded;
+                      _updateVisibleNodes();
+                    });
+                  }
+                : null,
             child: Row(
               children: [
                 if (hasChildren)
@@ -708,14 +742,37 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
         title: Text(loc!.search),
         bottom: TabBar(
           controller: _tabController,
-          tabs: const [
+          tabs: [
             Tab(
-              child: Text("My IP", style: TextStyle(fontSize: 12)),
+              child: Semantics(
+                identifier: "search_tab_myip",
+                child: const Text("My IP", style: TextStyle(fontSize: 12)),
+              ),
             ),
-            Tab(child: Text("DNS", style: TextStyle(fontSize: 12))),
-            Tab(child: Text("MAC", style: TextStyle(fontSize: 12))),
-            Tab(child: Text("Port", style: TextStyle(fontSize: 12))),
-            Tab(child: Text("MIB", style: TextStyle(fontSize: 12))),
+            Tab(
+              child: Semantics(
+                identifier: "search_tab_dns",
+                child: const Text("DNS", style: TextStyle(fontSize: 12)),
+              ),
+            ),
+            Tab(
+              child: Semantics(
+                identifier: "search_tab_mac",
+                child: const Text("MAC", style: TextStyle(fontSize: 12)),
+              ),
+            ),
+            Tab(
+              child: Semantics(
+                identifier: "search_tab_port",
+                child: const Text("Port", style: TextStyle(fontSize: 12)),
+              ),
+            ),
+            Tab(
+              child: Semantics(
+                identifier: "search_tab_mib",
+                child: const Text("MIB", style: TextStyle(fontSize: 12)),
+              ),
+            ),
           ],
           onTap: (v) {
             setState(() {
@@ -737,11 +794,14 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
       ),
       floatingActionButton: _tabController?.index == 4
           ? null
-          : FloatingActionButton(
-              onPressed: () {
-                _search();
-              },
-              child: _process ? const Icon(Icons.stop, color: Colors.red) : const Icon(Icons.play_circle),
+          : Semantics(
+              identifier: "search_fab",
+              child: FloatingActionButton(
+                onPressed: () {
+                  _search();
+                },
+                child: _process ? const Icon(Icons.stop, color: Colors.red) : const Icon(Icons.play_circle),
+              ),
             ),
     ));
   }
