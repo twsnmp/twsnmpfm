@@ -82,5 +82,5 @@
 			<string>_http._tcp</string>
 			<string>_snmp._udp</string>
 		</array>
-		</dict>
-		</plist>
+	</dict>
+</plist>

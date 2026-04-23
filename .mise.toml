@@ -14,6 +14,10 @@ run = """
 yes | sdkmanager --sdk_root=$ANDROID_HOME "platform-tools" "platforms;android-34" "build-tools;34.0.0" "cmdline-tools;latest"
 # Install CocoaPods
 gem install cocoapods
+# Generate launcher icons and splash screen
+flutter pub get
+dart run flutter_launcher_icons
+dart run flutter_native_splash:create
 """
 
 [tasks."build:apk"]

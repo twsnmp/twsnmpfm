@@ -51,11 +51,13 @@ flutter:
     - assets/conf/services.txt
     - assets/conf/mac-vendors-export.csv
 
-flutter_icons:
+flutter_launcher_icons:
   android: true
   ios: true
   remove_alpha_ios: true
   image_path: "lib/assets/images/twsnmpfm.png"
+  adaptive_icon_background: "#ffffff"
+  adaptive_icon_foreground: "lib/assets/images/twsnmpfm.png"
 
 flutter_native_splash:
   color: "#ffffff"
