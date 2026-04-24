@@ -14,15 +14,5 @@ appId: jp.co.twise.twsnmpfm
       id: "cert_fab"
     timeout: 10000
 - tapOn:
-    id: "cert_target_autocomplete"
-- eraseText
-- inputText: "google.com"
-- tapOn: "google.com"
-- runFlow:
-    when:
-      platform: Android
-    commands:
-      - hideKeyboard
-- tapOn:
     id: "cert_fab"
 - waitForAnimationToEnd

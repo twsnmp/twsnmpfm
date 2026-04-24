@@ -70,41 +70,50 @@ class NodeListState extends ConsumerState<NodeListPage> {
               },
             ),
           ),
-          PopupMenuButton<String>(
-            tooltip: loc.start,
-            icon: const Icon(Icons.play_circle),
-            onSelected: (value) {
-              if (_isRunning) return;
-              if (value == 'ping') {
-                _runPingChecks(context, ref);
-              } else if (value == 'cert') {
-                _runCertChecks(context, ref);
-              }
-            },
-            itemBuilder: (context) => <PopupMenuEntry<String>>[
-              PopupMenuItem<String>(
-                value: "ping",
-                enabled: !_isRunning,
-                child: Row(
-                  children: [
-                    const Icon(Icons.network_ping),
-                    const SizedBox(width: 8),
-                    Text(loc.runPing, style: const TextStyle(fontSize: 14)),
-                  ],
+          Semantics(
+            identifier: 'run_checks_button',
+            child: PopupMenuButton<String>(
+              tooltip: loc.start,
+              icon: const Icon(Icons.play_circle),
+              onSelected: (value) {
+                if (_isRunning) return;
+                if (value == 'ping') {
+                  _runPingChecks(context, ref);
+                } else if (value == 'cert') {
+                  _runCertChecks(context, ref);
+                }
+              },
+              itemBuilder: (context) => <PopupMenuEntry<String>>[
+                PopupMenuItem<String>(
+                  value: "ping",
+                  enabled: !_isRunning,
+                  child: Semantics(
+                    identifier: 'run_ping_menu',
+                    child: Row(
+                      children: [
+                        const Icon(Icons.network_ping),
+                        const SizedBox(width: 8),
+                        Text(loc.runPing, style: const TextStyle(fontSize: 14)),
+                      ],
+                    ),
+                  ),
                 ),
-              ),
-              PopupMenuItem<String>(
-                value: "cert",
-                enabled: !_isRunning,
-                child: Row(
-                  children: [
-                    const Icon(Icons.security),
-                    const SizedBox(width: 8),
-                    Text(loc.runCert, style: const TextStyle(fontSize: 14)),
-                  ],
+                PopupMenuItem<String>(
+                  value: "cert",
+                  enabled: !_isRunning,
+                  child: Semantics(
+                    identifier: 'run_cert_menu',
+                    child: Row(
+                      children: [
+                        const Icon(Icons.security),
+                        const SizedBox(width: 8),
+                        Text(loc.runCert, style: const TextStyle(fontSize: 14)),
+                      ],
+                    ),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
           Semantics(
             identifier: 'settings_button',
@@ -510,7 +519,7 @@ class NodeListState extends ConsumerState<NodeListPage> {
                 try {
                     bool bad = false;
                     final socket = await SecureSocket.connect(
-                        node.ip,
+                        node.name.isNotEmpty ? node.name : node.ip,
                         443,
                         timeout: Duration(seconds: settings.timeout),
                         onBadCertificate: (cert) {

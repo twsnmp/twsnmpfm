@@ -1,0 +1,31 @@
+appId: jp.co.twise.twsnmpfm
+---
+# (1) Create a node (miniPC)
+- tapOn:
+    id: "add_node_fab"
+- extendedWaitUntil:
+    visible:
+      id: "node_name_field"
+    timeout: 10000
+- tapOn:
+    id: "node_name_field"
+- inputText: "www.twise.co.jp"
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - hideKeyboard
+- tapOn:
+    id: "node_ip_field"
+- tapOn:
+    id: "get_ip_from_name_button"
+- tapOn:
+    id: "ping_switch"
+- tapOn:
+    id: "cert_switch"
+- tapOn:
+    id: "save_node_button"
+- extendedWaitUntil:
+    visible:
+      id: "node_menu_button_0"
+    timeout: 10000

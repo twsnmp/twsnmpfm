@@ -3,7 +3,7 @@ appId: jp.co.twise.twsnmpfm
 - launchApp:
     clearState: true
 - runFlow:
-    file: subflow/setup_cert_ok_node.yaml
+    file: subflow/setup_cert_ng_node.yaml
 - tapOn:
     id: "node_menu_button_0"
 - waitForAnimationToEnd
@@ -13,16 +13,6 @@ appId: jp.co.twise.twsnmpfm
     visible:
       id: "cert_fab"
     timeout: 10000
-- tapOn:
-    id: "cert_target_autocomplete"
-- eraseText
-- inputText: "google.com"
-- tapOn: "google.com"
-- runFlow:
-    when:
-      platform: Android
-    commands:
-      - hideKeyboard
 - tapOn:
     id: "cert_fab"
 - waitForAnimationToEnd

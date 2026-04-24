@@ -1,0 +1,16 @@
+appId: jp.co.twise.twsnmpfm
+---
+- launchApp:
+    clearState: true
+- runFlow:
+    file: subflow/setup_cert_ok_node.yaml
+- runFlow:
+    file: subflow/setup_cert_ng_node.yaml
+- tapOn:
+    id: "run_checks_button"
+- extendedWaitUntil:
+    visible:
+      id: "run_cert_menu"
+    timeout: 10000
+- tapOn:
+    id: "run_cert_menu"

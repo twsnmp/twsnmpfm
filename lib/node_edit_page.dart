@@ -52,8 +52,12 @@ class NodeEditFormState extends State<NodeEditForm> {
     try {
       // 1. Try system DNS lookup
       var ips = await InternetAddress.lookup(name);
-      var ip = ips.first.address;
-      _updateIP(ip);
+      var ipv4s = ips.where((a) => a.type == InternetAddressType.IPv4);
+      if (ipv4s.isNotEmpty) {
+        _updateIP(ipv4s.first.address);
+        return;
+      }
+      throw const OSError("No IPv4 address found");
     } catch (e) {
       try {
         // 2. Fallback to Google DNS lookup for emulator environments

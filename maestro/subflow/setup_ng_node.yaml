@@ -9,7 +9,7 @@ appId: jp.co.twise.twsnmpfm
     timeout: 10000
 - tapOn:
     id: "node_name_field"
-- inputText: "miniPC"
+- inputText: "ng_node"
 - runFlow:
     when:
       platform: Android
@@ -17,7 +17,7 @@ appId: jp.co.twise.twsnmpfm
       - hideKeyboard
 - tapOn:
     id: "node_ip_field"
-- inputText: "192.168.1.210"
+- inputText: "192.168.1.99"
 - runFlow:
     when:
       platform: Android
@@ -31,6 +31,8 @@ appId: jp.co.twise.twsnmpfm
       platform: Android
     commands:
       - hideKeyboard
+- tapOn:
+    id: "ping_switch"
 - tapOn:
     id: "save_node_button"
 - extendedWaitUntil:

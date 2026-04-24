@@ -3,7 +3,7 @@ appId: jp.co.twise.twsnmpfm
 - launchApp:
     clearState: true
 - runFlow:
-    file: setup_minipc.yaml
+    file: subflow/setup_ok_node.yaml
 - tapOn:
     id: "search_button"
 - extendedWaitUntil:

@@ -4,14 +4,15 @@ appId: jp.co.twise.twsnmpfm
     clearState: true
 - runFlow:
     file: subflow/setup_ok_node.yaml
+- runFlow:
+    file: subflow/setup_ng_node.yaml
+- runFlow:
+    file: subflow/setup_cert_ng_node.yaml
 - tapOn:
-    id: "node_menu_button_0"
-- waitForAnimationToEnd
-- tapOn:
-    id: "node_menu_item_hrmib"
+    id: "run_checks_button"
 - extendedWaitUntil:
     visible:
-      id: "hrmib_fab"
+      id: "run_ping_menu"
     timeout: 10000
 - tapOn:
-    id: "hrmib_fab"
+    id: "run_ping_menu"
