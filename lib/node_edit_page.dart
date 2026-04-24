@@ -128,7 +128,7 @@ class NodeEditFormState extends State<NodeEditForm> {
             initialValue: widget.node.name,
             autocorrect: false,
             enableSuggestions: false,
-            keyboardType: TextInputType.text,
+            keyboardType: TextInputType.url,
             validator: (value) {
               if (value == null || value.isEmpty) {
                 return loc.nameError;
@@ -190,7 +190,7 @@ class NodeEditFormState extends State<NodeEditForm> {
           child: TextFormField(
             autocorrect: false,
             enableSuggestions: false,
-            keyboardType: TextInputType.text,
+            keyboardType: TextInputType.visiblePassword,
             initialValue: widget.node.community,
             validator: (value) {
               if (value == null) {

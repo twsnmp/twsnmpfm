@@ -238,6 +238,16 @@ class _CertState extends State<CertPage> {
         identifier: 'cert_target_autocomplete',
         child: Autocomplete<String>(
           initialValue: TextEditingValue(text: _target),
+          fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
+            return TextFormField(
+              controller: controller,
+              focusNode: focusNode,
+              onFieldSubmitted: (value) => onFieldSubmitted(),
+              autocorrect: false,
+              enableSuggestions: false,
+              keyboardType: TextInputType.url,
+            );
+          },
           optionsBuilder: (value) {
             if (value.text.isEmpty) {
               return [];

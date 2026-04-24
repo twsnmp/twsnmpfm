@@ -169,6 +169,16 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
                 identifier: 'ntp_target_autocomplete',
                 child: Autocomplete<String>(
                   initialValue: TextEditingValue(text: _ntpTarget),
+                  fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
+                    return TextFormField(
+                      controller: controller,
+                      focusNode: focusNode,
+                      onFieldSubmitted: (value) => onFieldSubmitted(),
+                      autocorrect: false,
+                      enableSuggestions: false,
+                      keyboardType: TextInputType.url,
+                    );
+                  },
                   optionsBuilder: (value) {
                     if (value.text.isEmpty) {
                       return [];
@@ -246,6 +256,7 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
                 initialValue: _target,
                 autocorrect: false,
                 enableSuggestions: false,
+                keyboardType: TextInputType.url,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return loc?.requiredError;
@@ -316,6 +327,7 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
                 initialValue: _syslogHost,
                 autocorrect: false,
                 enableSuggestions: false,
+                keyboardType: TextInputType.url,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return loc?.requiredError;
@@ -390,6 +402,7 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
                 initialValue: _target,
                 autocorrect: false,
                 enableSuggestions: false,
+                keyboardType: TextInputType.url,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return loc?.requiredError;
@@ -407,6 +420,7 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
                 initialValue: _trapCommunity,
                 autocorrect: false,
                 enableSuggestions: false,
+                keyboardType: TextInputType.visiblePassword,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return loc?.requiredError;
@@ -423,6 +437,16 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
               Text(loc?.trapOID ?? "Trap OID", style: const TextStyle(fontSize: 12)),
               Autocomplete<String>(
                 initialValue: TextEditingValue(text: _trapOID),
+                fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
+                  return TextFormField(
+                    controller: controller,
+                    focusNode: focusNode,
+                    onFieldSubmitted: (value) => onFieldSubmitted(),
+                    autocorrect: false,
+                    enableSuggestions: false,
+                    keyboardType: TextInputType.url,
+                  );
+                },
                 optionsBuilder: (value) {
                   if (value.text.isEmpty) {
                     return [];
@@ -479,6 +503,7 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
                 initialValue: _target,
                 autocorrect: false,
                 enableSuggestions: false,
+                keyboardType: TextInputType.url,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return loc?.requiredError;
@@ -496,6 +521,7 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
                 initialValue: _mailUser,
                 autocorrect: false,
                 enableSuggestions: false,
+                keyboardType: TextInputType.visiblePassword,
                 onChanged: (value) {
                   setState(() {
                     _mailUser = value;
@@ -507,6 +533,7 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
                 initialValue: _mailPassword,
                 autocorrect: false,
                 enableSuggestions: false,
+                keyboardType: TextInputType.visiblePassword,
                 onChanged: (value) {
                   setState(() {
                     _mailPassword = value;

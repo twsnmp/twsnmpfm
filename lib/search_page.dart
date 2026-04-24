@@ -304,7 +304,7 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
                   initialValue: _dnsTarget,
                   autocorrect: false,
                   enableSuggestions: false,
-                  keyboardType: TextInputType.text,
+                  keyboardType: TextInputType.url,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return loc!.requiredError;
@@ -376,7 +376,7 @@ class _SearchState extends State<SearchPage> with SingleTickerProviderStateMixin
                   initialValue: _macAddress,
                   autocorrect: false,
                   enableSuggestions: false,
-                  keyboardType: TextInputType.text,
+                  keyboardType: TextInputType.visiblePassword,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return loc!.requiredError;
