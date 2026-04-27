@@ -14,9 +14,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
       - uses: jdx/mise-action@v2
         with:
           cache: true
+
+      - name: Configure Android SDK
+        run: |
+          flutter config --android-sdk $ANDROID_SDK_ROOT
+          flutter doctor
 
       - name: Build APK
         run: mise run build:apk
