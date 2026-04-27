@@ -12,7 +12,7 @@ TWSNMP For Mobile is the mobile version of the classic SNMP manager "TWSNMP". It
 
 - **Node Management**: Easily add, edit, and categorize network nodes with custom icons (Server, PC, LAN, Cloud).
 - **Connectivity Checks**: 
-  - Periodic and manual PING response confirmation.
+  - Manual PING response confirmation (Single or Batch).
   - SSL/TLS Server Certificate expiration and validity checks (HTTPS, etc.).
 - **SNMP Monitoring Tools**:
   - **MIB Browser**: Explore the MIB tree and retrieve object values using SNMP v1/v2c.
@@ -34,13 +34,36 @@ TWSNMP For Mobile is the mobile version of the classic SNMP manager "TWSNMP". It
   - Multilingual support (English and Japanese).
 
 ## Status
-First version already released.
+Version 3.0.0 released.
 
 - **iOS**: [App Store](https://apps.apple.com/jp/app/twsnmp-for-mobile/id1630463521)
 
-## How to Build
+## How to Build & Test
 
 To build the application from source, ensure you have the [Flutter SDK](https://docs.flutter.dev/get-started/install) installed.
+
+### Using mise (Recommended)
+
+This project uses [mise](https://mise.jdx.dev/) for managing development tools and build tasks.
+
+1. **Install tools**:
+   ```bash
+   mise install
+   ```
+2. **Setup environment (First time only)**:
+   Installs Android SDK components and CocoaPods.
+   ```bash
+   mise run setup
+   ```
+3. **Run tests**:
+   ```bash
+   flutter test
+   ```
+4. **Build for specific platforms**:
+   - **Android APK**: `mise run build:apk`
+   - **iOS IPA**: `mise run build:ios`
+
+### Standard Flutter Commands
 
 1. **Clone the repository**:
    ```bash
@@ -55,38 +78,21 @@ To build the application from source, ensure you have the [Flutter SDK](https://
    ```bash
    flutter run
    ```
-4. **Build for specific platforms**:
-   - **Android**: `flutter build apk`
-   - **iOS**: `flutter build ios`
-   - **macOS**: `flutter build macos`
-
-### Building with mise
-
-This project uses [mise](https://mise.jdx.dev/) for managing development tools and build tasks.
-
-1. **Install tools**:
-   ```bash
-   mise install
-   ```
-2. **Build APK**:
-   ```bash
-   mise run build:apk
-   ```
 
 ## CI/CD
 
 This repository uses GitHub Actions to automatically build the Android APK.
-- **Trigger**: Pushing a tag starting with `v` (e.g., `v1.0.0`).
+- **Trigger**: Pushing a tag starting with `v` (e.g., `v3.0.0`).
 - **Artifact**: The generated APK is automatically uploaded to the GitHub Release.
 
 ## How to Use
 
 1. **Adding Nodes**: Tap the **+** button on the main screen to add a new device. Enter the Name, IP address, and SNMP Community string.
 2. **Monitoring Status**: The main list displays icons for PING and Certificate status. A green check indicates OK, while red or amber indicates issues.
-3. **Accessing Tools**: Tap the **three-dot menu** on a node card to access specific tools like the MIB Browser, Traffic Monitor, or Virtual Panel.
-4. **Mass Checks**: Use the **Play icon** in the top bar to run PING or Certificate checks for all configured nodes manually.
+3. **Manual Check**: Use the **Play icon** in the top bar to run PING or Certificate checks for all nodes, or tap a node to check individually.
+4. **Accessing Tools**: Tap the **three-dot menu** on a node card to access specific tools like the MIB Browser, Traffic Monitor, or Virtual Panel.
 5. **Search**: Tap the **Search icon** in the top bar for DNS lookup or MAC address vendor search.
-6. **Settings**: Use the **Gear icon** in the top bar to adjust check intervals, timeouts, theme, and language settings.
+6. **Settings**: Use the **Gear icon** in the top bar to adjust timeouts, theme, and language settings.
 
 ## Copyright
 
