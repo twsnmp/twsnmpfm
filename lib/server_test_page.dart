@@ -217,28 +217,33 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
                 _errorMsgNTP,
                 style: const TextStyle(fontSize: 12, color: Colors.red),
               ),
-              SizedBox(
-                height: 180,
-                child: TimeLineChart(_createNTPChartData()),
-              ),
-              DataTable(
-                headingTextStyle: TextStyle(
-                  color: dark ? Colors.white : Colors.blueGrey,
-                  fontSize: 14,
+              ExcludeSemantics(
+                child: SizedBox(
+                  height: 180,
+                  child: TimeLineChart(_createNTPChartData()),
                 ),
-                headingRowHeight: 20,
-                dataTextStyle: TextStyle(color: dark ? Colors.white : Colors.black, fontSize: 12),
-                dataRowMinHeight: 10,
-                dataRowMaxHeight: 18,
-                columns: [
-                  DataColumn(
-                    label: Text(loc!.key),
+              ),
+              ExcludeSemantics(
+                child: DataTable(
+                  headingTextStyle: TextStyle(
+                    color: dark ? Colors.white : Colors.blueGrey,
+                    fontSize: 14,
                   ),
-                  DataColumn(
-                    label: Text(loc!.value),
-                  ),
-                ],
-                rows: _ntpStats,
+                  headingRowHeight: 20,
+                  dataTextStyle:
+                      TextStyle(color: dark ? Colors.white : Colors.black, fontSize: 12),
+                  dataRowMinHeight: 10,
+                  dataRowMaxHeight: 18,
+                  columns: [
+                    DataColumn(
+                      label: Text(loc!.key),
+                    ),
+                    DataColumn(
+                      label: Text(loc!.value),
+                    ),
+                  ],
+                  rows: _ntpStats,
+                ),
               ),
             ],
           ),
@@ -362,30 +367,33 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
                 _errorMsgSyslog,
                 style: const TextStyle(fontSize: 12, color: Colors.red),
               ),
-              SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: DataTable(
-                    headingTextStyle: TextStyle(
-                      color: dark ? Colors.white : Colors.blueGrey,
-                      fontSize: 14,
-                    ),
-                    headingRowHeight: 20,
-                    dataTextStyle: TextStyle(color: dark ? Colors.white : Colors.black, fontSize: 12),
-                    dataRowMinHeight: 10,
-                    dataRowMaxHeight: 18,
-                    columns: [
-                      DataColumn(
-                        label: Text(loc?.time ?? "Time"),
+              ExcludeSemantics(
+                child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: DataTable(
+                      headingTextStyle: TextStyle(
+                        color: dark ? Colors.white : Colors.blueGrey,
+                        fontSize: 14,
                       ),
-                      DataColumn(
-                        label: Text(loc?.length ?? "Length"),
-                      ),
-                      DataColumn(
-                        label: Text(loc?.syslogMsg ?? "Message"),
-                      ),
-                    ],
-                    rows: _syslogHist,
-                  )),
+                      headingRowHeight: 20,
+                      dataTextStyle:
+                          TextStyle(color: dark ? Colors.white : Colors.black, fontSize: 12),
+                      dataRowMinHeight: 10,
+                      dataRowMaxHeight: 18,
+                      columns: [
+                        DataColumn(
+                          label: Text(loc?.time ?? "Time"),
+                        ),
+                        DataColumn(
+                          label: Text(loc?.length ?? "Length"),
+                        ),
+                        DataColumn(
+                          label: Text(loc?.syslogMsg ?? "Message"),
+                        ),
+                      ],
+                      rows: _syslogHist,
+                    )),
+              ),
             ],
           ),
         ),
@@ -414,7 +422,8 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
                     _target = value;
                   });
                 },
-                decoration: InputDecoration(icon: const Icon(Icons.lan), labelText: loc?.server, hintText: loc?.server),
+                decoration: InputDecoration(
+                    icon: const Icon(Icons.lan), labelText: loc?.server, hintText: loc?.server),
               ),
               TextFormField(
                 initialValue: _trapCommunity,
@@ -432,7 +441,10 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
                     _trapCommunity = value;
                   });
                 },
-                decoration: InputDecoration(icon: const Icon(Icons.password), labelText: loc?.community, hintText: loc?.community),
+                decoration: InputDecoration(
+                    icon: const Icon(Icons.password),
+                    labelText: loc?.community,
+                    hintText: loc?.community),
               ),
               Text(loc?.trapOID ?? "Trap OID", style: const TextStyle(fontSize: 12)),
               Autocomplete<String>(
@@ -463,30 +475,33 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
                 _errorMsgTrap,
                 style: const TextStyle(fontSize: 12, color: Colors.red),
               ),
-              SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: DataTable(
-                    headingTextStyle: TextStyle(
-                      color: dark ? Colors.white : Colors.blueGrey,
-                      fontSize: 14,
-                    ),
-                    headingRowHeight: 20,
-                    dataTextStyle: TextStyle(color: dark ? Colors.white : Colors.black, fontSize: 12),
-                    dataRowMinHeight: 10,
-                    dataRowMaxHeight: 18,
-                    columns: [
-                      DataColumn(
-                        label: Text(loc?.time ?? "Time"),
+              ExcludeSemantics(
+                child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: DataTable(
+                      headingTextStyle: TextStyle(
+                        color: dark ? Colors.white : Colors.blueGrey,
+                        fontSize: 14,
                       ),
-                      DataColumn(
-                        label: Text(loc?.length ?? "Length"),
-                      ),
-                      DataColumn(
-                        label: Text(loc?.trapOID ?? "SNMP Trap OID"),
-                      ),
-                    ],
-                    rows: _trapHist,
-                  )),
+                      headingRowHeight: 20,
+                      dataTextStyle:
+                          TextStyle(color: dark ? Colors.white : Colors.black, fontSize: 12),
+                      dataRowMinHeight: 10,
+                      dataRowMaxHeight: 18,
+                      columns: [
+                        DataColumn(
+                          label: Text(loc?.time ?? "Time"),
+                        ),
+                        DataColumn(
+                          label: Text(loc?.length ?? "Length"),
+                        ),
+                        DataColumn(
+                          label: Text(loc?.trapOID ?? "SNMP Trap OID"),
+                        ),
+                      ],
+                      rows: _trapHist,
+                    )),
+              ),
             ],
           ),
         ),
@@ -515,7 +530,8 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
                     _target = value;
                   });
                 },
-                decoration: InputDecoration(icon: const Icon(Icons.lan), labelText: loc?.server, hintText: loc?.server),
+                decoration: InputDecoration(
+                    icon: const Icon(Icons.lan), labelText: loc?.server, hintText: loc?.server),
               ),
               TextFormField(
                 initialValue: _mailUser,
@@ -527,7 +543,10 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
                     _mailUser = value;
                   });
                 },
-                decoration: InputDecoration(icon: const Icon(Icons.account_circle), labelText: loc?.user, hintText: loc?.user),
+                decoration: InputDecoration(
+                    icon: const Icon(Icons.account_circle),
+                    labelText: loc?.user,
+                    hintText: loc?.user),
               ),
               TextFormField(
                 initialValue: _mailPassword,
@@ -539,7 +558,10 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
                     _mailPassword = value;
                   });
                 },
-                decoration: InputDecoration(icon: const Icon(Icons.password), labelText: loc?.password, hintText: loc?.password),
+                decoration: InputDecoration(
+                    icon: const Icon(Icons.password),
+                    labelText: loc?.password,
+                    hintText: loc?.password),
               ),
               TextFormField(
                 initialValue: _mailFrom,
@@ -557,7 +579,10 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
                     _mailFrom = value;
                   });
                 },
-                decoration: InputDecoration(icon: const Icon(Icons.person), labelText: loc?.mailFrom, hintText: loc?.mailFrom),
+                decoration: InputDecoration(
+                    icon: const Icon(Icons.person),
+                    labelText: loc?.mailFrom,
+                    hintText: loc?.mailFrom),
               ),
               TextFormField(
                 initialValue: _mailTo,
@@ -575,7 +600,8 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
                     _mailTo = value;
                   });
                 },
-                decoration: InputDecoration(icon: const Icon(Icons.person), labelText: loc?.mailTo, hintText: loc?.mailTo),
+                decoration: InputDecoration(
+                    icon: const Icon(Icons.person), labelText: loc?.mailTo, hintText: loc?.mailTo),
               ),
               TextFormField(
                 initialValue: _mailSubject,
@@ -592,7 +618,10 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
                     _mailSubject = value;
                   });
                 },
-                decoration: InputDecoration(icon: const Icon(Icons.subject), labelText: loc?.mailSubject, hintText: loc?.mailSubject),
+                decoration: InputDecoration(
+                    icon: const Icon(Icons.subject),
+                    labelText: loc?.mailSubject,
+                    hintText: loc?.mailSubject),
               ),
               TextFormField(
                 initialValue: _mailBody,
@@ -609,36 +638,42 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
                     _mailBody = value;
                   });
                 },
-                decoration: InputDecoration(icon: const Icon(Icons.email), labelText: loc?.mailBody, hintText: loc?.mailBody),
+                decoration: InputDecoration(
+                    icon: const Icon(Icons.email),
+                    labelText: loc?.mailBody,
+                    hintText: loc?.mailBody),
               ),
               Text(
                 _errorMsgMail,
                 style: const TextStyle(fontSize: 12, color: Colors.red),
               ),
-              SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: DataTable(
-                    headingTextStyle: TextStyle(
-                      color: dark ? Colors.white : Colors.blueGrey,
-                      fontSize: 14,
-                    ),
-                    headingRowHeight: 20,
-                    dataTextStyle: TextStyle(color: dark ? Colors.white : Colors.black, fontSize: 12),
-                    dataRowMinHeight: 10,
-                    dataRowMaxHeight: 18,
-                    columns: [
-                      DataColumn(
-                        label: Text(loc?.time ?? "Time"),
+              ExcludeSemantics(
+                child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: DataTable(
+                      headingTextStyle: TextStyle(
+                        color: dark ? Colors.white : Colors.blueGrey,
+                        fontSize: 14,
                       ),
-                      DataColumn(
-                        label: Text(loc?.mailSubject ?? "Subject"),
-                      ),
-                      DataColumn(
-                        label: Text(loc?.status ?? "Status"),
-                      ),
-                    ],
-                    rows: _mailHist,
-                  )),
+                      headingRowHeight: 20,
+                      dataTextStyle:
+                          TextStyle(color: dark ? Colors.white : Colors.black, fontSize: 12),
+                      dataRowMinHeight: 10,
+                      dataRowMaxHeight: 18,
+                      columns: [
+                        DataColumn(
+                          label: Text(loc?.time ?? "Time"),
+                        ),
+                        DataColumn(
+                          label: Text(loc?.mailSubject ?? "Subject"),
+                        ),
+                        DataColumn(
+                          label: Text(loc?.status ?? "Status"),
+                        ),
+                      ],
+                      rows: _mailHist,
+                    )),
+              ),
             ],
           ),
         ),
@@ -952,21 +987,37 @@ class _ServerTestState extends State<ServerTestPage> with SingleTickerProviderSt
         title: Text("${loc!.serverTest} ${widget.node.name}"),
         bottom: TabBar(
           controller: _tabController,
-          tabs: const [
+          tabs: [
             Tab(
-              child: Text("NTP", style: TextStyle(fontSize: 12)),
-            ),
-            Tab(
-              child: Text(
-                "syslog",
-                style: TextStyle(fontSize: 10),
+              key: const ValueKey("tab_ntp"),
+              child: Semantics(
+                identifier: "tab_ntp",
+                child: const Text("NTP", style: TextStyle(fontSize: 12)),
               ),
             ),
             Tab(
-              child: Text("Trap", style: TextStyle(fontSize: 12)),
+              key: const ValueKey("tab_syslog"),
+              child: Semantics(
+                identifier: "tab_syslog",
+                child: const Text(
+                  "syslog",
+                  style: TextStyle(fontSize: 10),
+                ),
+              ),
             ),
             Tab(
-              child: Text("Mail", style: TextStyle(fontSize: 12)),
+              key: const ValueKey("tab_trap"),
+              child: Semantics(
+                identifier: "tab_trap",
+                child: const Text("Trap", style: TextStyle(fontSize: 12)),
+              ),
+            ),
+            Tab(
+              key: const ValueKey("tab_mail"),
+              child: Semantics(
+                identifier: "tab_mail",
+                child: const Text("Mail", style: TextStyle(fontSize: 12)),
+              ),
             ),
           ],
         ),

@@ -1,0 +1,30 @@
+appId: jp.co.twise.twsnmpfm
+---
+- launchApp:
+    clearState: true
+- startRecording: maestro/demo/record/traffic
+- runFlow:
+    file: ../subflow/setup_ok_node.yaml
+- tapOn:
+    id: "node_menu_button_0"
+- waitForAnimationToEnd
+- tapOn:
+    id: "node_menu_item_traffic"
+- extendedWaitUntil:
+    visible:
+      id: "traffic_fab"
+    timeout: 10000
+- tapOn:
+    id: "traffic_target_dropdown"
+- tapOn: "tcp"
+- tapOn:
+    id: "traffic_fab"
+- waitForAnimationToEnd
+- extendedWaitUntil:
+    visible:
+      id: "this_id_does_not_exist"
+    timeout: 10000
+    optional: true
+- tapOn:
+    id: "traffic_fab" # Stop
+- stopRecording

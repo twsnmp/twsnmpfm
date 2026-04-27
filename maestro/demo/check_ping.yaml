@@ -1,0 +1,25 @@
+appId: jp.co.twise.twsnmpfm
+---
+- launchApp:
+    clearState: true
+- startRecording: maestro/demo/record/check_ping
+- runFlow:
+    file: ../subflow/setup_ok_node.yaml
+- runFlow:
+    file: ../subflow/setup_ng_node.yaml
+- runFlow:
+    file: ../subflow/setup_cert_ng_node.yaml
+- tapOn:
+    id: "run_checks_button"
+- extendedWaitUntil:
+    visible:
+      id: "run_ping_menu"
+    timeout: 10000
+- tapOn:
+    id: "run_ping_menu"
+- extendedWaitUntil:
+    visible:
+      id: "this_id_does_not_exist"
+    timeout: 5000
+    optional: true
+- stopRecording

@@ -2,8 +2,9 @@ appId: jp.co.twise.twsnmpfm
 ---
 - launchApp:
     clearState: true
+- startRecording: maestro/demo/record/server_test
 - runFlow:
-    file: subflow/setup_ok_node.yaml
+    file: ../subflow/setup_ok_node.yaml
 - tapOn:
     id: "node_menu_button_0"
 - waitForAnimationToEnd
@@ -17,3 +18,4 @@ appId: jp.co.twise.twsnmpfm
 - tapOn: "Trap.*"
 - tapOn: "Mail.*"
 - tapOn: "NTP.*"
+- stopRecording

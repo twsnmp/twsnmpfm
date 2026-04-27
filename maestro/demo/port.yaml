@@ -1,0 +1,30 @@
+appId: jp.co.twise.twsnmpfm
+---
+- launchApp:
+    clearState: true
+- startRecording: maestro/demo/record/port
+- runFlow:
+    file: ../subflow/setup_ok_node.yaml
+- tapOn:
+    id: "node_menu_button_0"
+- waitForAnimationToEnd
+- tapOn:
+    id: "node_menu_item_port"
+- extendedWaitUntil:
+    visible:
+      id: "port_fab"
+    timeout: 10000
+- tapOn:
+    id: "port_protocol_dropdown"
+- tapOn: "UDP"
+- tapOn:
+    id: "port_fab"
+- waitForAnimationToEnd
+- tapOn:
+    id: "port_fab"
+- extendedWaitUntil:
+    visible:
+      id: "this_id_does_not_exist"
+    timeout: 5000
+    optional: true
+- stopRecording

@@ -1,0 +1,29 @@
+appId: jp.co.twise.twsnmpfm
+---
+- launchApp:
+    clearState: true
+- startRecording: maestro/demo/record/ping
+- runFlow:
+    file: ../subflow/setup_ok_node.yaml
+- tapOn:
+    id: "node_menu_button_0"
+- waitForAnimationToEnd
+- tapOn:
+    id: "node_menu_item_ping"
+- extendedWaitUntil:
+    visible:
+      id: "ping_fab"
+    timeout: 10000
+- tapOn:
+    id: "ping_beep_switch"
+- tapOn:
+    id: "ping_fab"
+- extendedWaitUntil:
+    visible:
+      text: "ping done.*"
+    timeout: 30000
+- waitForAnimationToEnd:
+    timeout: 2000
+- stopRecording
+
+
