@@ -60,6 +60,7 @@ TWSNMP For Mobile is the mobile version of the classic SNMP manager "TWSNMP". It
 Version 3.0.0 released.
 
 - **iOS**: [App Store](https://apps.apple.com/jp/app/twsnmp-for-mobile/id1630463521)
+- **Android**: [GitHub Releases](https://github.com/twsnmp/twsnmpfm/releases)
 
 ## How to Build & Test
 

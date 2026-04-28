@@ -46,6 +46,7 @@ TWSNMP For Mobileは、長年親しまれているSNMPマネージャ「TWSNMP�
 バージョン 3.0.0 をリリース済み。
 
 - **iOS**: [App Store](https://apps.apple.com/jp/app/twsnmp-for-mobile/id1630463521)
+- **Android**: [GitHub リリース](https://github.com/twsnmp/twsnmpfm/releases)
 
 ## ビルド・テスト方法
 
