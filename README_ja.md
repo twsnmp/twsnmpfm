@@ -2,6 +2,8 @@
 
 [English Version](README.md)
 
+![twsnmpfm](images/twsnmpfm.png)
+
 TWSNMP For Mobile - ポケットに入る本格的ネットワーク管理ツール
 
 ## 概要
@@ -11,15 +13,22 @@ TWSNMP For Mobileは、長年親しまれているSNMPマネージャ「TWSNMP�
 ## 主な機能
 
 - **ノード管理**: ネットワーク機器をノードとして登録し、アイコン（サーバー、PC、ネットワーク、クラウド）で視覚的に分類・管理できます。
+  <img src="images/check_ping.png" width="300">
 - **応答確認**:
   - PINGによる手動（個別・一括）の応答確認。
+    <img src="images/ping.png" width="300">
   - SSL/TLSサーバー証明書の有効期限および妥当性のチェック。
+    <img src="images/cert.png" width="300">
 - **SNMP監視ツール**:
   - **MIBブラウザー**: MIBツリーを探索し、SNMP v1/v2cでオブジェクトの値を取得。
+    <img src="images/mib_browser.png" width="300">
   - **トラフィックモニター**: 通信量をリアルタイムでグラフ表示。
+    <img src="images/traffic.png" width="300">
   - **仮想パネル**: LANポートのリンク状態（Up/Down）をパネル形式で表示。
+    <img src="images/vpanel.png" width="300">
   - **ホストリソース**: CPU、メモリ、ディスクの使用量を監視（Host Resource MIB）。
   - **プロセスリスト**: 動作中のプロセス一覧を取得.
+    <img src="images/process.png" width="300">
   - **ポートリスト**: TCP/UDPポートの待機・通信状態を確認。
 - **サーバーテスト**:
   - SyslogメッセージやSNMPトラップの送信テスト。
@@ -93,6 +102,22 @@ GitHub Actions を使用して、Android APK を自動的にビルドします�
 4. **ツールの使用**: 各ノードの **三点リーダーメニュー** をタップすると、MIBブラウザーやトラフィックモニターなどの詳細ツールを起動できます。
 5. **検索**: 上部バーの **検索アイコン** から、DNS検索やMACアドレス検索が可能です。
 6. **設定**: 上部バーの **歯車アイコン** から、タイムアウト、テーマや言語の設定の切り替えなどが可能です。
+
+## デモ動画
+
+### PING
+
+<video src="https://github.com/twsnmp/twsnmpfm/raw/refs/heads/main/maestro/demo/record/ping.mp4" width="50%" autoplay loop muted playsinline>
+</video>
+
+### 証明書チェック
+
+<video src="https://github.com/twsnmp/twsnmpfm/raw/refs/heads/main/maestro/demo/record/check_cert.mp4" width="50%" autoplay loop muted playsinline>
+</video>
+
+
+
+[デモ動画のフォルダー](./maestro/demo/record/)
 
 ## Copyright
 
