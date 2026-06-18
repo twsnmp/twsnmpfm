@@ -120,7 +120,7 @@ This repository uses GitHub Actions to automatically build the Android APK.
 
 ## Copyright
 
-see ./LICENSE
+See [LICENSE](LICENSE)
 
 ```
 Copyright 2022-2026 Masayuki Yamai
